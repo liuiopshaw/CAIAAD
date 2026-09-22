@@ -1,0 +1,97 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environments
+.env
+.venv
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test files
+test_*.py
+*_test.py
+simple_test.py
+quick_test.py
+full_test.py
+# Allow performance test scripts
+!test_cda_performance.py
+TEST_REPORT.md
+FIX_REPORT.md
+tests/
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# AI Assistant configuration
+CLAUDE.md
+AGENT.md
+
+# Output files
+outputs/
+# SFT数据集文件夹（不提交到repo）
+sft_datasets/
+sft_datasets_converted/
+SFT_Generation_Package/
+README_SFT_GENERATION.md
+.venv312/
+
+# Literature full-text and training data (copyright-sensitive / large, regenerable)
+data/literature/texts/
+data/training/
+data/training_enhanced/
+data/training_v2/
+
+# Non-core docs stay local; all scripts/ are part of the project
+docs/
+
+# Project-specific files (local only)
+CHANGELOG.md
+batch_generate.sh
+ASA评分李克特量表docx.docx
+Revision Notes.docx
+
+# Example files (local only)
+examples/
+PROJECT_REVIEW.md
+
+# Large local assets (never upload)
+models/
+智能体建库文献/
+src.zip
+.claude/
