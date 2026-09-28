@@ -22,7 +22,7 @@ from collections import Counter
 from pathlib import Path
 
 PROJECT_ROOT = Path(os.environ.get("CU_AGENT_ROOT", str(Path(__file__).resolve().parent.parent)))
-BASE_DIR = Path(PROJECT_ROOT) / "智能体建库文献"
+BASE_DIR = Path(PROJECT_ROOT) / "agent_literature"
 OUT_DIR = Path(PROJECT_ROOT) / "data" / "literature"
 TEXT_DIR = OUT_DIR / "texts"
 CSV_PATH = OUT_DIR / "literature_index.csv"
@@ -34,7 +34,7 @@ CSV_PATH = OUT_DIR / "literature_index.csv"
 TAG_TEXT_CHARS = 8000
 
 # ---------------------------------------------------------------------------
-# Tagging rules (Chinese + English keywords)
+# Tagging rules (English keywords)
 # ---------------------------------------------------------------------------
 
 BIOLOGIC_KEYWORDS = [
@@ -42,54 +42,47 @@ BIOLOGIC_KEYWORDS = [
     "enzyme replacement", "vaccine", "immunization", "aav", "adeno-associated",
     "sirna", "small interfering rna", "mrna", "aptamer", "oligonucleotide",
     "antisense", "gene therapy", "stem cell", "exosome",
-    "抗体", "单抗", "单克隆", "多肽", "肽类", "蛋白", "疫苗", "适配体",
-    "核酸适配体", "基因治疗", "干细胞", "外泌体", "寡核苷酸",
 ]
 
 SMALL_MOLECULE_KEYWORDS = [
     "small molecule", "small-molecule", "inhibitor", "agonist", "antagonist",
     "donepezil", "memantine", "rivastigmine", "galantamine", "aducanumab",
     "lecanemab", "drug candidate", "pharmacokinetic", "bioavailability",
-    "小分子", "抑制剂", "激动剂", "拮抗剂", "多奈哌齐", "美金刚", "卡巴拉汀",
-    "加兰他敏", "药代动力学", "生物利用度",
 ]
 
 NANOMATERIAL_KEYWORDS = [
     "nanoparticle", "nanomaterial", "nanocluster", "nano-cluster", "nanozyme",
     "nanocomposite", "nanostructure", "nanocarrier", "nanodrug", "nanosheet",
     "nanorod", "nanowire", "nanotube", "quantum dot", "nano ", "nano-",
-    "纳米",
 ]
 
-NANOCLUSTER_KEYWORDS = ["nanocluster", "nano-cluster", "cluster", "团簇"]
+NANOCLUSTER_KEYWORDS = ["nanocluster", "nano-cluster", "cluster"]
 
 MECHANISM_KEYWORDS = {
     "gut_microbiome": [
         "gut microbiota", "gut microbiome", "gut-brain", "gut brain axis",
         "intestinal flora", "intestinal microbiota", "microbiota-gut-brain",
-        "肠道菌群", "肠道微生物", "肠脑轴", "肠-脑轴", "菌群",
     ],
     "amyloid": [
-        "amyloid", "aβ", "abeta", "β-amyloid", "淀粉样", "β淀粉样",
+        "amyloid", "aβ", "abeta", "β-amyloid",
     ],
     "tau": [
         "tau protein", "tau phosphorylation", "phosphorylated tau",
-        "p-tau", "tau pathology", "tau ", "tau蛋白", "磷酸化tau", "tau磷酸化",
+        "p-tau", "tau pathology", "tau ",
     ],
     "neuroinflammation": [
         "neuroinflammation", "microglia", "astrocyte", "neuroimmune",
-        "神经炎症", "小胶质细胞", "星形胶质细胞",
     ],
-    "autophagy": ["autophagy", "autophagic", "自噬"],
+    "autophagy": ["autophagy", "autophagic"],
     "antioxidant": [
         "antioxidant", "reactive oxygen", "ros ", "oxidative stress",
-        "superoxide", "抗氧化", "活性氧", "氧化应激",
+        "superoxide",
     ],
 }
 
 CU_PATTERN = re.compile(r"\bCu\b")
-CU_KEYWORDS = ["copper", "铜"]
-CYCLODEXTRIN_KEYWORDS = ["cyclodextrin", "环糊精"]
+CU_KEYWORDS = ["copper"]
+CYCLODEXTRIN_KEYWORDS = ["cyclodextrin"]
 
 CSV_FIELDS = [
     "relpath", "topic_dir", "sha256", "is_duplicate", "pages", "chars",

@@ -64,7 +64,7 @@ AGENT.md
 
 # Output files
 outputs/
-# SFT数据集文件夹（不提交到repo）
+# SFT dataset folders (not committed to repo)
 sft_datasets/
 sft_datasets_converted/
 SFT_Generation_Package/
@@ -83,7 +83,7 @@ docs/
 # Project-specific files (local only)
 CHANGELOG.md
 batch_generate.sh
-ASA评分李克特量表docx.docx
+ASA_likert_scale.docx
 Revision Notes.docx
 
 # Example files (local only)
@@ -92,6 +92,6 @@ PROJECT_REVIEW.md
 
 # Large local assets (never upload)
 models/
-智能体建库文献/
+agent_literature/
 src.zip
 .claude/

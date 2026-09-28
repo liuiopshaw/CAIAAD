@@ -36,12 +36,12 @@
       1
     ]
   },
-  "labels_zh": {
-    "delivery_efficiency": "靶组织递送效率(30%)",
-    "multi_target_synergy": "多靶点协同潜力(15%)",
-    "durability": "效应持续时间(10%)",
-    "manufacturability": "生产质控与精准调控能力(25%)",
-    "biosafety": "生物安全性(20%)"
+  "labels": {
+    "delivery_efficiency": "Target-tissue delivery efficiency (30%)",
+    "multi_target_synergy": "Multi-target synergy potential (15%)",
+    "durability": "Effect duration (10%)",
+    "manufacturability": "Manufacturing QC & precise tunability (25%)",
+    "biosafety": "Biosafety (20%)"
   },
-  "standard_source": "评分标准/标准.md (中性六维评估框架,无主观加分)"
+  "standard_source": "rubric/rubric.md (neutral six-dimension framework, no subjective bonuses)"
 }

@@ -14,7 +14,7 @@ from pathlib import Path
 from collections import defaultdict
 
 PROJECT_ROOT = Path(os.environ.get("CU_AGENT_ROOT", str(Path(__file__).resolve().parent.parent)))
-BASE_DIR = Path(PROJECT_ROOT) / "智能体建库文献"
+BASE_DIR = Path(PROJECT_ROOT) / "agent_literature"
 OUTPUT_DIR = Path(PROJECT_ROOT) / "data" / "training"
 V2_OUTPUT_DIR = Path(PROJECT_ROOT) / "data" / "training_v2"
 LITERATURE_DIR = Path(PROJECT_ROOT) / "data" / "literature"
@@ -22,32 +22,32 @@ TEXT_DIR = LITERATURE_DIR / "texts"
 INDEX_CSV = LITERATURE_DIR / "literature_index.csv"
 MIX_CONFIG = Path(__file__).with_name("data_mix_config.json")
 
-# Topic → Agent mapping (all 16 topic dirs covered; duplicates below)
+# Topic → Agent mapping (all topic dirs covered; duplicates below)
 TOPIC_AGENTS = {
-    "1 阿尔兹海默症": ["mma", "ea"],            # basic info (medicine-related)
-    "2 阿尔兹海默症的治疗": ["bsa", "mma", "ca"],  # treatment (incl. small molecules/biologics)
-    "3 肠道菌群": ["apa", "mma", "ea"],
-    "4 纳米材料的纳米医学应用": ["ea", "epa", "bsa", "ca"],
-    "5 纳米材料抗菌": ["apa", "ea"],
-    "6 金属纳米团簇的合成策略": ["ea", "epa"],
-    "7 注射治疗方式": ["bsa"],                   # administration route → biosafety
-    "8环糊精": ["ea", "mma"],
-    "9团簇结构": ["ea", "epa"],
-    "10 选择性抗菌": ["apa", "mma"],
-    "DFT": ["epa", "mma"],
-    "酶活性": ["epa"],
-    "铜环糊精": ["ea", "apa", "epa", "mma"],
+    "01_alzheimers": ["mma", "ea"],                  # basic info (medicine-related)
+    "02_alzheimers_treatment": ["bsa", "mma", "ca"], # treatment (incl. small molecules/biologics)
+    "03_gut_microbiome": ["apa", "mma", "ea"],
+    "04_nanomaterial_nanomedicine": ["ea", "epa", "bsa", "ca"],
+    "05_nanomaterial_antibacterial": ["apa", "ea"],
+    "06_metal_nanocluster_synthesis": ["ea", "epa"],
+    "07_injection_delivery": ["bsa"],                # administration route → biosafety
+    "08_cyclodextrin": ["ea", "mma"],
+    "09_cluster_structure": ["ea", "epa"],
+    "10_selective_antibacterial": ["apa", "mma"],
+    "dft": ["epa", "mma"],
+    "enzyme_activity": ["epa"],
+    "copper_cyclodextrin": ["ea", "apa", "epa", "mma"],
     # Cu x gut-microbiome cross-domain supplement (finetune/fetch_cross_lit.py)
-    "11 补充-Cu菌群交叉": ["ea", "apa", "epa", "bsa", "mma", "ca"],
+    "11_supplement_cu_microbiome_cross": ["ea", "apa", "epa", "bsa", "mma", "ca"],
 }
 
 # Duplicate topic dirs (byte-identical content per finetune/literature_index.py).
 # Exact-name match, checked BEFORE TOPIC_AGENTS substring matching; only the
 # canonical dir is mapped, consistent with the index's is_duplicate flag.
 DUPLICATE_TOPIC_DIRS = {
-    "7 注射治疗方式×": "7 注射治疗方式",
-    "DFT理论（10篇）": "DFT理论",
-    "铜环糊精（10篇）": "铜环糊精",
+    "07_injection_delivery_dup": "07_injection_delivery",
+    "dft_theory_10papers": "dft_theory",
+    "copper_cyclodextrin_10papers": "copper_cyclodextrin",
 }
 
 

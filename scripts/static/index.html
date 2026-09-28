@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nano-Bio Evaluator · coordinator 编排</title>
+<title>Nano-Bio Evaluator · Coordinator Orchestration</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
     background: #ffffff; color: #1f2329; height: 100vh; display: flex; overflow: hidden;
   }
-  /* ---------- 侧边栏 ---------- */
+  /* ---------- Sidebar ---------- */
   #sidebar {
     width: 260px; min-width: 260px; background: #f7f7f8; border-right: 1px solid #e5e6eb;
     display: flex; flex-direction: column; padding: 12px;
@@ -37,19 +37,19 @@
   .dot { width: 8px; height: 8px; border-radius: 50%; background: #c0c4cc; flex-shrink: 0; }
   .dot.ok { background: #34a853; }
   .dot.bad { background: #ea4335; }
-  /* ---------- 主区域 ---------- */
+  /* ---------- Main area ---------- */
   #main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
   #chat-flow { flex: 1; overflow-y: auto; padding: 24px 0; }
   .wrap { max-width: 800px; margin: 0 auto; padding: 0 24px; }
   #empty-hint { text-align: center; color: #8a8f99; margin-top: 18vh; }
   #empty-hint h1 { font-size: 22px; font-weight: 600; color: #1f2329; margin-bottom: 8px; }
-  /* 用户气泡 */
+  /* User bubble */
   .msg-user { display: flex; justify-content: flex-end; margin-bottom: 16px; }
   .msg-user .bubble {
     background: #e3e7fd; border-radius: 16px 16px 4px 16px; padding: 10px 14px;
     max-width: 75%; font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-word;
   }
-  /* 助手区(卡片流) */
+  /* Assistant area (card stream) */
   .msg-assistant { margin-bottom: 20px; }
   .card {
     border: 1px solid #e5e6eb; border-radius: 12px; margin-bottom: 10px;
@@ -80,7 +80,7 @@
     font-family: Consolas, "Courier New", monospace; color: #4e5564;
     max-height: 320px; overflow-y: auto;
   }
-  /* 汇总卡片 Markdown */
+  /* Summary card Markdown */
   .md { font-size: 14px; line-height: 1.7; }
   .md h1, .md h2, .md h3 { margin: 12px 0 6px; font-weight: 600; }
   .md h1 { font-size: 18px; } .md h2 { font-size: 16px; } .md h3 { font-size: 15px; }
@@ -89,14 +89,14 @@
   .md th, .md td { border: 1px solid #e5e6eb; padding: 5px 10px; text-align: left; }
   .md th { background: #f7f7f8; }
   .md p { margin: 6px 0; }
-  /* 错误提示 */
+  /* Error message */
   .error-box {
     background: #fef0f0; border: 1px solid #fde2e2; color: #d03030;
     border-radius: 10px; padding: 10px 14px; font-size: 13px; margin-bottom: 12px;
     white-space: pre-wrap; word-break: break-word;
   }
   .run-dir-note { font-size: 12px; color: #8a8f99; margin: 4px 0 16px; word-break: break-all; }
-  /* ---------- 输入区 ---------- */
+  /* ---------- Input area ---------- */
   #input-area { border-top: 1px solid #f0f0f2; padding: 14px 0 18px; }
   #input-box {
     max-width: 800px; margin: 0 auto; padding: 0 24px; display: flex; gap: 10px; align-items: flex-end;
@@ -116,24 +116,24 @@
 </head>
 <body>
   <aside id="sidebar">
-    <button id="new-chat"><span class="plus">＋</span> 新对话</button>
+    <button id="new-chat"><span class="plus">＋</span> New Chat</button>
     <div id="session-list"></div>
-    <div id="llm-status"><span class="dot" id="llm-dot"></span><span id="llm-text">LLM 服务器:检测中…</span></div>
+    <div id="llm-status"><span class="dot" id="llm-dot"></span><span id="llm-text">LLM server: detecting…</span></div>
   </aside>
   <main id="main">
     <div id="chat-flow">
       <div class="wrap">
         <div id="empty-hint">
           <h1>Nano-Bio Evaluator</h1>
-          <p>coordinator 编排入口 —— 输入研究需求,将依次执行 任务规划 → 创意设计 → 抗菌/酶活/安全评估 → 机理分析 → 汇总报告</p>
+          <p>Coordinator orchestration entry — enter a research need; the pipeline runs task planning → creative design → antibacterial / enzyme-activity / safety evaluation → mechanism analysis → summary report</p>
         </div>
         <div id="messages"></div>
       </div>
     </div>
     <div id="input-area">
       <div id="input-box">
-        <textarea id="msg-input" rows="1" placeholder="输入研究需求,Enter 发送(Shift+Enter 换行)"></textarea>
-        <button id="send-btn" title="发送">↑</button>
+        <textarea id="msg-input" rows="1" placeholder="Enter a research need; press Enter to send (Shift+Enter for a newline)"></textarea>
+        <button id="send-btn" title="Send">↑</button>
       </div>
     </div>
   </main>
@@ -143,8 +143,9 @@
   "use strict";
 
   var AGENT_NAMES = {
-    designer: "创意设计师", manufacturing: "抗菌评估", delivery: "酶活评估",
-    safety: "安全评估", mechanism: "机理分析", ranker: "汇总报告"
+    designer: "Creative Designer", manufacturing: "Antibacterial Eval",
+    delivery: "Enzyme-Activity Eval", safety: "Safety Eval",
+    mechanism: "Mechanism Analysis", ranker: "Summary Report"
   };
 
   var sessionId = null;
@@ -158,7 +159,7 @@
   var llmDot = document.getElementById("llm-dot");
   var llmText = document.getElementById("llm-text");
 
-  // ---------- 工具 ----------
+  // ---------- Utils ----------
   function el(tag, cls, text) {
     var e = document.createElement(tag);
     if (cls) e.className = cls;
@@ -174,7 +175,7 @@
             .replace(/"/g, "&quot;");
   }
 
-  // 简单 Markdown 渲染:标题 / 加粗 / 无序列表 / 表格(先转义 HTML)
+  // Simple Markdown renderer: headings / bold / unordered lists / tables (HTML-escaped first)
   function renderMarkdown(src) {
     var lines = src.split("\n");
     var html = [];
@@ -193,7 +194,7 @@
         closeList();
         var cells = t.replace(/^\|/, "").replace(/\|$/, "").split("|")
                      .map(function (c) { return c.trim(); });
-        // 跳过分隔行 |---|---|
+        // skip separator rows |---|---|
         if (cells.every(function (c) { return /^:?-{2,}:?$/.test(c); })) continue;
         if (!inTable) { html.push("<table>"); inTable = true; }
         var isHead = i + 1 < lines.length &&
@@ -224,7 +225,7 @@
     return html.join("");
   }
 
-  // ---------- 卡片 ----------
+  // ---------- Cards ----------
   function makeCard(title, meta) {
     var card = el("div", "card");
     var head = el("div", "card-head");
@@ -253,24 +254,25 @@
     };
   }
 
-  // ---------- 编排一轮对话 ----------
+  // ---------- Orchestrate one turn ----------
   function addUserMessage(text) {
     var row = el("div", "msg-user");
     row.appendChild(el("div", "bubble", text));
     messagesEl.appendChild(row);
   }
 
-  // 事件渲染器:实时 SSE 流与会话回放共用。
-  // agent_done 事件带 content 时,在卡片内展示该 agent 的原始输出。
+  // Event renderer: shared by the live SSE stream and session replay.
+  // When an agent_done event carries content, show the agent's raw output in its card.
   function createRenderer(area) {
-    var agentCards = {};   // key: agent 或 agent#batch -> card
+    var agentCards = {};   // key: agent or agent#batch -> card
     function agentKey(agent, batch) {
-      // 批量 agent(designer)按批次建卡;分块 agent(manufacturing/delivery/safety/mechanism)合并为一张卡
+      // batched agent (designer) gets one card per batch; chunked agents
+      // (manufacturing/delivery/safety/mechanism) merge into one card
       return agent === "designer" ? agent + "#" + batch : agent;
     }
     function agentTitle(agent, batch) {
       var name = AGENT_NAMES[agent] || agent;
-      return agent === "designer" ? name + " · 批次 " + batch : name;
+      return agent === "designer" ? name + " · batch " + batch : name;
     }
     function getAgentCard(agent, batch) {
       var key = agentKey(agent, batch);
@@ -284,7 +286,7 @@
     }
     return function handleEvent(ev) {
       if (ev.type === "plan") {
-        var planCard = makeCard("任务规划", "");
+        var planCard = makeCard("Task Planning", "");
         planCard.setStatus("done");
         var pre = el("pre"); pre.textContent = ev.content;
         planCard.body.appendChild(pre);
@@ -293,13 +295,13 @@
         getAgentCard(ev.agent, ev.batch);
       } else if (ev.type === "agent_done") {
         var card = getAgentCard(ev.agent, ev.batch);
-        card.setStatus("done", (ev.chars || 0) + " 字符");
+        card.setStatus("done", (ev.chars || 0) + " chars");
         if (ev.content) {
           var cpre = el("pre"); cpre.textContent = ev.content;
           card.body.appendChild(cpre);
         }
       } else if (ev.type === "summary") {
-        var summaryCard = makeCard("汇总报告", "");
+        var summaryCard = makeCard("Summary Report", "");
         summaryCard.setStatus("done");
         var md = el("div", "md");
         md.innerHTML = renderMarkdown(ev.content || "");
@@ -307,19 +309,19 @@
         area.appendChild(summaryCard.root);
       } else if (ev.type === "direct_answer") {
         var acard = getAgentCard(ev.agent, 1);
-        acard.setStatus("done", "直接回答");
+        acard.setStatus("done", "Direct answer");
         var amd = el("div", "md");
         amd.innerHTML = renderMarkdown(ev.content || "");
         acard.body.appendChild(amd);
       } else if (ev.type === "done") {
-        var note = el("div", "run-dir-note", "原始输出已保存: " + ev.run_dir);
+        var note = el("div", "run-dir-note", "Raw output saved: " + ev.run_dir);
         area.appendChild(note);
       } else if (ev.type === "error") {
         Object.keys(agentCards).forEach(function (k) {
           var c = agentCards[k];
           if (c.icon.className.indexOf("running") >= 0) c.setStatus("error");
         });
-        area.appendChild(el("div", "error-box", "执行出错: " + ev.message));
+        area.appendChild(el("div", "error-box", "Execution error: " + ev.message));
       }
       scrollBottom();
     };
@@ -362,7 +364,7 @@
             buf = buf.slice(idx + 2);
             block.split("\n").forEach(function (line) {
               if (line.indexOf("data: ") === 0) {
-                try { handleEvent(JSON.parse(line.slice(6))); } catch (e) { /* 忽略坏行 */ }
+                try { handleEvent(JSON.parse(line.slice(6))); } catch (e) { /* ignore malformed lines */ }
               }
             });
           }
@@ -371,7 +373,7 @@
       }
       return pump();
     }).catch(function (err) {
-      area.appendChild(el("div", "error-box", "请求失败: " + err.message));
+      area.appendChild(el("div", "error-box", "Request failed: " + err.message));
       setGenerating(false);
       scrollBottom();
     });
@@ -384,7 +386,7 @@
     if (!on) inputEl.focus();
   }
 
-  // ---------- 会话 ----------
+  // ---------- Sessions ----------
   function newChat() {
     if (generating) return;
     sessionId = null;
@@ -409,24 +411,24 @@
         if (m.role === "user") addUserMessage(m.content);
       });
       if (sess.events && sess.events.length) {
-        // 新格式:完整回放编排事件流(含各 agent 原始输出)
+        // new format: full orchestration event replay (incl. each agent's raw output)
         var area = el("div", "msg-assistant");
         messagesEl.appendChild(area);
         var render = createRenderer(area);
         sess.events.forEach(render);
       } else {
-        // 旧会话(无 events):只回放汇总/错误
+        // legacy sessions (no events): replay only summary/errors
         (sess.messages || []).forEach(function (m) {
           if (m.role !== "assistant") return;
           var area = el("div", "msg-assistant");
           if (m.status === "done") {
-            var card = makeCard("汇总报告", "");
+            var card = makeCard("Summary Report", "");
             card.setStatus("done");
             var md = el("div", "md");
             md.innerHTML = renderMarkdown(m.content || "");
             card.body.appendChild(md);
             area.appendChild(card.root);
-            if (m.run_dir) area.appendChild(el("div", "run-dir-note", "原始输出已保存: " + m.run_dir));
+            if (m.run_dir) area.appendChild(el("div", "run-dir-note", "Raw output saved: " + m.run_dir));
           } else {
             area.appendChild(el("div", "error-box", m.content));
           }
@@ -437,7 +439,7 @@
         e.classList.toggle("active", e.dataset.sid === id);
       });
       scrollBottom();
-    }).catch(function () { /* 会话读取失败时静默 */ });
+    }).catch(function () { /* stay silent when session fetch fails */ });
   }
 
   function refreshSessions() {
@@ -450,26 +452,26 @@
         item.addEventListener("click", function () { loadSession(s.session_id); });
         sessionListEl.appendChild(item);
       });
-    }).catch(function () { /* 忽略 */ });
+    }).catch(function () { /* ignore */ });
   }
 
-  // ---------- LLM 状态 ----------
+  // ---------- LLM status ----------
   function checkHealth() {
     fetch("/api/health").then(function (r) { return r.json(); }).then(function (h) {
       if (h.status === "ok") {
         llmDot.className = "dot ok";
-        llmText.textContent = "LLM 服务器:在线 (" + h.llm_base + ")";
+        llmText.textContent = "LLM server: online (" + h.llm_base + ")";
       } else {
         llmDot.className = "dot bad";
-        llmText.textContent = "LLM 服务器:离线 (" + h.llm_base + ")";
+        llmText.textContent = "LLM server: offline (" + h.llm_base + ")";
       }
     }).catch(function () {
       llmDot.className = "dot bad";
-      llmText.textContent = "LLM 服务器:状态未知";
+      llmText.textContent = "LLM server: status unknown";
     });
   }
 
-  // ---------- 输入交互 ----------
+  // ---------- Input interaction ----------
   function send() {
     var text = inputEl.value.trim();
     if (!text || generating) return;
@@ -487,7 +489,7 @@
   });
   document.getElementById("new-chat").addEventListener("click", newChat);
 
-  // ---------- 启动 ----------
+  // ---------- Startup ----------
   refreshSessions();
   checkHealth();
   setInterval(checkHealth, 30000);

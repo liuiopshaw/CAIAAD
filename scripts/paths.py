@@ -34,5 +34,5 @@ OUTPUT_ROOT = Path(
 )
 
 LITERATURE_DIR = Path(
-    os.environ.get("CU_AGENT_LITERATURE_DIR", str(PROJECT_ROOT / "智能体建库文献"))
+    os.environ.get("CU_AGENT_LITERATURE_DIR", str(PROJECT_ROOT / "agent_literature"))
 )

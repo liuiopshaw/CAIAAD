@@ -67,7 +67,7 @@ All agent outputs are saved RAW and unmodified under `outputs/run_<TS>/`; scorin
 
 ## Scoring rubric
 
-`评分标准/标准.md` — five weighted dimensions (target-tissue delivery 30%, multi-target synergy 15%, effect duration 10%, manufacturing control 25%, biosafety 20%) plus an optional AD-relevance gate (hard: ×ad/10; soft: ×(0.5+0.5·ad/10)). Mirrored in `scripts/asa_rubric.json` for deterministic ranking.
+`rubric/rubric.md` — five weighted dimensions (target-tissue delivery 30%, multi-target synergy 15%, effect duration 10%, manufacturing control 25%, biosafety 20%) plus an optional AD-relevance gate (hard: ×ad/10; soft: ×(0.5+0.5·ad/10)). Mirrored in `scripts/asa_rubric.json` for deterministic ranking.
 
 ## Project Structure
 
@@ -103,7 +103,7 @@ All absolute paths resolve through `scripts/paths.py` and can be overridden with
 | `CU_AGENT_MODEL_PATH` | base model directory | `<root>/models/qwen/Qwen3-VL-8B-Instruct` |
 | `CU_AGENT_LORA_DIR` | LoRA adapters directory | `<root>/models/lora_enhanced` |
 | `CU_AGENT_OUTPUT_DIR` | outputs directory | `<root>/outputs` |
-| `CU_AGENT_LITERATURE_DIR` | literature PDF library | `<root>/智能体建库文献` |
+| `CU_AGENT_LITERATURE_DIR` | literature PDF library | `<root>/agent_literature` |
 
 ## Configuration
 

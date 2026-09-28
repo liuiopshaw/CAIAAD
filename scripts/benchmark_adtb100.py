@@ -201,7 +201,7 @@ Output format (ONE LINE per candidate, numbered, no other text):
 # ---------------------------------------------------------------------------
 
 RUBRIC_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..",
-                           "评分标准", "标准.md")
+                           "rubric", "rubric.md")
 
 RUBRIC_DIMS = ["delivery", "synergy", "duration", "manufacturability", "safety"]
 RUBRIC_WEIGHTS = {"delivery": 0.30, "synergy": 0.15, "duration": 0.10,
@@ -415,7 +415,7 @@ def main():
                     help="harness = 4-agent chain (delivery/mechanism/safety/ranker); "
                          "prompt = single consolidated scoring prompt, no chain")
     ap.add_argument("--rubric", action="store_true",
-                    help="anchor with the rubric file 评分标准/标准.md (5-dim weighted framework); "
+                    help="anchor with the rubric file rubric/rubric.md (5-dim weighted framework); "
                          "overall = deterministic weighted sum, ranker overall kept as ca_overall")
     ap.add_argument("--gate", choices=["off", "hard", "soft"], default="off",
                     help="AD-relevance gate: off = additive (default), "
@@ -598,7 +598,7 @@ def main():
         "model_variant": "base (Qwen3-VL-8B, NO LoRA)" if variant == "base"
                          else "lora (per-agent adapters, lora_enhanced)",
         "mode": args.mode,
-        "rubric": "评分标准/标准.md (AD-relevance gate x [delivery 30% / synergy 15% / "
+        "rubric": "rubric/rubric.md (AD-relevance gate x [delivery 30% / synergy 15% / "
                   "duration 10% / manufacturability 25% / safety 20%]; overall = "
                   "deterministic gated fusion, model's own overall in ca_overall)" if args.rubric else None,
         "gate": GATE if args.rubric else None,

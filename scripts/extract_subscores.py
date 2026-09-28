@@ -36,7 +36,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from output_utils import find_run_dir, OUTPUT_ROOT
 
 AGENT_AXES = {
-    "manufacturing": ["manufacturability"],            # manufacturing control & tunability (rubric, 评分标准/标准.md)
+    "manufacturing": ["manufacturability"],            # manufacturing control & tunability (rubric, rubric/rubric.md)
     "delivery": ["delivery_efficiency"],               # target-tissue delivery efficiency
     "safety": ["biosafety"],                           # biological safety
     "mechanism": ["multi_target_synergy", "durability"],  # multi-target synergy + effect durability

@@ -23,7 +23,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 PROJECT_ROOT = Path(os.environ.get("CU_AGENT_ROOT", str(Path(__file__).resolve().parent.parent)))
-DEST = PROJECT_ROOT / "智能体建库文献" / "11 补充-Cu菌群交叉"
+DEST = PROJECT_ROOT / "agent_literature" / "11_supplement_cu_microbiome_cross"
 SOURCES_CSV = DEST / "SOURCES.csv"
 UA = {"User-Agent": "cu-agent-lit-fetch/1.0 (literature supplement)"}
 
