@@ -32,7 +32,7 @@ class CreativeDesigningAgent(BaseAgent):
         super().__init__(
             llm=llm,
             role="Creative_Designing_agent",  # Agent role name: material design expert
-            goal="Design and optimize water treatment material solutions, strictly following material type classification and structural description specifications",
+            goal="Design innovative Alzheimer's disease (AD) therapeutic candidates — small molecules, nano formulations, and biologics — with explicit AD mechanism hypotheses, strictly following modality classification and structural description specifications",
             # Specify the prompt template file dedicated to the design agent
             prompt_file="designer_prompt.md",
             # Read the temperature parameter dedicated to material design from Config;

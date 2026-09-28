@@ -29,7 +29,7 @@ class AssessmentScreeningAgentB(BaseAgent):
             # Role identifier: Assessment Screening Expert B, used to distinguish expert identities in multi-agent collaboration
             role="Assessment_Screening_agent_B",
             # Goal description: tells the agent that its core task is to comprehensively evaluate all aspects of material proposals
-            goal="Comprehensively evaluate various aspects of material proposals",
+            goal="Comprehensively evaluate AD therapeutic candidates across the five weighted rubric dimensions",
             # Specifies the prompt template file (Markdown format) used by this agent; loaded and populated with parameters at runtime
             prompt_file="assessment_screening_agent_b_prompt.md",
             # Reads Expert B's dedicated temperature parameter from the config file, controlling the randomness of LLM output

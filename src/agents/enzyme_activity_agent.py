@@ -3,7 +3,6 @@
 
 from .base_agent import BaseAgent
 from src.tools import ToolFactory
-from src.tools.enzyme_classifier import EnzymeClassifier
 
 
 class EnzymeActivityAgent(BaseAgent):
@@ -12,8 +11,8 @@ class EnzymeActivityAgent(BaseAgent):
     Assesses whether an AD therapeutic effectively reaches its site of action
     (barrier penetration & bioavailability, targeting & designability, exposure
     durability). Scoring follows the shared rubric anchors; no subjective bonus
-    points. (Role renamed from enzyme-activity prediction; class name kept for
-    backward compatibility.)
+    points. (Class name kept for backward compatibility with the former
+    enzyme-activity prediction role.)
     """
 
     def __init__(self, llm):
@@ -28,7 +27,6 @@ class EnzymeActivityAgent(BaseAgent):
             temperature=Config.EPA_TEMPERATURE,
             max_iter=1
         )
-        self.enzyme_classifier = EnzymeClassifier()
 
     def create_agent(self):
         agent = super().create_agent()
@@ -41,7 +39,3 @@ class EnzymeActivityAgent(BaseAgent):
         except Exception:
             agent.tools = ToolFactory.create_unified_assessment_tools()
         return agent
-
-    def classify_structure(self, material_properties: dict) -> dict:
-        """Use rule-based classifier for initial enzyme activity assessment."""
-        return self.enzyme_classifier.run(material_properties)

@@ -41,7 +41,7 @@ class SynthesisGuidingAgent(BaseAgent):
         super().__init__(
             llm,
             "Synthesis_Guiding_agent",  # Role name: synthesis methods expert, used for logging and identification
-            "Design material synthesis methods and process flows",  # Goal description: guides the LLM's task direction
+            "Design development and preparation methods and process flows for AD therapeutic candidates",  # Goal description: guides the LLM's task direction
             "synthesis_guiding_agent_prompt.md",  # Prompt template file: contains the detailed system prompt for this role
             temperature=Config.SYNTHESIS_EXPERT_TEMPERATURE,  # Temperature parameter: read from the config file, controls the randomness of LLM output
             max_iter=2  # Maximum iterations: set to 2 (original value was 8), following the "less is more" principle

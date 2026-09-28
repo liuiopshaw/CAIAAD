@@ -34,7 +34,7 @@ class AssessmentScreeningAgentOverall(BaseAgent):
             # Goal description: clearly tells the agent that its task is to aggregate expert results, perform weighted
             # calculations, and generate the final report; it must also provide improvement suggestions so that the
             # output contains not only evaluation conclusions but also actionable guidance
-            goal="Synthesize evaluation results from various experts, perform weighted calculations, and generate final material evaluation report, while providing improvement suggestions",
+            goal="Synthesize evaluation results from various experts, perform weighted calculations, and generate the final AD candidate evaluation report, while providing improvement suggestions",
             # Specify the prompt template file (Markdown format) used by this agent
             prompt_file="assessment_screening_agent_overall_prompt.md",
             # Read the dedicated temperature parameter for the final validation expert from the config file,

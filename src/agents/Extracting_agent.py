@@ -42,7 +42,7 @@ class ExtractingAgent(BaseAgent):
         super().__init__(
             llm=llm,
             role="Extracting_agent",  # Role name: literature processing expert, used for logging and identification
-            goal="Process and analyze relevant technical literature to provide background information for material evaluation",  # Goal description: guides the LLM to extract and organize key information from the literature
+            goal="Process and analyze relevant technical literature to provide background information for therapeutic evaluation",  # Goal description: guides the LLM to extract and organize key information from the literature
             prompt_file="extractor_prompt.md",  # Prompt template file: defines this role's literature analysis method and output format
             temperature=Config.LITERATURE_PROCESSOR_TEMPERATURE  # Temperature parameter: read from the config file, controls the randomness of LLM output
             # Note: this agent does not set the max_iter parameter and uses BaseAgent's default

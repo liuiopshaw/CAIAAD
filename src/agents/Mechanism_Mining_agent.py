@@ -35,7 +35,7 @@ class MechanismMiningAgent(BaseAgent):
             # Goal description: explicitly tells the agent its core task,
             # focusing on mining the reaction mechanisms and kinetic characteristics
             # of pollutant degradation
-            goal="Mine reaction mechanisms and kinetic characteristics of pollutant degradation",
+            goal="Mine the mechanism of action of AD therapeutics — molecular targets, pathways, and intervention logic against AD pathological processes",
             # Specify the prompt template file (Markdown format) used by this agent;
             # it is loaded and populated with parameters at runtime
             prompt_file="mechanism_prompt.md",

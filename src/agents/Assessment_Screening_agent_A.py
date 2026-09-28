@@ -33,7 +33,7 @@ class AssessmentScreeningAgentA(BaseAgent):
         super().__init__(
             llm,  # Language model instance
             "Assessment_Screening_agent_A",  # Agent role name: Assessment Expert A
-            "Comprehensively evaluate various aspects of material proposals",
+            "Comprehensively evaluate AD therapeutic candidates across the five weighted rubric dimensions",
             # Specify the prompt template file dedicated to Assessment Agent A
             "assessment_screening_agent_a_prompt.md",
             # Read the temperature parameter dedicated to Expert A from Config

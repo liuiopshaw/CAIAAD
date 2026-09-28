@@ -25,22 +25,23 @@ class AssessmentScoringLogic:
     Encapsulates all scoring-related methods."""
 
     # Dimension weights
-    # Weight configuration for each assessment dimension: catalytic performance has the highest weight (50%), structural rationality is second (20%),
-    # while economic feasibility, environmental friendliness, and technical feasibility each account for 10%, reflecting the core concerns of water treatment material assessment
+    # Weight configuration for each assessment dimension, aligned with the AD scoring
+    # rubric (rubric/rubric.md and scripts/asa_rubric.json): delivery efficiency and
+    # manufacturability dominate, biosafety follows, synergy and duration complete the profile
     DIMENSION_WEIGHTS = {
-        "catalytic": 0.50,      # Catalytic performance weight - the most critical assessment dimension
-        "economic": 0.10,       # Economic feasibility weight - cost factors are relatively secondary
-        "environmental": 0.10,  # Environmental friendliness weight - as important as technical requirements
-        "technical": 0.10,      # Technical feasibility weight - assesses implementation difficulty
-        "structural": 0.20      # Structural rationality weight - the scientific foundation of the material itself
+        "delivery": 0.30,           # Target-tissue delivery efficiency weight
+        "synergy": 0.15,            # Multi-target synergy potential weight
+        "duration": 0.10,           # Effect duration weight
+        "manufacturability": 0.25,  # Manufacturing QC & precise tunability weight
+        "biosafety": 0.20           # Biosafety weight
     }
 
     # Scoring criteria
     # Scoring criteria mapping table: maps numeric scores from 1-10 to corresponding textual descriptions
-    # 10 is the highest (exceptional), 1 is the lowest (completely invalid); designs scoring below 5 are unusable
+    # 10 is the highest (exceptional), 1 is the lowest (completely invalid); candidates scoring below 5 are weak
     SCORE_CRITERIA = {
         10: "Exceptional - Outstanding performance, fully validated",
-        9: "Excellent - Strong scientific value, well-designed structure",
+        9: "Excellent - Strong scientific value, well-justified rationale",
         8: "Very Good - Stable performance, minor improvements needed",
         7: "Good - Above average, some limitations",
         6: "Average - Acceptable performance, noticeable limitations",
@@ -48,7 +49,7 @@ class AssessmentScoringLogic:
         4: "Poor - Low performance, major defects",
         3: "Very Poor - Minimal performance, critical defects",
         2: "Invalid - Serious issues, fundamental errors",
-        1: "Completely Invalid - Chemically impossible or non-existent"
+        1: "Completely Invalid - Irrelevant to AD or non-existent"
     }
 
     @staticmethod
@@ -58,7 +59,7 @@ class AssessmentScoringLogic:
         Calculate the weighted total score: multiply each of the five dimension scores by its weight and sum the results.
 
         Args:
-            scores (List[int]): Five dimension scores [catalytic performance, economic feasibility, environmental friendliness, technical feasibility, structural rationality]
+            scores (List[int]): Five dimension scores [delivery efficiency, multi-target synergy, effect duration, manufacturability, biosafety]
 
         Returns:
             float: Weighted total score, rounded to two decimal places
@@ -69,11 +70,11 @@ class AssessmentScoringLogic:
 
         # Weighted summation: multiply each dimension's score by its corresponding weight and accumulate
         weighted_total = (
-            scores[0] * AssessmentScoringLogic.DIMENSION_WEIGHTS["catalytic"] +
-            scores[1] * AssessmentScoringLogic.DIMENSION_WEIGHTS["economic"] +
-            scores[2] * AssessmentScoringLogic.DIMENSION_WEIGHTS["environmental"] +
-            scores[3] * AssessmentScoringLogic.DIMENSION_WEIGHTS["technical"] +
-            scores[4] * AssessmentScoringLogic.DIMENSION_WEIGHTS["structural"]
+            scores[0] * AssessmentScoringLogic.DIMENSION_WEIGHTS["delivery"] +
+            scores[1] * AssessmentScoringLogic.DIMENSION_WEIGHTS["synergy"] +
+            scores[2] * AssessmentScoringLogic.DIMENSION_WEIGHTS["duration"] +
+            scores[3] * AssessmentScoringLogic.DIMENSION_WEIGHTS["manufacturability"] +
+            scores[4] * AssessmentScoringLogic.DIMENSION_WEIGHTS["biosafety"]
         )
 
         # Return the result rounded to two decimal places to avoid floating-point precision issues

@@ -36,7 +36,7 @@ class AssessmentScreeningAgentC(BaseAgent):
                          # Role identifier: Assessment Screening Expert C, used to distinguish different expert identities in multi-agent collaboration
                          "Assessment_Screening_agent_C",
                          # Goal description: tells the agent that its core task is to comprehensively evaluate all aspects of material proposals
-                         "Comprehensively evaluate various aspects of material proposals",
+                         "Comprehensively evaluate AD therapeutic candidates across the five weighted rubric dimensions",
                          # Specify the prompt template file (Markdown format) used by this agent, which is loaded and populated with parameters at runtime
                          "assessment_screening_agent_c_prompt.md",
                          # Read Expert C's dedicated temperature parameter from the configuration file to control the randomness of LLM output

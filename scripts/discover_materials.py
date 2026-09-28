@@ -131,7 +131,7 @@ NADH oxidase-like enzyme activity. Categorize by size:
 - nanoparticle (>3nm)
 
 Available data from: PubChem, PubMed, Materials Project, DrugBank APIs.
-Available agents: extractor (extraction), manufacturing (antibacterial), delivery (enzyme),
+Available agents: extractor (extraction), manufacturing (antibacterial), delivery (delivery efficiency),
 safety (biosafety), mechanism (mechanism), ranker (comparison).
 """
 

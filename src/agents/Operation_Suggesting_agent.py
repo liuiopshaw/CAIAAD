@@ -30,7 +30,7 @@ class OperationSuggestingAgent(BaseAgent):
         super().__init__(
             llm,
             "Operation_Suggesting_agent",  # Role name: operation suggestion expert, used for logging and identification
-            "Provide detailed operational guidance for material synthesis, production and application",  # Goal description: guides the LLM to generate detailed operating procedures
+            "Provide detailed operational guidance for laboratory testing and preclinical development of AD therapeutic candidates",  # Goal description: guides the LLM to generate detailed operating procedures
             "operation_suggesting_agent_prompt.md",  # Prompt template file: contains the detailed system prompt for this role, defining its professional domain and behavioral norms
             temperature=Config.OPERATION_SUGGESTING_TEMPERATURE,  # Temperature parameter: read from the config file, controls the randomness of LLM output
             max_iter=2  # Maximum number of iterations: set to 2 (original value was 8), following the "less is more" principle
@@ -41,9 +41,8 @@ class OperationSuggestingAgent(BaseAgent):
         """Create and configure the operation suggesting agent, attaching the required tools.
 
         The execution flow of this method:
-        1. First try to create an EAS (Elastic Algorithm Service) LLM instance for better performance
-        2. If EAS is unavailable, fall back to the default LLM passed in during initialization
-        3. Decide whether to load the operation guidance toolset based on whether the endpoint supports tool calling
+        1. Create the agent via BaseAgent.create_agent() using the LLM passed in during initialization
+        2. Decide whether to load the operation guidance toolset based on the ENABLE_TOOLS setting
 
         Returns:
             The configured agent instance with chemical database query tools attached
