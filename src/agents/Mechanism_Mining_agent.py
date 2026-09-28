@@ -14,13 +14,13 @@ logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 # Mechanism mining expert class
-# Inherits from BaseAgent, specializing in mining and analyzing the reaction mechanisms
-# and kinetic characteristics of pollutant degradation
+# Inherits from BaseAgent, specializing in mining and analyzing the mechanisms
+# of action of AD therapeutics
 class MechanismMiningAgent(BaseAgent):
     """Mechanism mining expert agent
-    Responsible for mining the reaction mechanisms and kinetic characteristics of pollutant
-    degradation, revealing degradation pathways and key intermediates by analyzing material
-    structure and chemical properties.
+    Responsible for mining the mechanism of action of AD therapeutics — molecular
+    targets, pathways, and intervention logic against AD pathological processes —
+    by analyzing candidate composition and pharmacological properties.
     """
 
     def __init__(self, llm):
@@ -33,8 +33,7 @@ class MechanismMiningAgent(BaseAgent):
             # analysis stage in multi-agent collaboration
             role="Mechanism_Mining_agent",
             # Goal description: explicitly tells the agent its core task,
-            # focusing on mining the reaction mechanisms and kinetic characteristics
-            # of pollutant degradation
+            # focusing on mining the mechanism of action against AD pathology
             goal="Mine the mechanism of action of AD therapeutics — molecular targets, pathways, and intervention logic against AD pathological processes",
             # Specify the prompt template file (Markdown format) used by this agent;
             # it is loaded and populated with parameters at runtime

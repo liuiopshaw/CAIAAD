@@ -11,14 +11,14 @@ logging.basicConfig(level=logging.WARNING)
 # Get the logger instance for the current module; log output carries the module name for easier troubleshooting
 logger = logging.getLogger(__name__)
 
-# Material design expert agent class
-# Responsible for creating and optimizing water treatment material solutions based on user requirements
+# AD therapeutic design expert agent class
+# Responsible for designing innovative Alzheimer's disease therapeutic candidates based on user requirements
 class CreativeDesigningAgent(BaseAgent):
     """Creative Designing Agent
-       Dedicated to water treatment material design tasks:
-       - Generate material design solutions based on user requirements
-       - Query material information from databases such as Materials Project
-       - Output structured design results (chemical formula, crystal structure, physical properties, etc.)"""
+       Dedicated to AD therapeutic design tasks:
+       - Generate therapeutic candidate designs based on user requirements
+       - Query compound/target information from databases such as PubChem and UniProt
+       - Output structured design results (modality, composition, mechanism hypothesis, etc.)"""
 
     def __init__(self, llm):
         """Initialize the creative designing agent
