@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Line 1: specify the source file encoding as UTF-8 to ensure proper character parsing
+# Line 1: specify the source file encoding as UTF-8 to ensure correct character parsing
 import os
 # Line 3: import the os module for reading environment variables
 from dotenv import load_dotenv
@@ -39,14 +39,6 @@ class Config:
     LLAVA_API_BASE = os.getenv("LLAVA_API_BASE", "http://localhost:8000/v1")
     LLAVA_MODEL_NAME = os.getenv("LLAVA_MODEL_NAME", "llava-1.6-13b-awq")
 
-    # --- Database connection ---
-    NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7687")
-    NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
-    NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "")
-
-    # --- Local experiment database ---
-    LOCAL_EXP_DB_PATH = os.getenv("LOCAL_EXP_DB_PATH", "data/local_experiments.db")
-
     # --- Model parameter configuration ---
     # Line 32: MODEL_TEMPERATURE — default temperature parameter (0.0~1.0), controls output randomness; defaults to 0.7
     MODEL_TEMPERATURE = float(os.getenv("MODEL_TEMPERATURE", "0.7"))
@@ -81,12 +73,6 @@ class Config:
     # Backward-compatible unified evaluation temperature configuration
     EXPERT_EVALUATION_TEMPERATURE = float(os.getenv("EXPERT_EVALUATION_TEMPERATURE", "0.3"))
 
-    # --- Iterative design configuration ---
-    # Maximum number of design iterations; defaults to 3 to prevent infinite loops
-    MAX_DESIGN_ITERATIONS = int(os.getenv("MAX_DESIGN_ITERATIONS", "3"))
-    # Minimum acceptable score (out of 10)
-    MIN_ACCEPTABLE_SCORE = float(os.getenv("MIN_ACCEPTABLE_SCORE", "7.0"))
-
     # ---- Nano-bio evaluation scoring weights ----
     APA_WEIGHTS = {
         "potency": 0.40,
@@ -109,14 +95,6 @@ class Config:
         "structural_stability": 0.10
     }
 
-    # ---- Workflow ----
-    SCORE_PASS_THRESHOLD = float(os.getenv("SCORE_PASS_THRESHOLD", "7.0"))
-    MAX_EXTRACTION_RETRIES = int(os.getenv("MAX_EXTRACTION_RETRIES", "3"))
-
-    # --- Consistency analysis configuration ---
-    HIGH_CONSISTENCY_THRESHOLD = float(os.getenv("HIGH_CONSISTENCY_THRESHOLD", "1.0"))
-    MEDIUM_CONSISTENCY_THRESHOLD = float(os.getenv("MEDIUM_CONSISTENCY_THRESHOLD", "2.0"))
-
     # --- Language configuration ---
     # Line 64: LANGUAGE — interface language selection; "zh" for Chinese, "en" for English
     LANGUAGE = os.getenv("LANGUAGE", "en")
@@ -124,14 +102,6 @@ class Config:
     # --- Other configuration ---
     # Line 67: VERBOSE — whether to output detailed logs; the string read from the environment variable is converted to a boolean
     VERBOSE = os.getenv("VERBOSE", "True").lower() == "true"
-
-    # --- EAS (Elastic Algorithm Service) model configuration (optional) ---
-    # Line 70: EAS_ENDPOINT — endpoint address of the self-deployed model
-    EAS_ENDPOINT = os.getenv("EAS_ENDPOINT")
-    # Line 71: EAS_TOKEN — authentication token of the self-deployed model
-    EAS_TOKEN = os.getenv("EAS_TOKEN")
-    # Line 72: EAS_MODEL_NAME — name of the self-deployed model
-    EAS_MODEL_NAME = os.getenv("EAS_MODEL_NAME")
 
     @classmethod
     def is_api_key_valid(cls, api_key):

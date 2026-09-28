@@ -30,7 +30,7 @@ class BiosafetyAgent(BaseAgent):
         # centralized in BaseAgent._resolve_llm(); it is not recreated here
         agent = super().create_agent()
         try:
-            from src.utils.llm_config import tools_enabled
+            from src.agents.base_agent import tools_enabled
             if tools_enabled():
                 agent.tools = ToolFactory.create_unified_assessment_tools()
             else:

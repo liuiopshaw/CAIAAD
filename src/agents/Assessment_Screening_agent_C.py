@@ -68,7 +68,7 @@ class AssessmentScreeningAgentC(BaseAgent):
         # The three assessment experts A/B/C share the same set of tools to ensure consistent evaluation criteria
         try:
             # Dynamically import the tool-switch check function to determine whether the current environment is configured to enable external tools
-            from src.utils.llm_config import tools_enabled
+            from src.agents.base_agent import tools_enabled
             if tools_enabled():
                 # When tools are enabled: create the unified evaluation tool set
                 # These tools typically include chemical property queries, toxicity database retrieval, etc.

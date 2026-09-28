@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 # ---- API constants ----
 BASE_URL = "https://www.ebi.ac.uk/chembl/api/data"
-HEADERS = {"User-Agent": "ECOMATS-ChEMBL-Tool/1.0"}
+HEADERS = {"User-Agent": "NanoBio-ChEMBL-Tool/1.0"}
 
 # ---- Request rate control ----
 # Key-free public API, polite rate limiting: minimum 0.4 s between requests (>= 0.3 s required)

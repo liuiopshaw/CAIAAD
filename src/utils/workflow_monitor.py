@@ -490,7 +490,7 @@ class WorkflowMonitor:
         with open(filepath, 'w', encoding='utf-8') as f:
             # Report header title
             f.write("=" * 80 + "\n")
-            f.write("ECOMATS Workflow Monitor Report\n")
+            f.write("Nano-Bio Workflow Monitor Report\n")
             f.write("=" * 80 + "\n\n")
 
             # 1. Workflow basic information

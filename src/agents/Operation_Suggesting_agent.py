@@ -59,7 +59,7 @@ class OperationSuggestingAgent(BaseAgent):
         # This toolset focuses on material parameter queries and reagent information retrieval,
         # helping the agent generate more precise operation suggestions (e.g., temperature, pressure, reagent dosage)
         try:
-            from src.utils.llm_config import tools_enabled
+            from src.agents.base_agent import tools_enabled
             if tools_enabled():
                 # The endpoint supports tool calling: load the operation guidance toolset
                 agent.tools = ToolFactory.create_operation_guidance_tools()

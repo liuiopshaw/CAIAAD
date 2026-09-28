@@ -71,7 +71,7 @@ class SynthesisGuidingAgent(BaseAgent):
         # Note: DashScope-compatible endpoints may not support native tool calling (function calling)
         # Therefore, the tools_enabled switch must be checked first
         try:
-            from src.utils.llm_config import tools_enabled
+            from src.agents.base_agent import tools_enabled
             if tools_enabled():
                 # The endpoint supports tool calling: load the material search tool set
                 agent.tools = ToolFactory.create_material_search_tools()

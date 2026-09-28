@@ -52,7 +52,7 @@ class AssessmentScreeningAgentB(BaseAgent):
         # The ASA toolset is shared by the three experts A/B/C, providing chemical property queries, environmental assessment, etc.
         try:
             # Dynamically import the tools toggle check function to determine whether external tools are enabled
-            from src.utils.llm_config import tools_enabled
+            from src.agents.base_agent import tools_enabled
             if tools_enabled():
                 # When tools are enabled: create the unified assessment toolset, including chemical database query capabilities
                 agent.tools = ToolFactory.create_unified_assessment_tools()

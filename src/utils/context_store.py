@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Context store module - provides a thread-safe data sharing mechanism
-# In the ECOMATS multi-agent collaboration architecture, different agents may run in
+# In the multi-agent collaboration architecture, different agents may run in
 # different threads; this module ensures they can safely share data without race conditions
 
 # The typing module provides type annotations; Dict and Any describe the key-value pair types

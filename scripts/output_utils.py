@@ -2,7 +2,7 @@
 """Per-run output folder convention.
 
 Every test run gets its own folder:  outputs/run_<TS>/
-Producers (task_100, run_base, discover, batch_eval) call run_dir(ts) at start.
+Producers (task_100, run_base, discover) call run_dir(ts) at start.
 Consumers (formula_lookup, rank, excel) call find_run_dir(ts) — which falls
 back to the flat outputs/ root for legacy runs saved before this convention.
 

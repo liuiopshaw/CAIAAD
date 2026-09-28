@@ -65,7 +65,7 @@ class MechanismMiningAgent(BaseAgent):
         try:
             # Dynamically import the tool-toggle check function to determine whether the
             # current environment is configured to enable external tools
-            from src.utils.llm_config import tools_enabled
+            from src.agents.base_agent import tools_enabled
             if tools_enabled():
                 # When tools are enabled: create the toolset dedicated to mechanism analysis.
                 # These tools typically include reaction pathway analysis, transition-state

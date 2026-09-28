@@ -62,7 +62,7 @@ class CreativeDesigningAgent(BaseAgent):
         # Attach tools: decide whether to enable tool calls based on the environment
         # On DashScope-compatible endpoints, tool calls may return 500 errors, so a conditional check is needed
         try:
-            from src.utils.llm_config import tools_enabled
+            from src.agents.base_agent import tools_enabled
             if tools_enabled():
                 # When tools are enabled: create the toolset dedicated to material design,
                 # including Materials Project query, structure validation, and other tools

@@ -13,7 +13,7 @@ between tools <-> utils.
 # These are low-level tool classes; instances are obtained via get_xxx factory functions
 from .materials_project_tool import get_materials_project_tool    # Materials Project inorganic materials database query
 from .pubchem_tool import get_pubchem_tool                        # PubChem organic compound database query
-# EvaluationTool removed - not used in ECOMATS, only in BioCrew
+# EvaluationTool removed - not used in this project, only in BioCrew
 from .name2cas_tool import get_name2cas_tool                      # Compound name to CAS number
 from .name2properties_tool import get_name2properties_tool        # Query compound properties by name
 from .cid2properties_tool import get_cid2properties_tool          # Query compound properties by CID

@@ -69,7 +69,7 @@ class AssessmentScreeningAgentA(BaseAgent):
         # Attach the toolset: use the unified ASA assessment toolset (shared by Experts A/B/C)
         # The unified toolset ensures consistent tool capabilities across experts, making evaluation results more comparable
         try:
-            from src.utils.llm_config import tools_enabled
+            from src.agents.base_agent import tools_enabled
             if tools_enabled():
                 # When tools are enabled: create the unified assessment toolset
                 agent.tools = ToolFactory.create_unified_assessment_tools()

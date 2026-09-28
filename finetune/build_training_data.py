@@ -37,7 +37,7 @@ TOPIC_AGENTS = {
     "dft": ["epa", "mma"],
     "enzyme_activity": ["epa"],
     "copper_cyclodextrin": ["ea", "apa", "epa", "mma"],
-    # Cu x gut-microbiome cross-domain supplement (finetune/fetch_cross_lit.py)
+    # Cu x gut-microbiome cross-domain supplement (open-access PMC papers)
     "11_supplement_cu_microbiome_cross": ["ea", "apa", "epa", "bsa", "mma", "ca"],
 }
 

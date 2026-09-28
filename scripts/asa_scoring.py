@@ -13,7 +13,7 @@ Axis model (rubric-driven):
   - axis WITHOUT subscores (e.g. microbiome_remodeling) -> the agent's direct
                             axis score is taken as-is
 
-Consistency (from run_nano_bio_eval.py, lines 90-92):
+Consistency (historical reference implementation):
   Cj = 1 - (1/3) * sum((Wij - Wbar)^2) / Wbar
   Sj = Wbar * Cj
 where Wij are the axis scores and Wbar their mean.

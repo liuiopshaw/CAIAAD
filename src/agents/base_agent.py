@@ -1,5 +1,7 @@
 # Import the logging module for recording runtime log messages
 import logging
+# Import the os module for reading environment variables
+import os
 # Import the Agent class from the crewai framework as the base class for all custom agents
 from crewai import Agent
 # Import the custom prompt loading utility, used to read prompt templates from external .md files
@@ -25,10 +27,19 @@ MEMORY_GUIDANCE_EN = """
 """
 
 
+def tools_enabled() -> bool:
+    """Determine whether agent tool calling is enabled.
+
+    Controlled solely by the ENABLE_TOOLS environment variable:
+    "true" (default) enables tools, anything else disables them.
+    """
+    return os.getenv("ENABLE_TOOLS", "true").lower() == "true"
+
+
 class BaseAgent:
     """ Base class for all custom agents, providing common agent creation
-        functionality. It encapsulates shared logic such as LLM configuration,
-        prompt loading, temperature parameter, and maximum iteration count."""
+        functionality. It encapsulates shared logic such as prompt loading,
+        temperature parameter, and maximum iteration count."""
 
     # Default maximum iteration count is 10, preventing the agent from falling into
     # infinite loops or excessive tool calls. Used when a subclass does not
@@ -58,58 +69,22 @@ class BaseAgent:
         self.prompt_params = prompt_params or {}
 
     def _resolve_llm(self):
-        """Resolve the LLM instance this agent should use; creation happens only once.
+        """Resolve the LLM instance this agent should use.
 
-        Priority (consistent with the pattern in Creative_Designing_agent; degrades
-        quietly when EAS is not configured):
-        1. When all three EAS settings (EAS_ENDPOINT/EAS_TOKEN/EAS_MODEL_NAME) are
-           present, create an EAS LLM (the self.temperature parameter is passed
-           through correctly)
-        2. Otherwise, if a temperature parameter is specified, create a standard LLM
-           with that temperature
-        3. Otherwise, reuse the default self.llm passed to the constructor
-
-        Any failure only logs a DEBUG message and falls back to the default LLM,
-        ensuring the agent always remains usable.
+        The externally provided ``self.llm`` is used as-is; per-agent
+        ``temperature`` values are kept on the subclass constructors so a
+        custom LLM can be wired in by the caller when needed.
 
         Returns:
             The resolved LLM instance
         """
-        try:
-            # Lazily import the Config class to avoid circular import issues
-            from src.config.config import Config
-            # Check whether an EAS (Elastic Algorithm Service) endpoint is configured:
-            # only when all three EAS settings exist do we use EAS mode to create a
-            # dedicated LLM instance
-            if Config.EAS_ENDPOINT and Config.EAS_TOKEN and Config.EAS_MODEL_NAME:
-                from src.utils.llm_config import create_eas_llm
-                agent_llm = create_eas_llm(temperature=self.temperature)
-                logger.info("Successfully created EAS LLM instance")
-                return agent_llm
-        except Exception as e:
-            # When EAS creation fails (e.g. incomplete configuration, network
-            # unreachable), only log a DEBUG message and continue falling back to
-            # the standard/default LLM, ensuring the program does not crash due to
-            # LLM configuration problems
-            logger.debug(f"EAS LLM not available, falling back: {e}")
-
-        # Standard mode: if a temperature parameter is specified, create a standard
-        # LLM with that temperature; otherwise reuse the default self.llm passed in,
-        # avoiding unnecessary duplicate creation
-        if self.temperature is not None:
-            try:
-                from src.utils.llm_config import create_llm
-                return create_llm(temperature=self.temperature)
-            except Exception as e:
-                logger.debug(f"Failed to create custom LLM with temperature {self.temperature}: {e}")
         return self.llm
 
     def create_agent(self):
         """Create and return a configured CrewAI Agent instance
 
         This method is responsible for:
-        1. Deciding which LLM to use via _resolve_llm() (EAS mode or standard mode,
-           created only once)
+        1. Resolving the LLM via _resolve_llm()
         2. Loading the prompt template and performing parameterized substitution
         3. Appending the Memory-first usage guidance
         4. Assembling the final Agent object
@@ -117,8 +92,7 @@ class BaseAgent:
         Returns:
             Agent: the fully configured CrewAI Agent instance
         """
-        # Resolve the LLM used by this agent (EAS / standard LLM with temperature /
-        # default passed-in LLM)
+        # Resolve the LLM used by this agent
         agent_llm = self._resolve_llm()
 
         # Load the backstory (prompt template) from a .md file, returning the full
@@ -147,7 +121,7 @@ class BaseAgent:
         # - verbose=False: disable verbose output to avoid excessive console messages
         # - allow_delegation=False: disallow task delegation; base-class agents
         #   execute tasks directly
-        # - llm: the configured LLM instance (may be EAS or standard LLM)
+        # - llm: the configured LLM instance
         # - max_iter: maximum iteration limit, preventing excessive tool calls
         return Agent(
             role=self.role,

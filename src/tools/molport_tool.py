@@ -53,7 +53,7 @@ class MolPortTool:
         # Set HTTP request headers
         # User-Agent identifies the tool; Content-Type and Accept specify JSON data exchange
         self.session.headers.update({
-            "User-Agent": "ECOMATS-MolPort-Tool/1.0",
+            "User-Agent": "NanoBio-MolPort-Tool/1.0",
             "Content-Type": "application/json",
             "Accept": "application/json"
         })
