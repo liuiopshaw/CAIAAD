@@ -190,13 +190,10 @@ def main():
         out.append(f"> The DB_Formula column is the database-tool verification result (source: {db_source}, scripts/formula_lookup.py), not agent output; the Chemical_Formula column remains the raw agent output.")
     out.append(f"> Source files: {', '.join(src_files)}\n")
 
-    # ---- Target metric: Cu x direct_antibacterial x microbiome_remodeling ----
-    cu = [r for r in valid if "Cu" in [e.strip() for e in r[ELEMENTS].split(",")]]
+    # ---- Target metric: direct_antibacterial x microbiome_remodeling coverage ----
     da = [r for r in valid if r[INTERVENTION] == "direct_antibacterial"]
     mr = [r for r in valid if r[MECHANISM] == "microbiome_remodeling"]
-    cu_da = [r for r in cu if r[INTERVENTION] == "direct_antibacterial"]
-    cu_mr = [r for r in cu if r[MECHANISM] == "microbiome_remodeling"]
-    cu_both = [r for r in cu if r[INTERVENTION] == "direct_antibacterial" and r[MECHANISM] == "microbiome_remodeling"]
+    both_set = [r for r in valid if r[INTERVENTION] == "direct_antibacterial" and r[MECHANISM] == "microbiome_remodeling"]
     pct = lambda x: f"{len(x)} ({len(x)/len(valid)*100:.0f}%)" if valid else "0"
 
     out.append(f"- Total materials: **{len(valid)}**")
@@ -206,17 +203,14 @@ def main():
         adj = [asa_map[r[NAME]]["total_adj"] for r in valid if r[NAME] in asa_map]
         out.append(f"\n- ASA_Adj range: {min(adj):.3f} - {max(adj):.3f} (rubric v{rubric.get('version')})" if adj else "")
     out.append("")
-    out.append("## Target metric (Cu x direct antibacterial x microbiome remodeling)\n")
+    out.append("## Target metric (direct antibacterial x microbiome remodeling)\n")
     out.append("| Metric | Count (share) |")
     out.append("|---|---|")
-    out.append(f"| Cu-based materials | **{pct(cu)}** |")
     out.append(f"| direct_antibacterial (all) | {pct(da)} |")
     out.append(f"| microbiome_remodeling (all) | {pct(mr)} |")
-    out.append(f"| Cu ∩ direct_antibacterial | **{pct(cu_da)}** |")
-    out.append(f"| Cu ∩ microbiome_remodeling | **{pct(cu_mr)}** |")
-    out.append(f"| Cu with both | **{pct(cu_both)}** |")
+    out.append(f"| both mechanisms | **{pct(both_set)}** |")
 
-    # Element frequency across the full ranking — verify Cu is near the top but not artificially dominant (project goal)
+    # Element frequency across the full ranking (neutral statistics, no element goal)
     all_elem = Counter()
     for r in valid:
         for e in r[ELEMENTS].split(","):
@@ -225,8 +219,7 @@ def main():
                 all_elem[e] += 1
     out.append(f"| Element frequency Top8 (excl. O/N/C, per material) | {', '.join(f'{e}x{n}' for e, n in all_elem.most_common(8))} |")
 
-    # Element frequency within the both-metric set — verify whether Cu is the most frequent element (project goal)
-    both_set = [r for r in valid if r[INTERVENTION] == "direct_antibacterial" and r[MECHANISM] == "microbiome_remodeling"]
+    # Element frequency within the both-metric set (neutral statistics, no element goal)
     elem_freq = Counter()
     for r in both_set:
         for e in r[ELEMENTS].split(","):
@@ -234,9 +227,7 @@ def main():
             if e and e != "O":
                 elem_freq[e] += 1
     top_elems = ", ".join(f"{e}×{n}" for e, n in elem_freq.most_common(6))
-    cu_is_top = bool(elem_freq) and elem_freq.get("Cu", 0) == elem_freq.most_common(1)[0][1]
-    out.append(f"| Element frequency in both-metric set (excl. O, per material) | {top_elems} |")
-    out.append(f"| Cu is the most frequent element in both-metric set | **{'YES' if cu_is_top else 'NO'}** |\n")
+    out.append(f"| Element frequency in both-metric set (excl. O, per material) | {top_elems} |\n")
 
     # ---- Phase 4: three-modality coverage metrics ----
     mod_freq = Counter(r[MODALITY].strip() for r in valid)

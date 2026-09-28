@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
 Control experiment: RAW Qwen3-VL-8B base model (NO LoRA agents), ONE single call.
-Task = the task100 material-design task, WITHOUT the Cu-optimization clauses
-(no Cu flagship quota, no Cu preference rules, non-Cu example line).
+Task = the task100 material-design task, WITHOUT the element-optimization
+clauses (no flagship quota for any element, no element preference rules,
+no element-specific example line).
 
 The server persists every completion to outputs/server_responses/ — so this
 script tolerates the 40-90 min single-shot generation: if the HTTP read times
@@ -20,7 +21,7 @@ from output_utils import run_dir, OUTPUT_ROOT
 
 OUTPUT = OUTPUT_ROOT  # server_responses/ audit folder stays flat here
 
-# task100 design prompt WITHOUT any Cu-optimization content
+# task100 design prompt WITHOUT any element-specific steering content
 PROMPT = """Design 100 nanomaterial candidates that have been REPORTED in peer-reviewed literature and achieve HIGH comprehensive ASA scores (combining antibacterial, enzyme-like activity, and biosafety), for Alzheimer's therapy research via the gut-brain axis.
 
 For EACH material, output ONE line with ALL these fields, pipe-separated:

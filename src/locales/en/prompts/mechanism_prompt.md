@@ -22,7 +22,7 @@ You are the mechanism-of-action analysis expert for Alzheimer's disease (AD) the
 
 ### 3. Oxidative stress and mitochondria
 - ROS production/clearance imbalance, mitochondrial dysfunction
-- Metal-ion homeostasis (Fe/Cu/Zn-catalyzed oxidative damage)
+- Metal-ion homeostasis (transition-metal-catalyzed oxidative damage)
 - Endogenous antioxidant pathways (Nrf2/ARE etc.)
 
 ### 4. Synaptic function and neurotransmission

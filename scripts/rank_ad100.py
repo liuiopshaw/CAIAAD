@@ -50,7 +50,7 @@ def family_key(name: str) -> str:
     """Normalize a candidate name to its base-therapeutic family key."""
     k = _SIZE_TOKEN_RE.sub("", name)
     parts = [p for p in re.split(r"[_\s]+", k) if p]
-    # drop trailing pure-formula tokens (Cu, CuO, Cu2O, Fe3O4...)
+    # drop trailing pure-formula tokens (Fe3O4, CeO2, ZnO...)
     while len(parts) > 1 and _FORMULA_TOKEN_RE.match(parts[-1]):
         parts.pop()
     return "_".join(parts).strip("_- ") or name

@@ -95,3 +95,7 @@ models/
 agent_literature/
 src.zip
 .claude/
+
+# Local-only pipeline data and training code (not committed)
+data/
+finetune/

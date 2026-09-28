@@ -76,7 +76,7 @@ class NanoLitSearchTool:
         self._last_request = time.time()
 
     def _params(self, extra: Dict[str, Any]) -> Dict[str, Any]:
-        params = {"tool": "cu-agent", "email": os.getenv("NCBI_EMAIL", "cu-agent@example.com")}
+        params = {"tool": "nano-bio-agent", "email": os.getenv("NCBI_EMAIL", "nano-bio@example.com")}
         if self.api_key:
             params["api_key"] = self.api_key
         params.update(extra)

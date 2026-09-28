@@ -341,11 +341,11 @@ if __name__ == "__main__":
         print(f"STEP 2: designer — Design {total_count} ASA-top materials ({total_batches} batches from config)")
         print("=" * 60)
 
-        # 2026-09: subjective steering removed — no Cu flagship targets, no
-        # element-frequency goals. Batches exist only for VRAM chunking.
+        # 2026-09: subjective steering removed — no element-specific flagship
+        # targets, no element-frequency goals. Batches exist only for VRAM chunking.
         # The designer format block is the v2 contract generated per batch by
         # schema_v2.cda_format_block via cda_format_block_for() (modality_focus).
-        # schema="v3" (AD100): single uniform v3 format block, no Cu quota.
+        # schema="v3" (AD100): single uniform v3 format block, no element quota.
         is_v3 = CFG.get("schema") == "v3"
         cda_chunks = []
         designed_names = []  # cross-batch anti-duplication (see below)

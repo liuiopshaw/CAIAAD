@@ -221,7 +221,7 @@ Rules:
   - dual-atom: 0.3-0.5nm
   - nanocluster: 1-3nm
   - nanoparticle: estimate from context, default 10-20nm
-- Core Elements: chemical symbols, comma-separated (e.g., Fe,O or Pt,C or Cu,N,C)
+- Core Elements: chemical symbols, comma-separated (e.g., Fe,O or Pt,C or Mn,N,C)
 - Size Category: EXACTLY one of: single_atom, dual_atom, nanocluster, nanoparticle
 - Source: PUBCHEM, PUBMED, MATERIALS_PROJECT, or DRUGBANK
 
@@ -231,8 +231,8 @@ For example:
 - "Platinum nanoparticle-deposited multi-walled carbon nanotubes" → Pt_NP_MWCNT | 5 | Pt,C | nanoparticle | PUBMED
 - "Ruthenium Single-Atom Catalyst" → Ru_SAC | 0.2 | Ru | single_atom | PUBMED
 - "Nonmetallic N/C Nanozyme" → N_C_Nanozyme | 5 | N,C | nanocluster | PUBMED
-- "Protein-protected metal nanoclusters" → Metal_NC_Protein | 2 | Au,Ag,Cu | nanocluster | PUBMED
-- "Cu-N-C peroxidase mimics" → Cu-N-C_SAC | 0.2 | Cu,N,C | single_atom | PUBMED
+- "Protein-protected metal nanoclusters" → Metal_NC_Protein | 2 | Au,Ag,Pt | nanocluster | PUBMED
+- "Mn-N-C peroxidase mimics" → Mn-N-C_SAC | 0.2 | Mn,N,C | single_atom | PUBMED
 - "Zn-Based Single-Atom Nanozyme" → Zn_SAC | 0.2 | Zn | single_atom | PUBMED
 - "Fe-N-C Single-Atom Nanozymes" → Fe-N-C_SAC | 0.2 | Fe,N,C | single_atom | PUBMED
 - "MOF-Based Single-Atom and Metal Cluster Catalysts" → MOF_SAC_Cluster | 0.3-2 | Fe,Cu,Zn | dual_atom | PUBMED

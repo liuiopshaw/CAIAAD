@@ -130,7 +130,7 @@ class EnzymeClassifier:
         if "oxygen vacancy" in booster_lower:
             return props.get("has_oxygen_vacancy", False)
         if "fenton" in booster_lower:
-            return any(el in ["Fe", "Cu", "Co", "Mn"] for el in props.get("core_elements", []))
+            return any(el in ["Fe", "Co", "Mn"] for el in props.get("core_elements", []))
         if "small particle" in booster_lower:
             return (props.get("size_nm") or 999) < 10
         if "metal-organic" in booster_lower:
@@ -139,8 +139,8 @@ class EnzymeClassifier:
             return "Ce" in props.get("core_elements", [])
         if "fluorite" in booster_lower or "perovskite" in booster_lower:
             return props.get("crystal_structure") in ["fluorite", "perovskite"]
-        if "cu nanocluster" in booster_lower:
-            return "Cu" in props.get("core_elements", []) and props.get("shape") == "nanocluster"
+        if "nanocluster" in booster_lower:
+            return props.get("shape") == "nanocluster"
         if "cyclodextrin" in booster_lower:
             return "cyclodextrin" in str(props.get("coating", "")).lower()
         return any(word in booster_lower for word in str(props).lower().split())

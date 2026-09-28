@@ -130,7 +130,7 @@ def cda_format_block(modality_focus: "str | None" = None) -> str:
 
     lines += [
         "",
-        "Chemical_Formula: formula of the INORGANIC active phase (e.g., Cu, CuO, Cu2O, CuFe2O4, Cu-N4, ZnMoO4)",
+        "Chemical_Formula: formula of the INORGANIC active phase (e.g., Fe3O4, CeO2, ZnO, ZnMoO4, Fe-N4, TiO2)",
         "Ligand: the stabilizing ligand/coating as reported in literature. For nanoclusters and NPs <10nm an organic capping agent is REQUIRED (e.g., cyclodextrin, glutathione, BSA, PVP, PEG, citrate, tannic acid, chitosan). For SAC/DAC write the anchoring support (e.g., N-doped carbon, CeO2, ZIF-8, g-C3N4).",
         "SMILES: canonical SMILES of the small molecule (small_molecule modality only). Provide it ONLY if completely certain; otherwise write NA — NEVER invent, guess, or repeat SMILES strings (a database lookup resolves SMILES from the compound name later)",
         "Target_UniProt: UniProt accession of the primary protein target (small_molecule/biologic modalities)",
@@ -191,7 +191,7 @@ def normalize_record(cells: "list[str]") -> "dict | None":
 
 # ---------------------------------------------------------------------------
 # Schema v3 — AD100 run contract (, user-specified 4-dimension
-# classification; single-choice per dimension; English enums; NO Cu quota)
+# classification; single-choice per dimension; English enums; NO element quota)
 # ---------------------------------------------------------------------------
 
 FIELDS_V3 = [
@@ -268,11 +268,11 @@ def cda_format_block_v3() -> str:
         lines.append(f"- {t}: {DRUG_TYPE_FIELD_GUIDE[t]}")
     lines += [
         "",
-        "Chemical_Formula: formula of the INORGANIC active phase (nano_formulation only, e.g., Cu, CuO, Fe3O4, ZnMoO4). Only real, chemically valid formulas — if unsure, write NA",
+        "Chemical_Formula: formula of the INORGANIC active phase (nano_formulation only, e.g., Fe3O4, CeO2, ZnO, ZnMoO4). Only real, chemically valid formulas — if unsure, write NA",
         "Ligand: stabilizing ligand/coating for nano candidates (e.g., cyclodextrin, glutathione, BSA, PVP, PEG, citrate, chitosan); for SAC/DAC the anchoring support",
         "Target_UniProt: UniProt accession of the primary protein target (small_molecule/biologic; NA otherwise). Provide it ONLY if completely certain; otherwise write NA — NEVER invent or guess accessions (a database lookup verifies them later)",
         "",
-        "CATEGORY RULES: (a) A nano formulation that carries a payload agent (small molecule or biologic) is STILL nano_formulation — there is no separate composite category (e.g., a Cu nanocluster carrying quercetin = nano_formulation). (b) TWO-AGENT LIMIT: never combine MORE THAN TWO therapeutic agents in one candidate — one carrier plus one payload at most (coatings/ligands like cyclodextrin, PEG, chitosan are NOT agents). NO triple combinations like 'nanocluster + EGCG + quercetin'.",
+        "CATEGORY RULES: (a) A nano formulation that carries a payload agent (small molecule or biologic) is STILL nano_formulation — there is no separate composite category (e.g., a metal nanocluster carrying quercetin = nano_formulation). (b) TWO-AGENT LIMIT: never combine MORE THAN TWO therapeutic agents in one candidate — one carrier plus one payload at most (coatings/ligands like cyclodextrin, PEG, chitosan are NOT agents). NO triple combinations like 'nanocluster + EGCG + quercetin'.",
         "",
         "Material_Name is REQUIRED for EVERY candidate — a real, verifiable name, NEVER 'NA' or a placeholder. SMILES/Target_UniProt may be NA when uncertain, but the name may NOT.",
         "",

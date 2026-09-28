@@ -18,12 +18,11 @@ import schema_v2  # noqa: E402
 
 DEFAULT_TOA_GOAL = (
     "Design 100 candidates spanning nanomaterials, small-molecule drugs, and "
-    "biologics — with a FOCUS on Cu-based nanomaterials whose selective direct "
-    "antibacterial action and gut-microbiome remodeling are priority mechanisms, "
-    "alongside AD-relevant small molecules and biologics targeting amyloid/tau/"
-    "neuroinflammation pathways. Validate NADH oxidase-like activity, assess "
-    "antibacterial performance and biosafety, analyze mechanisms, and produce a "
-    "ranked summary report."
+    "biologics, with AD-relevant mechanisms as the priority — selective direct "
+    "antibacterial action and gut-microbiome remodeling alongside small molecules "
+    "and biologics targeting amyloid/tau/neuroinflammation pathways. Validate "
+    "NADH oxidase-like activity, assess antibacterial performance and biosafety, "
+    "analyze mechanisms, and produce a ranked summary report."
 )
 
 

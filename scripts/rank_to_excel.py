@@ -5,7 +5,7 @@ Export a ranking run to an Excel workbook (.xlsx).
 Reuses rank_cda_outputs.parse_records (same parsing/sorting as the MD ranking)
 plus the formula_lookup map, and writes:
   Sheet 1 "Ranking": the full ranked table (same columns as ranking_<TS>.md)
-  Sheet 2 "Target Metrics": Cu x direct-antibacterial x microbiome-remodeling
+  Sheet 2 "Target Metrics": direct-antibacterial x microbiome-remodeling coverage
     metrics + element frequencies
     + Phase 4 three-modality coverage (Modality/Mechanism distributions,
     SMILES/Target_UniProt non-NA counts)
@@ -168,23 +168,18 @@ def main():
 
     # ---- Sheet 2: Target Metrics ----
     ws2 = wb.create_sheet("Target Metrics")
-    cu = [r for r in valid if "Cu" in [e.strip() for e in r[ELEMENTS].split(",")]]
     da = [r for r in valid if r[INTERVENTION] == "direct_antibacterial"]
     mr = [r for r in valid if r[MECHANISM] == "microbiome_remodeling"]
-    cu_da = [r for r in cu if r[INTERVENTION] == "direct_antibacterial"]
-    cu_mr = [r for r in cu if r[MECHANISM] == "microbiome_remodeling"]
-    cu_both = [r for r in cu if r[INTERVENTION] == "direct_antibacterial" and r[MECHANISM] == "microbiome_remodeling"]
+    both_set = [r for r in valid if r[INTERVENTION] == "direct_antibacterial" and r[MECHANISM] == "microbiome_remodeling"]
     nadh_yes = sum(1 for r in valid if r[NADH].strip().upper() == "YES")
     pct = lambda x: f"{len(x)} ({len(x)/len(valid)*100:.0f}%)" if valid else "0"
 
-    both_set = [r for r in valid if r[INTERVENTION] == "direct_antibacterial" and r[MECHANISM] == "microbiome_remodeling"]
     elem_freq = Counter()
     for r in both_set:
         for e in r[ELEMENTS].split(","):
             e = e.strip()
             if e and e != "O":
                 elem_freq[e] += 1
-    cu_is_top = bool(elem_freq) and elem_freq.get("Cu", 0) == elem_freq.most_common(1)[0][1]
     all_elem = Counter()
     for r in valid:
         for e in r[ELEMENTS].split(","):
@@ -207,15 +202,11 @@ def main():
         ("NADH Activity YES", f"{nadh_yes} ({nadh_yes/len(valid)*100:.0f}%)" if valid else "0"),
         ("ASA Range", f"{asa(valid[-1])} – {asa(valid[0])}" if valid else ""),
         ("", ""),
-        ("Cu-based materials", pct(cu)),
         ("direct_antibacterial (all)", pct(da)),
         ("microbiome_remodeling (all)", pct(mr)),
-        ("Cu ∩ direct_antibacterial", pct(cu_da)),
-        ("Cu ∩ microbiome_remodeling", pct(cu_mr)),
-        ("Cu ∩ both", pct(cu_both)),
+        ("both mechanisms", pct(both_set)),
         ("Element frequency Top8, full ranking (excl. O/N/C)", ", ".join(f"{e}×{n}" for e, n in all_elem.most_common(8))),
         ("Element frequency of both-qualified candidates (excl. O)", ", ".join(f"{e}×{n}" for e, n in elem_freq.most_common(6))),
-        ("Cu is the most frequent element among both-qualified", "✅ Yes" if cu_is_top else "❌ No"),
         ("", ""),
         ("Modality Distribution", ", ".join(f"{m}×{mod_freq.get(m, 0)}" for m in schema_v2.MODALITIES)),
         ("Mechanism Distribution", ", ".join(f"{k}×{v}" for k, v in mech_freq.most_common())),

@@ -29,7 +29,7 @@ Analyze the user's requirement and determine:
 - Keywords: "design", "propose"
 
 **Skip if**:
-- User provides a specific candidate name or composition (e.g., "donepezil", "Cu nanocluster-cyclodextrin formulation")
+- User provides a specific candidate name or composition (e.g., "donepezil", "lipid nanoparticle formulation")
 - User explicitly says the candidate already exists
 - Keywords: "existing", "given", "this candidate"
 
@@ -96,7 +96,7 @@ Analyze the user's requirement and determine:
 ```
 
 ### Example 2
-**User**: "A Cu nanocluster-cyclodextrin formulation for gut-microbiota modulation in Alzheimer's disease. Please evaluate it only."
+**User**: "A lipid nanoparticle formulation for gut-microbiota modulation in Alzheimer's disease. Please evaluate it only."
 
 **Output**:
 ```json
@@ -107,7 +107,7 @@ Analyze the user's requirement and determine:
   "needs_mechanism": false,
   "needs_synthesis": false,
   "needs_operation": false,
-  "material_provided": "Cu nanocluster-cyclodextrin formulation",
+  "material_provided": "lipid nanoparticle formulation",
   "reasoning": "User provided a specific candidate description and explicitly requests 'evaluate it only', indicating experts-only mode without final summary"
 }
 ```
