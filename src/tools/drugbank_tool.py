@@ -5,15 +5,11 @@ and drug-microbiome interaction data.
 """
 
 import logging
-import os
 import httpx
 from typing import Optional
+from src.config.config import Config
 
 logger = logging.getLogger(__name__)
-
-
-def _api_key() -> str:
-    return os.getenv("DRUGBANK_API_KEY", "")
 
 
 class DrugBankTool:
@@ -43,7 +39,7 @@ class DrugBankTool:
 
     def _make_request(self, endpoint: str) -> Optional[dict]:
         headers = {
-            "Authorization": f"Bearer {_api_key()}",
+            "Authorization": f"Bearer {Config.DRUGBANK_API_KEY}",
             "Accept": "application/json"
         }
         for attempt in range(self.MAX_RETRIES + 1):
@@ -70,7 +66,7 @@ class DrugBankTool:
             "enzyme_targets": [],
             "source": "DrugBank"
         }
-        if not _api_key():
+        if not Config.DRUGBANK_API_KEY:
             return result
         search_result = self._make_request(f"search?q={compound_name}&type=compound")
         if not search_result:
@@ -114,7 +110,7 @@ class DrugBankTool:
             "active_site_residues": [],
             "source": "DrugBank"
         }
-        if not _api_key():
+        if not Config.DRUGBANK_API_KEY:
             return result
         search_result = self._make_request(f"search?q={enzyme_name}&type=enzyme")
         if not search_result:
@@ -147,7 +143,7 @@ class DrugBankTool:
             "clinical_relevance": None,
             "source": "DrugBank"
         }
-        if not _api_key():
+        if not Config.DRUGBANK_API_KEY:
             return result
         search_result = self._make_request(f"search?q={compound_name}&type=compound")
         if not search_result:
