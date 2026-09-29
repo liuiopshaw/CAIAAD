@@ -11,11 +11,11 @@ logging.basicConfig(level=logging.WARNING)
 # Get the logger instance for the current module; all subsequent log output goes through this logger
 logger = logging.getLogger(__name__)
 
-# Assessment Screening Expert C class
+# Assessment Expert C class
 # Inherits from BaseAgent; one of three parallel experts comprehensively evaluating
 # AD therapeutic candidates across the five weighted rubric dimensions
-class AssessmentScreeningAgentC(BaseAgent):
-    """Assessment Screening Expert C Agent
+class AssessmentAgentC(BaseAgent):
+    """Assessment Expert Agent C
 
     A specialized agent responsible for comprehensively evaluating AD therapeutic
     candidates across the five weighted rubric dimensions, distinguished from
@@ -23,7 +23,7 @@ class AssessmentScreeningAgentC(BaseAgent):
     """
 
     def __init__(self, llm):
-        """Initialize the Assessment Screening Expert C agent.
+        """Initialize the Assessment Expert C agent.
 
         Args:
             llm: The large language model instance this agent will use, injected by the upper-level caller
@@ -34,14 +34,14 @@ class AssessmentScreeningAgentC(BaseAgent):
         # Call the constructor of the base class BaseAgent, passing in all core parameters of the agent
         # Passed as positional arguments for more concise and compact code
         super().__init__(llm,
-                         # Role identifier: Assessment Screening Expert C, used to distinguish different expert identities in multi-agent collaboration
-                         "Assessment_Screening_agent_C",
+                         # Role identifier: Assessment Expert C, used to distinguish different expert identities in multi-agent collaboration
+                         "assessment_agent_c",
                          # Goal description: tells the agent that its core task is to comprehensively evaluate all aspects of material proposals
                          "Comprehensively evaluate AD therapeutic candidates across the five weighted rubric dimensions",
                          # Specify the prompt template file (Markdown format) used by this agent, which is loaded and populated with parameters at runtime
-                         "assessment_screening_agent_c_prompt.md",
+                         "assessment_agent_c_prompt.md",
                          # Read Expert C's dedicated temperature parameter from the configuration file to control the randomness of LLM output
-                         temperature=Config.EXPERT_C_TEMPERATURE,
+                         temperature=Config.ASSESSMENT_C_TEMPERATURE,
                          # Maximum iterations set to 2:
                          # Following the "less is more" principle, drastically reduced from the original 15 to focus on the core evaluation logic
                          max_iter=2,
@@ -49,7 +49,7 @@ class AssessmentScreeningAgentC(BaseAgent):
                          prompt_params={"EXPERT_ID": "C"})
 
     def create_agent(self):
-        """Create and configure the assessment screening agent.
+        """Create and configure the assessment agent.
 
         Uses the LLM instance passed to the constructor as-is (LLM selection
         is centralized in BaseAgent._resolve_llm()), then attaches the unified
@@ -65,7 +65,7 @@ class AssessmentScreeningAgentC(BaseAgent):
         # This method loads the prompt, sets role information, initializes the CrewAI agent, etc.
         agent = super().create_agent()
 
-        # Use the unified ASA (Assessment Screening Agent) evaluation tool set
+        # Use the unified assessment tool set
         # The three assessment experts A/B/C share the same set of tools to ensure consistent evaluation criteria
         try:
             # Dynamically import the tool-switch check function to determine whether the current environment is configured to enable external tools

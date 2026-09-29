@@ -10,7 +10,7 @@ from typing import List, Union, Dict, Any
 from crewai import Agent
 # Import the custom prompt loading utility to read prompts from external .md files
 from src.utils.prompt_loader import load_prompt
-# Import the BaseAgent base class; TaskOrganizingAgent inherits from it to reuse common agent creation logic
+# Import the BaseAgent base class; CoordinatorAgent inherits from it to reuse common agent creation logic
 from src.agents.base_agent import BaseAgent
 
 # Set the global log level of the logging module to WARNING,
@@ -19,13 +19,13 @@ logging.basicConfig(level=logging.WARNING)
 # Get the logger instance for the current module; log output carries the module name for easier source tracing
 logger = logging.getLogger(__name__)
 
-# Task organizing agent class, acting as the "brain" of the entire system:
+# Coordinator agent class, acting as the "brain" of the entire system:
 # 1. Analyze user intent (intent recognition)
 # 2. Map intents to concrete task types
 # 3. Manage the agent registry
 # 4. Delegate tasks to the appropriate expert agents
-class TaskOrganizingAgent(BaseAgent):
-    """Task Organizing Agent - responsible for intent recognition and agent scheduling
+class CoordinatorAgent(BaseAgent):
+    """Coordinator Agent - responsible for intent recognition and agent scheduling
        It is the coordination center of the entire multi-agent system: it receives user
        requirements, analyzes intents, and assigns tasks to the correct expert agents"""
 
@@ -37,20 +37,20 @@ class TaskOrganizingAgent(BaseAgent):
     # every referenced class must actually exist. A list value means the task
     # is handled by several agents in parallel (e.g. the three assessment experts).
     TASK_AGENT_MAPPING = {
-        "therapeutic_design": "CreativeDesigningAgent",            # Therapeutic design -> creative designing agent
-        "evaluation": ["AssessmentScreeningAgentA",                 # Evaluation -> the three assessment experts
-                        "AssessmentScreeningAgentB",                 # in parallel; evaluation_mode "with_summary"
-                        "AssessmentScreeningAgentC"],                # additionally schedules the Overall expert
-        "final_summary": "AssessmentScreeningAgentOverall",        # Final summary -> overall (final validation) agent
-        "mechanism_analysis": "MechanismMiningAgent",              # Mechanism analysis -> mechanism mining agent
-        "development_method": "SynthesisGuidingAgent",             # Development/preparation method -> synthesis guiding agent
-        "operation_guidance": "OperationSuggestingAgent",          # Operation guidance -> operation suggesting agent
-        "literature_processing": "ExtractingAgent",                # Literature processing -> information extracting agent
-        "coordinator": "TaskOrganizingAgent"                       # Coordination task -> itself
+        "therapeutic_design": "DesignerAgent",                  # Therapeutic design -> designer agent
+        "evaluation": ["AssessmentAgentA",                       # Evaluation -> the three assessment experts
+                        "AssessmentAgentB",                       # in parallel; evaluation_mode "with_summary"
+                        "AssessmentAgentC"],                      # additionally schedules the Overall expert
+        "final_summary": "AssessmentAgentOverall",              # Final summary -> overall (final validation) agent
+        "mechanism_analysis": "MechanismAgent",                 # Mechanism analysis -> mechanism agent
+        "development_method": "SynthesisGuidingAgent",          # Development/preparation method -> synthesis guiding agent
+        "operation_guidance": "OperationSuggestingAgent",       # Operation guidance -> operation suggesting agent
+        "literature_processing": "ExtractorAgent",              # Literature processing -> extractor agent
+        "coordinator": "CoordinatorAgent"                       # Coordination task -> itself
     }
 
     def __init__(self, llm):
-        """Initialize the task organizing agent
+        """Initialize the coordinator agent
 
         Args:
             llm: Language model instance, passed in externally (usually from the Crew configuration)
@@ -59,7 +59,7 @@ class TaskOrganizingAgent(BaseAgent):
         # role and goal are used by the CrewAI framework to identify the agent's responsibilities
         super().__init__(
             llm=llm,
-            role="Task_Organizing_agent",  # Agent role: task organizer
+            role="coordinator",  # Agent role: coordinator
             goal="Organize and coordinate the work of various expert agents to ensure tasks are completed according to plan",
             # Specify the prompt template file used by this agent
             prompt_file="coordinator_prompt.md"
@@ -70,7 +70,7 @@ class TaskOrganizingAgent(BaseAgent):
         self._agent_registry: Dict[str, Union[Agent, List[Agent]]] = {}
 
     def create_agent(self):
-        """Create and return the CrewAI Agent instance of the task organizing agent
+        """Create and return the CrewAI Agent instance of the coordinator agent
 
         Unlike the base class create_agent, this method overrides the parent implementation:
         - Uses the coordinator_prompt specified in the constructor as the backstory
@@ -81,7 +81,7 @@ class TaskOrganizingAgent(BaseAgent):
             Agent: The configured coordinator Agent instance
         """
         return Agent(
-            role="Task_Organizing_agent",
+            role="coordinator",
             goal="Organize and coordinate experts' work to ensure efficient task completion",
             # Load the prompt template specified in the constructor (coordinator_prompt.md, under locales/en/prompts)
             backstory=load_prompt(self.prompt_file),
@@ -102,7 +102,7 @@ class TaskOrganizingAgent(BaseAgent):
         so it can later be looked up by type via get_agent_for_task.
 
         Args:
-            agent_type: Agent type name (e.g. "CreativeDesigningAgent")
+            agent_type: Agent type name (e.g. "CoordinatorAgent")
             agent: A single Agent instance or a list of Agent instances
                    (the list form is used for multiple instances of the same type, e.g. multiple evaluation experts)
         """
@@ -251,7 +251,7 @@ class TaskOrganizingAgent(BaseAgent):
 
             # Log the LLM's reasoning at INFO level for debugging and auditing
             # Use .get to prevent a KeyError if the LLM's JSON lacks the reasoning key
-            logger.info(f"TOA Intent Analysis: {intent.get('reasoning', '')}")
+            logger.info(f"Coordinator Intent Analysis: {intent.get('reasoning', '')}")
             return intent
 
         except json.JSONDecodeError as e:

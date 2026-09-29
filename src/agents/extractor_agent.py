@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)  # Get the logger for the current module, so log sources can be located
 
 
-class ExtractingAgent(BaseAgent):
+class ExtractorAgent(BaseAgent):
     """Literature processing agent
 
     An agent responsible for processing and analyzing scientific literature,
@@ -41,10 +41,10 @@ class ExtractingAgent(BaseAgent):
         from src.config.config import Config
         super().__init__(
             llm=llm,
-            role="Extracting_agent",  # Role name: literature processing expert, used for logging and identification
+            role="extractor",  # Role name: literature processing expert, used for logging and identification
             goal="Process and analyze relevant technical literature to provide background information for therapeutic evaluation",  # Goal description: guides the LLM to extract and organize key information from the literature
             prompt_file="extractor_prompt.md",  # Prompt template file: defines this role's literature analysis method and output format
-            temperature=Config.LITERATURE_PROCESSOR_TEMPERATURE  # Temperature parameter: read from the config file, controls the randomness of LLM output
+            temperature=Config.EXTRACTOR_TEMPERATURE  # Temperature parameter: read from the config file, controls the randomness of LLM output
             # Note: this agent does not set the max_iter parameter and uses BaseAgent's default
             # This means the literature extraction task may need more iterations to ensure information completeness
         )

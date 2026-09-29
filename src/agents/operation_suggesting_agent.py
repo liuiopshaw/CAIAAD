@@ -29,10 +29,10 @@ class OperationSuggestingAgent(BaseAgent):
         from src.config.config import Config
         super().__init__(
             llm,
-            "Operation_Suggesting_agent",  # Role name: operation suggestion expert, used for logging and identification
+            "operation_suggesting_agent",  # Role name: operation suggestion expert, used for logging and identification
             "Provide detailed operational guidance for laboratory testing and preclinical development of AD therapeutic candidates",  # Goal description: guides the LLM to generate detailed operating procedures
             "operation_suggesting_agent_prompt.md",  # Prompt template file: contains the detailed system prompt for this role, defining its professional domain and behavioral norms
-            temperature=Config.OPERATION_SUGGESTING_TEMPERATURE,  # Temperature parameter: read from the config file, controls the randomness of LLM output
+            temperature=Config.OPERATION_TEMPERATURE,  # Temperature parameter: read from the config file, controls the randomness of LLM output
             max_iter=2  # Maximum number of iterations: set to 2 (original value was 8), following the "less is more" principle
                         # Fewer iterations means: reusing upstream synthesis routes, focusing on refining operational details, and avoiding excessive repeated reasoning
         )

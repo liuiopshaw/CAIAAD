@@ -1,30 +1,29 @@
 #!/usr/bin/env python3
-"""Delivery Efficiency Scoring Agent (formerly EPA) — target-tissue delivery evaluation."""
+"""Delivery Agent — target-tissue delivery evaluation."""
 
 from .base_agent import BaseAgent
 from src.tools import ToolFactory
 
 
-class EnzymeActivityAgent(BaseAgent):
+class DeliveryAgent(BaseAgent):
     """Target-tissue delivery efficiency scoring agent.
 
     Assesses whether an AD therapeutic effectively reaches its site of action
     (barrier penetration & bioavailability, targeting & designability, exposure
     durability). Scoring follows the shared rubric anchors; no subjective bonus
-    points. (Class name kept for backward compatibility with the former
-    enzyme-activity prediction role.)
+    points.
     """
 
     def __init__(self, llm):
         from src.config.config import Config
         super().__init__(
             llm=llm,
-            role="delivery_efficiency_scoring_agent",
+            role="delivery",
             goal="Score target-tissue delivery efficiency (delivery_efficiency) of AD therapeutics: "
                  "barrier penetration & bioavailability, targeting & designability, and exposure "
                  "durability, following the shared rubric anchors.",
             prompt_file="delivery_prompt.md",
-            temperature=Config.EPA_TEMPERATURE,
+            temperature=Config.DELIVERY_TEMPERATURE,
             max_iter=1
         )
 

@@ -39,7 +39,7 @@ class ToolFactory:
     @staticmethod
     def create_operation_guidance_tools():
         """
-        Create the operation guidance tool set — for use by Operation_Suggesting_agent.
+        Create the operation guidance tool set — for use by operation_suggesting_agent.
 
         Matched to task requirements:
         - pubchem: chemical safety data
@@ -59,7 +59,7 @@ class ToolFactory:
     @staticmethod
     def create_literature_extraction_tools():
         """
-        Create the literature extraction tool set — for Extracting_agent to
+        Create the literature extraction tool set — for extractor_agent to
         extract chemical information from the literature.
 
         Strategy (Less is More):
@@ -117,8 +117,8 @@ class ToolFactory:
     @staticmethod
     def create_mechanism_analysis_tools():
         """
-        Create the mechanism analysis tool set — for use by MechanismMiningAgent,
-        the mechanism mining Agent.
+        Create the mechanism analysis tool set — for use by MechanismAgent,
+        the mechanism analysis Agent.
 
         Note: Prefer reusing analysis results from upstream Agents to reduce
         duplicate queries.
@@ -135,7 +135,7 @@ class ToolFactory:
     @staticmethod
     def create_unified_assessment_tools():
         """
-        Create the unified ASA assessment tool set — shared by the three
+        Create the unified assessment tool set — shared by the three
         expert Agents Expert A/B/C.
 
         Strategy (Less is More):

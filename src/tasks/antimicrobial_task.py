@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Antimicrobial evaluation task for APA agent."""
+"""Antimicrobial evaluation task for the antimicrobial agent."""
 
 from .base_task import BaseTask, load_task_text
 
@@ -13,7 +13,7 @@ class AntimicrobialTask(BaseTask):
     DEFAULT_DESCRIPTION = (
         "Evaluate the selective antibacterial performance of each AD therapeutic "
         "candidate for Alzheimer's disease therapy via gut microbiota modulation. "
-        "For every candidate, score the four APA dimensions — bactericidal potency "
+        "For every candidate, score the four antimicrobial dimensions — bactericidal potency "
         "(40%), pathogen-probiotic selectivity (35%), spectrum breadth (15%), and "
         "resistance risk (10%) — on a 1-10 scale. Distinguish in-vitro evidence "
         "from in-vivo evidence, base all scores on actual data, and state "

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Comparison Agent (CA) — Multi-material cross-comparison with Cj fusion."""
+"""Ranker Agent — Multi-material cross-comparison with Cj fusion."""
 
 import logging
 from .base_agent import BaseAgent
@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 
-class ComparisonAgent(BaseAgent):
+class RankerAgent(BaseAgent):
     """Cross-material comparison and ranking agent.
 
     Aggregates manufacturing, delivery, and safety evaluation scores, applies
@@ -21,12 +21,12 @@ class ComparisonAgent(BaseAgent):
         from src.config.config import Config
         super().__init__(
             llm=llm,
-            role="comparison_agent",
+            role="ranker",
             goal="Aggregate multi-dimensional evaluation scores, fuse with consistency "
                  "coefficient Cj, generate cross-material comparison matrix, radar chart "
                  "data, rankings, and AD therapeutic potential recommendations.",
             prompt_file="ranker_prompt.md",
-            temperature=Config.CA_TEMPERATURE,
+            temperature=Config.RANKER_TEMPERATURE,
             max_iter=1
         )
         self.material_compare = MaterialCompare()

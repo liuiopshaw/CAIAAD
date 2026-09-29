@@ -43,54 +43,28 @@ class Config:
     MODEL_MAX_TOKENS = int(os.getenv("MODEL_MAX_TOKENS", "2048"))
 
     # --- Agent-specific temperature configuration ---
-    # The material design expert uses a higher temperature of 0.8 to increase output diversity and encourage innovative designs
-    MATERIAL_DESIGNER_TEMPERATURE = float(os.getenv("MATERIAL_DESIGNER_TEMPERATURE", "0.8"))
+    # The designer agent uses a higher temperature of 0.8 to increase output diversity and encourage innovative designs
+    DESIGNER_TEMPERATURE = float(os.getenv("DESIGNER_TEMPERATURE", "0.8"))
 
-    # The three evaluation experts use a lower temperature of 0.3 to ensure consistency and accuracy of scoring
-    EXPERT_A_TEMPERATURE = float(os.getenv("EXPERT_A_TEMPERATURE", "0.3"))
-    EXPERT_B_TEMPERATURE = float(os.getenv("EXPERT_B_TEMPERATURE", "0.3"))
-    EXPERT_C_TEMPERATURE = float(os.getenv("EXPERT_C_TEMPERATURE", "0.3"))
+    # The three assessment experts use a lower temperature of 0.3 to ensure consistency and accuracy of scoring
+    ASSESSMENT_A_TEMPERATURE = float(os.getenv("ASSESSMENT_A_TEMPERATURE", "0.3"))
+    ASSESSMENT_B_TEMPERATURE = float(os.getenv("ASSESSMENT_B_TEMPERATURE", "0.3"))
+    ASSESSMENT_C_TEMPERATURE = float(os.getenv("ASSESSMENT_C_TEMPERATURE", "0.3"))
 
-    # The final validation expert uses a moderate temperature of 0.5, balancing stability and flexibility of comprehensive judgment
-    FINAL_VALIDATOR_TEMPERATURE = float(os.getenv("FINAL_VALIDATOR_TEMPERATURE", "0.5"))
+    # The overall assessment expert uses a moderate temperature of 0.5, balancing stability and flexibility of comprehensive judgment
+    ASSESSMENT_OVERALL_TEMPERATURE = float(os.getenv("ASSESSMENT_OVERALL_TEMPERATURE", "0.5"))
 
-    # The other experts (mechanism analysis, synthesis guidance, operation suggestion, literature processing) uniformly use the evaluation-grade temperature of 0.3
-    MECHANISM_EXPERT_TEMPERATURE = float(os.getenv("MECHANISM_EXPERT_TEMPERATURE", "0.3"))
-    SYNTHESIS_EXPERT_TEMPERATURE = float(os.getenv("SYNTHESIS_EXPERT_TEMPERATURE", "0.3"))
-    OPERATION_SUGGESTING_TEMPERATURE = float(os.getenv("OPERATION_SUGGESTING_TEMPERATURE", "0.3"))
-    LITERATURE_PROCESSOR_TEMPERATURE = float(os.getenv("LITERATURE_PROCESSOR_TEMPERATURE", "0.3"))
+    # The other experts (mechanism analysis, synthesis guidance, operation suggestion, literature extraction) uniformly use the evaluation-grade temperature of 0.3
+    MECHANISM_TEMPERATURE = float(os.getenv("MECHANISM_TEMPERATURE", "0.3"))
+    SYNTHESIS_TEMPERATURE = float(os.getenv("SYNTHESIS_TEMPERATURE", "0.3"))
+    OPERATION_TEMPERATURE = float(os.getenv("OPERATION_TEMPERATURE", "0.3"))
+    EXTRACTOR_TEMPERATURE = float(os.getenv("EXTRACTOR_TEMPERATURE", "0.3"))
 
-    # ---- Temperatures for the newly added agents in the nano-bio evaluation system ----
-    APA_TEMPERATURE = float(os.getenv("APA_TEMPERATURE", "0.3"))
-    EPA_TEMPERATURE = float(os.getenv("EPA_TEMPERATURE", "0.3"))
-    BSA_TEMPERATURE = float(os.getenv("BSA_TEMPERATURE", "0.3"))
-    MMA_TEMPERATURE = float(os.getenv("MMA_TEMPERATURE", "0.3"))
-    CA_TEMPERATURE = float(os.getenv("CA_TEMPERATURE", "0.1"))
-
-    # Backward-compatible unified evaluation temperature configuration
-    EXPERT_EVALUATION_TEMPERATURE = float(os.getenv("EXPERT_EVALUATION_TEMPERATURE", "0.3"))
-
-    # ---- Nano-bio evaluation scoring weights ----
-    APA_WEIGHTS = {
-        "potency": 0.40,
-        "selectivity": 0.35,
-        "spectrum": 0.15,
-        "resistance_risk": 0.10
-    }
-
-    EPA_WEIGHTS = {
-        "activity_strength": 0.65,
-        "substrate_affinity": 0.25,
-        "condition_window": 0.10
-    }
-
-    BSA_WEIGHTS = {
-        "cytotoxicity": 0.30,
-        "organ_damage": 0.25,
-        "in_vivo_toxicity": 0.20,
-        "environmental_risk": 0.15,
-        "structural_stability": 0.10
-    }
+    # ---- Temperatures for the nano-bio evaluation system scoring agents ----
+    ANTIMICROBIAL_TEMPERATURE = float(os.getenv("ANTIMICROBIAL_TEMPERATURE", "0.3"))
+    DELIVERY_TEMPERATURE = float(os.getenv("DELIVERY_TEMPERATURE", "0.3"))
+    SAFETY_TEMPERATURE = float(os.getenv("SAFETY_TEMPERATURE", "0.3"))
+    RANKER_TEMPERATURE = float(os.getenv("RANKER_TEMPERATURE", "0.1"))
 
     # --- Language configuration ---
     # Line 64: LANGUAGE — interface language selection; "zh" for Chinese, "en" for English

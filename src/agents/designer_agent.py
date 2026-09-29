@@ -1,6 +1,6 @@
 # Import the logging module for recording runtime log information of the agent
 import logging
-# Import the BaseAgent base class; CreativeDesigningAgent inherits from it to reuse common agent creation logic
+# Import the BaseAgent base class; DesignerAgent inherits from it to reuse common agent creation logic
 from src.agents.base_agent import BaseAgent
 # Import the ToolFactory class, used to create the toolset required for material design
 from src.tools import ToolFactory
@@ -13,15 +13,15 @@ logger = logging.getLogger(__name__)
 
 # AD therapeutic design expert agent class
 # Responsible for designing innovative Alzheimer's disease therapeutic candidates based on user requirements
-class CreativeDesigningAgent(BaseAgent):
-    """Creative Designing Agent
+class DesignerAgent(BaseAgent):
+    """Designer Agent
        Dedicated to AD therapeutic design tasks:
        - Generate therapeutic candidate designs based on user requirements
        - Query compound/target information from databases such as PubChem and UniProt
        - Output structured design results (modality, composition, mechanism hypothesis, etc.)"""
 
     def __init__(self, llm):
-        """Initialize the creative designing agent
+        """Initialize the designer agent
 
         Args:
             llm: Language model instance, passed in externally (usually from the Crew configuration or main program)
@@ -31,20 +31,20 @@ class CreativeDesigningAgent(BaseAgent):
         # Call the constructor of the parent class BaseAgent, passing configuration parameters specific to the design agent
         super().__init__(
             llm=llm,
-            role="Creative_Designing_agent",  # Agent role name: material design expert
+            role="designer",  # Agent role name: material design expert
             goal="Design innovative Alzheimer's disease (AD) therapeutic candidates — small molecules, nano formulations, and biologics — with explicit AD mechanism hypotheses, strictly following modality classification and structural description specifications",
             # Specify the prompt template file dedicated to the design agent
             prompt_file="designer_prompt.md",
             # Read the temperature parameter dedicated to material design from Config;
             # a higher temperature can increase the diversity/creativity of design solutions
-            temperature=Config.MATERIAL_DESIGNER_TEMPERATURE,
+            temperature=Config.DESIGNER_TEMPERATURE,
             # max_iter=1: performance optimization, limited to only 1 iteration
             # The original value was 8; reducing the iteration count significantly lowers API call costs and speeds up responses
             max_iter=1
         )
 
     def create_agent(self):
-        """Create and return a configured creative designing Agent instance
+        """Create and return a configured designer Agent instance
 
         This method overrides the parent class's create_agent, adding:
         1. Attachment of tools dedicated to therapeutic design

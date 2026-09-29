@@ -5,7 +5,7 @@ from .base_task import BaseTask, load_task_text
 from crewai import Task
 
 
-class EnzymeActivityTask(BaseTask):
+class DeliveryTask(BaseTask):
     """Task for target-tissue delivery-efficiency evaluation of AD therapeutics."""
 
     # Default task text, used when the locale YAML file is absent.
@@ -27,13 +27,13 @@ class EnzymeActivityTask(BaseTask):
     )
 
     def __init__(self, agent):
-        task_text = load_task_text('enzyme_activity_task')
+        task_text = load_task_text('delivery_task')
         super().__init__(agent=agent,
                          expected_output=task_text.get('expected_output') or self.DEFAULT_EXPECTED_OUTPUT,
                          description=task_text.get('description') or self.DEFAULT_DESCRIPTION)
 
     def create_task(self, agent, context_task=None, user_requirement=None):
-        task_text = load_task_text('enzyme_activity_task')
+        task_text = load_task_text('delivery_task')
         desc = task_text.get('description') or self.DEFAULT_DESCRIPTION
         if user_requirement:
             prefix = task_text.get('user_requirement_prefix', 'User requirement: ')

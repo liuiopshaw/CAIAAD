@@ -13,11 +13,11 @@ logging.basicConfig(level=logging.WARNING)
 # Get the logger instance for the current module; all subsequent log output goes through this logger
 logger = logging.getLogger(__name__)
 
-# Mechanism mining expert class
+# Mechanism expert class
 # Inherits from BaseAgent, specializing in mining and analyzing the mechanisms
 # of action of AD therapeutics
-class MechanismMiningAgent(BaseAgent):
-    """Mechanism mining expert agent
+class MechanismAgent(BaseAgent):
+    """Mechanism expert agent
     Responsible for mining the mechanism of action of AD therapeutics — molecular
     targets, pathways, and intervention logic against AD pathological processes —
     by analyzing candidate composition and pharmacological properties.
@@ -29,9 +29,9 @@ class MechanismMiningAgent(BaseAgent):
         # Call the constructor of the base class BaseAgent, passing in all core agent parameters
         super().__init__(
             llm=llm,
-            # Role identifier: mechanism mining expert, responsible for the chemical mechanism
+            # Role identifier: mechanism expert, responsible for the chemical mechanism
             # analysis stage in multi-agent collaboration
-            role="Mechanism_Mining_agent",
+            role="mechanism",
             # Goal description: explicitly tells the agent its core task,
             # focusing on mining the mechanism of action against AD pathology
             goal="Mine the mechanism of action of AD therapeutics — molecular targets, pathways, and intervention logic against AD pathological processes",
@@ -40,7 +40,7 @@ class MechanismMiningAgent(BaseAgent):
             prompt_file="mechanism_prompt.md",
             # Read the mechanism expert's dedicated temperature parameter from the config file;
             # usually set to a low value to ensure rigor and consistency of mechanism analysis
-            temperature=Config.MECHANISM_EXPERT_TEMPERATURE,
+            temperature=Config.MECHANISM_TEMPERATURE,
             # Maximum iterations set to 2:
             # following the "less is more" principle, reduced from the original 8 to 2.
             # This agent mainly reuses upstream analysis results (e.g., material
@@ -59,7 +59,7 @@ class MechanismMiningAgent(BaseAgent):
         agent = super().create_agent()
 
         # Use the toolset dedicated to mechanism analysis.
-        # Unlike the evaluation and screening expert, the mechanism mining expert needs
+        # Unlike the evaluation and screening expert, the mechanism expert needs
         # tools focused on chemical structure analysis and reaction pathway computation
         try:
             # Dynamically import the tool-toggle check function to determine whether the
@@ -81,5 +81,5 @@ class MechanismMiningAgent(BaseAgent):
             # more tools than miss critical information"
             agent.tools = ToolFactory.create_mechanism_analysis_tools()
 
-        # Return the fully configured mechanism mining agent instance for the caller to use
+        # Return the fully configured mechanism agent instance for the caller to use
         return agent

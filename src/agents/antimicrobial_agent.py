@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Antimicrobial Prediction Agent (APA) — Selective antibacterial performance evaluation."""
+"""Antimicrobial Agent — Selective antibacterial performance evaluation."""
 
 import logging
 from .base_agent import BaseAgent
@@ -20,13 +20,13 @@ class AntimicrobialAgent(BaseAgent):
         from src.config.config import Config
         super().__init__(
             llm=llm,
-            role="antimicrobial_prediction_agent",
+            role="antimicrobial",
             goal="Predict selective antibacterial performance of nanomaterials — "
                  "strong inhibition against gut pathogens with minimal impact on probiotics. "
                  "Support in vitro and in vivo selectivity assessment for Alzheimer's "
                  "treatment via gut microbiota modulation.",
             prompt_file="antimicrobial_prompt.md",
-            temperature=Config.APA_TEMPERATURE,
+            temperature=Config.ANTIMICROBIAL_TEMPERATURE,
             max_iter=1
         )
 

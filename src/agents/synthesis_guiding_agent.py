@@ -40,10 +40,10 @@ class SynthesisGuidingAgent(BaseAgent):
         from src.config.config import Config
         super().__init__(
             llm,
-            "Synthesis_Guiding_agent",  # Role name: synthesis methods expert, used for logging and identification
+            "synthesis_guiding_agent",  # Role name: synthesis methods expert, used for logging and identification
             "Design development and preparation methods and process flows for AD therapeutic candidates",  # Goal description: guides the LLM's task direction
             "synthesis_guiding_agent_prompt.md",  # Prompt template file: contains the detailed system prompt for this role
-            temperature=Config.SYNTHESIS_EXPERT_TEMPERATURE,  # Temperature parameter: read from the config file, controls the randomness of LLM output
+            temperature=Config.SYNTHESIS_TEMPERATURE,  # Temperature parameter: read from the config file, controls the randomness of LLM output
             max_iter=2  # Maximum iterations: set to 2 (original value was 8), following the "less is more" principle
                         # Fewer iterations means: reuse upstream design results, focus on synthesis route planning, and avoid excessive repeated reasoning
         )

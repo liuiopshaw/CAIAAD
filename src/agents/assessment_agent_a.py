@@ -1,6 +1,6 @@
 # Import the logging module for recording runtime log information of the agent
 import logging
-# Import the BaseAgent base class; AssessmentScreeningAgentA inherits from it to reuse common agent creation logic
+# Import the BaseAgent base class; AssessmentAgentA inherits from it to reuse common agent creation logic
 from src.agents.base_agent import BaseAgent
 # Import the ToolFactory class, used to create the toolset required for assessment and screening
 from src.tools import ToolFactory
@@ -11,18 +11,18 @@ logging.basicConfig(level=logging.WARNING)
 # Get the logger instance for the current module; log output carries the module name for easy source tracing
 logger = logging.getLogger(__name__)
 
-# Assessment Screening Expert Agent A
+# Assessment Expert Agent A
 # Expert A is an independent evaluator in the multi-expert assessment system,
 # working in parallel with Experts B and C to evaluate material proposals from different dimensions
-class AssessmentScreeningAgentA(BaseAgent):
-    """Assessment Screening Agent A
+class AssessmentAgentA(BaseAgent):
+    """Assessment Agent A
        Responsible for comprehensively evaluating material design proposals from a specific perspective:
        - Works in parallel with other assessment experts (B, C)
        - Uses a unified assessment toolset
        - Distinguished from other experts' assessment perspectives via EXPERT_ID in prompt_params"""
 
     def __init__(self, llm):
-        """Initialize Assessment Screening Agent A
+        """Initialize Assessment Agent A
 
         Args:
             llm: Language model instance, passed in externally (usually from Crew configuration or the main program)
@@ -32,13 +32,13 @@ class AssessmentScreeningAgentA(BaseAgent):
         # Call the constructor of the parent class BaseAgent, passing in the configuration specific to Assessment Agent A
         super().__init__(
             llm,  # Language model instance
-            "Assessment_Screening_agent_A",  # Agent role name: Assessment Expert A
+            "assessment_agent_a",  # Agent role name: Assessment Expert A
             "Comprehensively evaluate AD therapeutic candidates across the five weighted rubric dimensions",
             # Specify the prompt template file dedicated to Assessment Agent A
-            "assessment_screening_agent_a_prompt.md",
+            "assessment_agent_a_prompt.md",
             # Read the temperature parameter dedicated to Expert A from Config
             # A lower assessment temperature helps obtain more consistent and rational evaluation results
-            temperature=Config.EXPERT_A_TEMPERATURE,
+            temperature=Config.ASSESSMENT_A_TEMPERATURE,
             # max_iter=2: performance optimization, drastically reduced from the original 15 iterations to 2
             # Design principle: Less is More — focus on core evaluation logic and avoid unnecessary repeated reasoning
             max_iter=2,
@@ -67,7 +67,7 @@ class AssessmentScreeningAgentA(BaseAgent):
         # The parent method handles backstory loading, parameter substitution (EXPERT_ID=A),
         # and appending of Memory-first guidance text
         agent = super().create_agent()
-        # Attach the toolset: use the unified ASA assessment toolset (shared by Experts A/B/C)
+        # Attach the toolset: use the unified assessment toolset (shared by Experts A/B/C)
         # The unified toolset ensures consistent tool capabilities across experts, making evaluation results more comparable
         try:
             from src.agents.base_agent import tools_enabled

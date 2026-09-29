@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class MaterialCompare:
     """Generate cross-material comparison matrix and rankings.
 
-    Takes evaluated scores from APA, EPA, BSA for multiple materials
+    Takes manufacturing, delivery, and safety scores for multiple materials
     and produces standardized comparison output including radar chart data.
     """
 
@@ -22,13 +22,13 @@ class MaterialCompare:
         Args:
             evaluations: list of dicts, each containing:
                 - material_name (str)
-                - apa_score (float)
-                - epa_score (float)
-                - bsa_score (float)
+                - manufacturing_score (float)
+                - delivery_score (float)
+                - safety_score (float)
                 - comprehensive_score (float)
-                - apa_details (dict)
-                - epa_details (dict)
-                - bsa_details (dict)
+                - manufacturing_details (dict)
+                - delivery_details (dict)
+                - safety_details (dict)
                 - selectivity_ratio (float | None)
                 - mechanism_summary (str | None)
             mode: 'full_matrix', 'ranking_only', 'radar_data'
@@ -63,9 +63,9 @@ class MaterialCompare:
         for entry in ranked:
             matrix.append({
                 "material": entry["material_name"],
-                "antibacterial_score": round(entry.get("apa_score", 0), 2),
-                "enzyme_activity_score": round(entry.get("epa_score", 0), 2),
-                "biosafety_score": round(entry.get("bsa_score", 0), 2),
+                "manufacturing_score": round(entry.get("manufacturing_score", 0), 2),
+                "delivery_score": round(entry.get("delivery_score", 0), 2),
+                "safety_score": round(entry.get("safety_score", 0), 2),
                 "comprehensive_score": round(entry.get("comprehensive_score", 0), 2),
                 "selectivity_ratio": entry.get("selectivity_ratio"),
                 "key_strength": self._identify_key_strength(entry),
@@ -81,36 +81,36 @@ class MaterialCompare:
                 "rank": i + 1,
                 "material": entry["material_name"],
                 "overall_score": round(entry.get("comprehensive_score", 0), 2),
-                "apa_score": round(entry.get("apa_score", 0), 2),
-                "epa_score": round(entry.get("epa_score", 0), 2),
-                "bsa_score": round(entry.get("bsa_score", 0), 2)
+                "manufacturing_score": round(entry.get("manufacturing_score", 0), 2),
+                "delivery_score": round(entry.get("delivery_score", 0), 2),
+                "safety_score": round(entry.get("safety_score", 0), 2)
             })
         return rankings
 
     def _build_radar_data(self, ranked: list) -> dict:
         """Build radar chart compatible data structure."""
         dimensions = [
-            "antibacterial_potency",
-            "pathogen_selectivity",
-            "enzyme_activity",
-            "substrate_affinity",
-            "biosafety"
+            "manufacturing_potency",
+            "manufacturing_selectivity",
+            "delivery_efficiency",
+            "delivery_affinity",
+            "safety"
         ]
         datasets = []
         for entry in ranked[:5]:  # Top 5 materials
-            apa = entry.get("apa_details", {})
-            epa = entry.get("epa_details", {})
-            bsa = entry.get("bsa_details", {})
+            manufacturing = entry.get("manufacturing_details", {})
+            delivery = entry.get("delivery_details", {})
+            safety = entry.get("safety_details", {})
 
             datasets.append({
                 "label": entry["material_name"],
                 "data": [
-                    apa.get("potency_score", 0),
-                    apa.get("selectivity_score", 0),
-                    epa.get("activity_strength_score", 0),
-                    epa.get("substrate_affinity_score", 0),
-                    bsa.get("overall_safety_score", 0) or
-                    entry.get("bsa_score", 0)
+                    manufacturing.get("potency_score", 0),
+                    manufacturing.get("selectivity_score", 0),
+                    delivery.get("activity_strength_score", 0),
+                    delivery.get("substrate_affinity_score", 0),
+                    safety.get("overall_safety_score", 0) or
+                    entry.get("safety_score", 0)
                 ]
             })
         return {"dimensions": dimensions, "datasets": datasets}
@@ -131,40 +131,40 @@ class MaterialCompare:
         selectivity_best = max(ranked, key=lambda x: x.get("selectivity_ratio") or 0)
         if selectivity_best.get("selectivity_ratio"):
             recommendations.append(
-                f"Best antibacterial selectivity: {selectivity_best['material_name']} "
+                f"Best manufacturing selectivity: {selectivity_best['material_name']} "
                 f"(selectivity ratio {selectivity_best['selectivity_ratio']:.1f})"
             )
 
-        # Check enzyme activity champion
-        enzyme_best = max(ranked, key=lambda x: x.get("epa_score", 0))
+        # Check delivery champion
+        delivery_best = max(ranked, key=lambda x: x.get("delivery_score", 0))
         recommendations.append(
-            f"Best enzyme-like activity: {enzyme_best['material_name']} "
-            f"(enzyme activity score {enzyme_best.get('epa_score', 0):.1f}/10)"
+            f"Best delivery: {delivery_best['material_name']} "
+            f"(delivery score {delivery_best.get('delivery_score', 0):.1f}/10)"
         )
 
         # Check safety champion
-        safety_best = max(ranked, key=lambda x: x.get("bsa_score", 0))
+        safety_best = max(ranked, key=lambda x: x.get("safety_score", 0))
         recommendations.append(
-            f"Best biosafety: {safety_best['material_name']} "
-            f"(safety score {safety_best.get('bsa_score', 0):.1f}/10)"
+            f"Best safety: {safety_best['material_name']} "
+            f"(safety score {safety_best.get('safety_score', 0):.1f}/10)"
         )
 
         return recommendations
 
     def _identify_key_strength(self, entry: dict) -> str:
         scores = {
-            "antibacterial": entry.get("apa_score", 0),
-            "enzyme_activity": entry.get("epa_score", 0),
-            "biosafety": entry.get("bsa_score", 0)
+            "manufacturing": entry.get("manufacturing_score", 0),
+            "delivery": entry.get("delivery_score", 0),
+            "safety": entry.get("safety_score", 0)
         }
         best_dim = max(scores, key=scores.get)
         return f"Best in {best_dim} ({scores[best_dim]:.1f})"
 
     def _identify_key_weakness(self, entry: dict) -> str:
         scores = {
-            "antibacterial": entry.get("apa_score", 0),
-            "enzyme_activity": entry.get("epa_score", 0),
-            "biosafety": entry.get("bsa_score", 0)
+            "manufacturing": entry.get("manufacturing_score", 0),
+            "delivery": entry.get("delivery_score", 0),
+            "safety": entry.get("safety_score", 0)
         }
         worst_dim = min(scores, key=scores.get)
         return f"Needs improvement in {worst_dim} ({scores[worst_dim]:.1f})"

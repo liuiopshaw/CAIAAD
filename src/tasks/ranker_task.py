@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Cross-material comparison task for CA agent."""
+"""Cross-material comparison task for the ranker agent."""
 
 from crewai import Task
 
 
-class ComparisonTask:
+class RankerTask:
     def __init__(self, agent):
         self.agent = agent
 

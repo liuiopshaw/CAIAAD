@@ -18,9 +18,9 @@ class DrugBankTool:
     Query modes:
     - gut_metabolism: Gut microbiota metabolism pathways for a compound
     - enzyme_benchmark: Kinetic parameters of natural enzymes (CAT, SOD, NADH oxidase)
-      Used by EPA to compare against nanozyme activity
+      Used by the delivery agent to compare against nanozyme activity
     - drug_microbiome: Known drug-microbiome interaction records
-      Used by MMA for mechanism analogy
+      Used by the mechanism agent for mechanism analogy
     """
 
     BASE_URL = "https://api.drugbank.com/v1"

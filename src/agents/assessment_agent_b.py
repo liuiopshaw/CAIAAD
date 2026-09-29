@@ -11,11 +11,11 @@ logging.basicConfig(level=logging.WARNING)
 # Get the logger instance for the current module; all subsequent log output goes through this logger
 logger = logging.getLogger(__name__)
 
-# Assessment Screening Expert Agent B
+# Assessment Expert Agent B
 # Inherits from BaseAgent; one of three parallel experts comprehensively evaluating
 # AD therapeutic candidates across the five weighted rubric dimensions
-class AssessmentScreeningAgentB(BaseAgent):
-    """Assessment Screening Expert Agent B
+class AssessmentAgentB(BaseAgent):
+    """Assessment Expert Agent B
     Responsible for comprehensively evaluating AD therapeutic candidates across the
     five weighted rubric dimensions, distinguished from Experts A and C via EXPERT_ID
     """
@@ -26,14 +26,14 @@ class AssessmentScreeningAgentB(BaseAgent):
         # Call the BaseAgent constructor, passing all core agent parameters
         super().__init__(
             llm=llm,
-            # Role identifier: Assessment Screening Expert B, used to distinguish expert identities in multi-agent collaboration
-            role="Assessment_Screening_agent_B",
+            # Role identifier: Assessment Expert B, used to distinguish expert identities in multi-agent collaboration
+            role="assessment_agent_b",
             # Goal description: tells the agent that its core task is to comprehensively evaluate all aspects of material proposals
             goal="Comprehensively evaluate AD therapeutic candidates across the five weighted rubric dimensions",
             # Specifies the prompt template file (Markdown format) used by this agent; loaded and populated with parameters at runtime
-            prompt_file="assessment_screening_agent_b_prompt.md",
+            prompt_file="assessment_agent_b_prompt.md",
             # Reads Expert B's dedicated temperature parameter from the config file, controlling the randomness of LLM output
-            temperature=Config.EXPERT_B_TEMPERATURE,
+            temperature=Config.ASSESSMENT_B_TEMPERATURE,
             # Maximum iterations set to 2:
             # Following the "less is more" principle, greatly reduced from the original 15 to focus on the core evaluation logic
             max_iter=2,
@@ -48,8 +48,8 @@ class AssessmentScreeningAgentB(BaseAgent):
         # Call the base class's create_agent method to complete the basic creation and configuration of the agent instance
         agent = super().create_agent()
 
-        # Use the unified ASA (Assessment Screening Agent) assessment toolset
-        # The ASA toolset is shared by the three experts A/B/C, providing chemical property queries, environmental assessment, etc.
+        # Use the unified assessment toolset
+        # The unified toolset is shared by the three experts A/B/C, providing chemical property queries, environmental assessment, etc.
         try:
             # Dynamically import the tools toggle check function to determine whether external tools are enabled
             from src.agents.base_agent import tools_enabled
