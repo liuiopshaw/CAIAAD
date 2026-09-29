@@ -140,14 +140,14 @@ def _generate(req: ChatRequest) -> dict:
     # sharing a long common prefix) get decorrelated sampling trajectories.
     # (First version used a single fixed seed for every request, which made
     # batches converge to near-duplicate candidate lists.) Override base with
-    # CU_AGENT_SEED; CU_AGENT_SEED="" disables seeding.
-    seed_env = os.environ.get("CU_AGENT_SEED", "42")
+    # NANO_BIO_SEED; NANO_BIO_SEED="" disables seeding.
+    seed_env = os.environ.get("NANO_BIO_SEED", "42")
     if seed_env:
         import zlib
         try:
             base_seed = int(seed_env)
         except ValueError:
-            logger.warning(f"CU_AGENT_SEED={seed_env!r} is not an integer — treating as unset (no seeding)")
+            logger.warning(f"NANO_BIO_SEED={seed_env!r} is not an integer — treating as unset (no seeding)")
             base_seed = None
         if base_seed is not None:
             seed = (base_seed + zlib.crc32(text.encode("utf-8"))) % (2**31)

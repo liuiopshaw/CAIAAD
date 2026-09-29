@@ -19,7 +19,7 @@ Two entry points share the same prompt builders (`scripts/pipeline_prompts.py`) 
 
 ```bash
 # 1. Start the LoRA multi-adapter server (loads the base model once)
-python scripts/model_server.py          # port 8000; CU_AGENT_SEED="" disables deterministic seeding
+python scripts/model_server.py          # port 8000; NANO_BIO_SEED="" disables deterministic seeding
 
 # 2a. CLI pipeline: coordinator -> designer x4 -> manufacturing/delivery/safety/mechanism -> ranker
 python scripts/task_100_materials.py --config scripts/pipeline_config.json
@@ -27,7 +27,7 @@ python scripts/task_100_materials.py --config scripts/pipeline_config.json
 #    --redo-batch TS N / --experts-only TS    surgical re-runs
 
 # 2b. Web chat entry (SSE orchestration, chat-style UI)
-python scripts/web_server.py            # port 8001 (CU_AGENT_WEB_PORT to override)
+python scripts/web_server.py            # port 8001 (NANO_BIO_WEB_PORT to override)
 
 # 3. Deterministic ranking (no agent involved; raw outputs never modified)
 python scripts/extract_subscores.py <TS>
@@ -104,14 +104,14 @@ All absolute paths resolve through `scripts/paths.py` and can be overridden with
 
 | Variable | Purpose | Default |
 |---|---|---|
-| `CU_AGENT_ROOT` | project root | `scripts/..` |
-| `CU_AGENT_MODEL_PATH` | base model directory | `<root>/models/base/vlm-instruct` |
-| `CU_AGENT_LORA_DIR` | LoRA adapters directory | `<root>/models/lora_enhanced` |
-| `CU_AGENT_OUTPUT_DIR` | outputs directory | `<root>/outputs` |
-| `CU_AGENT_LITERATURE_DIR` | literature PDF library | `<root>/agent_literature` |
-| `CU_AGENT_SEED` | base seed for per-prompt deterministic sampling (`""` disables seeding) | `42` |
-| `CU_AGENT_WEB_PORT` | web chat server port (`scripts/web_server.py`) | `8001` |
-| `CU_AGENT_LLM_BASE` | upstream LLM base URL for the web server's health proxy | `http://localhost:8000` |
+| `NANO_BIO_ROOT` | project root | `scripts/..` |
+| `NANO_BIO_MODEL_PATH` | base model directory | `<root>/models/base/vlm-instruct` |
+| `NANO_BIO_LORA_DIR` | LoRA adapters directory | `<root>/models/lora_enhanced` |
+| `NANO_BIO_OUTPUT_DIR` | outputs directory | `<root>/outputs` |
+| `NANO_BIO_LITERATURE_DIR` | literature PDF library | `<root>/agent_literature` |
+| `NANO_BIO_SEED` | base seed for per-prompt deterministic sampling (`""` disables seeding) | `42` |
+| `NANO_BIO_WEB_PORT` | web chat server port (`scripts/web_server.py`) | `8001` |
+| `NANO_BIO_LLM_BASE` | upstream LLM base URL for the web server's health proxy | `http://localhost:8000` |
 
 ## Configuration
 
