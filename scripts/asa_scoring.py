@@ -115,7 +115,7 @@ def compute_asa(axis_scores: dict, rubric: dict) -> dict:
 
     axis_scores: {axis_name: {sub: score}} or {axis_name: direct_score}.
     Returns {total, total_raw, total_adj, axes, consistency_cj,
-             consistency_sj, rubric_version, missing}.
+             consistency_sj, missing}.
     `total` is an alias of `total_adj` (the ranking key).
     """
     axes_def = rubric["axes"]
@@ -130,8 +130,8 @@ def compute_asa(axis_scores: dict, rubric: dict) -> dict:
         per_axis[name] = score
         missing.extend(f"{name}.{m}" for m in miss)
 
-    # modality_adjustments: reserved hook (empty in rubric v0.1). When
-    # populated, per-modality weight overrides apply here — config only.
+    # modality_adjustments: reserved hook (currently empty). When populated,
+    # per-modality weight overrides apply here — config only.
     total_raw = sum(per_axis[n] * axes_def[n]["weight"] for n in axes_def)
 
     cons = rubric.get("consistency") or {}
@@ -151,7 +151,6 @@ def compute_asa(axis_scores: dict, rubric: dict) -> dict:
         "axes": per_axis,
         "consistency_cj": cj,
         "consistency_sj": sj,
-        "rubric_version": rubric.get("version"),
         "missing": missing,
     }
 
@@ -187,7 +186,7 @@ def main():
         rows.append((name, r))
     rows.sort(key=lambda kv: (-kv[1]["total_adj"], kv[0]))
 
-    print(f"rubric v{rubric.get('version')} ({rubric_path})")
+    print(f"asa_rubric ({rubric_path})")
     for name, r in rows:
         print(f"{name}: total_adj={r['total_adj']:.3f} total_raw={r['total_raw']:.3f} "
               f"Cj={r['consistency_cj']:.3f} axes={ {k: round(v, 2) for k, v in r['axes'].items()} }"

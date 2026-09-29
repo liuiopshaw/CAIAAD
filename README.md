@@ -56,7 +56,7 @@ python scripts/rank_ad100.py <TS> --rubric scripts/asa_rubric.json
 ## Blind benchmark suite
 
 ```bash
-python scripts/benchmark_adtb100.py --rubric --gate hard --benchmark benchmark/AD-TxBench-100_v3.0.json
+python scripts/benchmark_adtb100.py --rubric --gate hard --benchmark benchmark/AD-TxBench-100.json
 #   --use-base            raw base model arm
 #   --mode prompt         single consolidated scoring prompt (no agent chain)
 #   --gate off|hard|soft  AD-relevance gating formula
@@ -85,7 +85,7 @@ All agent outputs are saved RAW and unmodified under `outputs/run_<TS>/`; scorin
 │   ├── llm_endpoints.json    # per-agent endpoint config (local/hosted)
 │   ├── task_100_materials.py # CLI candidate-design pipeline
 │   ├── web_server.py         # SSE chat orchestration (:8001) + static/index.html
-│   ├── schema_v2.py          # output contract (v2/v3) single source of truth
+│   ├── output_schema.py      # output contract (current/legacy) single source of truth
 │   ├── asa_scoring.py        # deterministic ASA engine (rubric-driven)
 │   ├── extract_subscores.py  # mechanical subscore extraction
 │   ├── rank_ad100.py / rank_cda_outputs.py / rank_to_excel.py

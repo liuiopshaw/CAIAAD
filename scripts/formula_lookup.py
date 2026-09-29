@@ -14,9 +14,10 @@ task100_formula_map_<TS>.json — BOTH inside the run directory (outputs/run_<TS
 the flat outputs/ root only serves legacy runs saved before that convention) —
 for rank_cda_outputs.py.
 
-Designer records are parsed with schema_v2 (parse_record_v3 for the v3 / AD100
-13-field layout first, then normalize_record for legacy v1/v2 records), so the
-Chemical_Formula / Ligand cells are resolved by schema, not by fixed v1 indices.
+Designer records are parsed with output_schema (parse_record_current for the
+current AD100 13-field layout first, then normalize_record for legacy records),
+so the Chemical_Formula / Ligand cells are resolved by schema, not by fixed
+legacy indices.
 
 Agent outputs are never modified — this is separate tool data.
 
@@ -63,9 +64,10 @@ def formula_like(tok: str) -> bool:
 def load_records(ts: str):
     """Records as [Material_Name, Chemical_Formula, Ligand] triples padded to
     11 cells (the shape candidates_for expects). The column layout is resolved
-    PER RECORD by schema_v2 — v3/AD100 13-field rows via parse_record_v3,
-    legacy v1/v2 rows via normalize_record — never by fixed v1 indices."""
-    from schema_v2 import parse_record_v3, normalize_record
+    PER RECORD by output_schema — current AD100 13-field rows via
+    parse_record_current, legacy rows via normalize_record — never by fixed
+    legacy indices."""
+    from output_schema import parse_record_current, normalize_record
     parts = sorted(find_run_dir(ts).glob(f"task100_designer_{ts}_part*.txt"))
     if not parts:
         raise SystemExit(f"No task100_designer_{ts}_part*.txt found in {find_run_dir(ts)}")
@@ -78,11 +80,12 @@ def load_records(ts: str):
             cells = [c.strip() for c in line.split("|")]
             if not cells[0] or cells[0] == "Material_Name":
                 continue  # header / nameless line — never a record
-            # v3 FIRST (same discrimination as compound_lookup.py): both v2 and
-            # v3 accept 13-cell rows, but parse_record_v3 gates on the
-            # Drug_Type enum at cells[1] while normalize_record would silently
-            # misparse a v3 row as v2.
-            rec = parse_record_v3(cells) or normalize_record(cells)
+            # Current schema FIRST (same discrimination as compound_lookup.py):
+            # both the legacy-modality and the current layout accept 13-cell
+            # rows, but parse_record_current gates on the Drug_Type enum at
+            # cells[1] while normalize_record would silently misparse a
+            # current row as legacy-modality.
+            rec = parse_record_current(cells) or normalize_record(cells)
             if rec is None:
                 continue
             records.append([rec["Material_Name"], rec.get("Chemical_Formula") or "",

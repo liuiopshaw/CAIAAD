@@ -5,12 +5,12 @@ Auto-starts server, waits for ready, runs pipeline, cleans up.
 ALL agent outputs preserved RAW.
 
 Batch quotas and per-step parameters are externalized to pipeline_config.json
-(--config to override). The default config is schema v3 (AD100): the designer
-emits the uniform 13-field v3 contract from schema_v2.cda_format_block_v3, with
-no modality or element quotas — the v2 per-batch format block is only used when
-a config sets "schema" to something else. The pre-Phase-4 nano-only config was
-deleted (its purpose was reproducing the element-steered baseline, which no
-longer exists).
+(--config to override). The default config is the current schema (AD100): the
+designer emits the uniform 13-field current contract from
+output_schema.cda_format_block_current, with no modality or element quotas —
+the legacy-modality per-batch format block is only used when a config sets
+"schema" to something else. The pre-Phase-4 nano-only config was deleted (its
+purpose was reproducing the element-steered baseline, which no longer exists).
 
 Pipeline order: coordinator -> designer -> manufacturing -> delivery -> safety -> mechanism -> ranker.
 manufacturing/delivery/safety/mechanism append a JSON subscore tail per material line (raw output
@@ -27,7 +27,7 @@ HEALTH = "http://localhost:8000/health"
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import llm_client
 from output_utils import run_dir
-import schema_v2
+import output_schema
 import pipeline_prompts
 from pipeline_prompts import (
     batch_focus, cda_format_block_for, split_chunks, build_expert_prompt,
@@ -59,7 +59,7 @@ FORMAT CORRECTION: your previous answer ignored the required output format. Do N
 
 
 def call_expert(agent: str, prompt: str, save_prefix: str, n: int, max_tokens: int, temp: float,
-                part_lines: "list | None" = None, is_v3: bool = False):
+                part_lines: "list | None" = None, is_current: bool = False):
     """Call an expert agent with two escalation levels for prose collapse:
       1. retry once with a sterner format correction AT HIGHER TEMPERATURE
          (low base temps make failures nearly deterministic);
@@ -89,7 +89,7 @@ def call_expert(agent: str, prompt: str, save_prefix: str, n: int, max_tokens: i
     for suffix, half in zip(("a", "b"), halves):
         if not half:
             continue
-        hp = build_expert_prompt(agent, "\n".join(half), is_v3)
+        hp = build_expert_prompt(agent, "\n".join(half), is_current)
         h = call(agent, hp, max_tokens=max_tokens, temp=retry_temp)
         save(f"{save_prefix}_part{n}{suffix}.txt", h)
         hf = json_tail_fraction(h)
@@ -227,10 +227,10 @@ if __name__ == "__main__":
         OUTPUT = find_run_dir(str(TS))
         batch_cfg = next(b for b in CFG["designer"]["batches"] if b["batch_id"] == batch_id)
         total_batches = len(CFG["designer"]["batches"])
-        is_v3 = CFG.get("schema") == "v3"
+        is_current = CFG.get("schema") == "current"
         server_proc = start_server()
         try:
-            fmt_block = schema_v2.cda_format_block_v3() if is_v3 else cda_format_block_for(batch_cfg)
+            fmt_block = output_schema.cda_format_block_current() if is_current else cda_format_block_for(batch_cfg)
             chunk = call("designer", designer_prompt(
                 batch_cfg["count"], batch_id, total_batches,
                 batch_focus(batch_cfg), fmt_block, exclusion=args.note),
@@ -256,11 +256,11 @@ if __name__ == "__main__":
                 for n, part in enumerate(split_chunks(mat_lines, CFG[agent]["chunks"]), start=1):
                     if not part:
                         continue
-                    prompt = build_expert_prompt(agent, "\n".join(part), is_v3)
+                    prompt = build_expert_prompt(agent, "\n".join(part), is_current)
                     chunk2, jfrac, retried = call_expert(
                         agent, prompt, f"task100_{agent}_{TS}_redo{redo_tag}", n,
                         CFG[agent]["max_tokens"], CFG[agent]["temperature"],
-                        part_lines=part, is_v3=is_v3)
+                        part_lines=part, is_current=is_current)
                     print(f"  {agent} redo chunk {n} done (json={jfrac:.0%}{' after retry' if retried else ''})")
                     time.sleep(3)
         finally:
@@ -285,7 +285,7 @@ if __name__ == "__main__":
 
         server_proc = start_server()
         try:
-            is_v3 = CFG.get("schema") == "v3"
+            is_current = CFG.get("schema") == "current"
             expert_prompts = {}
             # Prompt builders duplicated from the main flow below (same text,
             # redo save prefix). Kept as a dict so the loop stays uniform.
@@ -298,11 +298,11 @@ if __name__ == "__main__":
                     if not part:
                         continue
                     part_text = "\n".join(part)
-                    prompt = build_expert_prompt(agent, part_text, is_v3)
+                    prompt = build_expert_prompt(agent, part_text, is_current)
                     chunk, jfrac, retried = call_expert(
                         agent, prompt, f"task100_{agent}_{TS}_redo{redo_tag}", n,
                         CFG[agent]["max_tokens"], CFG[agent]["temperature"],
-                        part_lines=part, is_v3=is_v3)
+                        part_lines=part, is_current=is_current)
                     print(f"  {agent} redo chunk {n} done ({len(chunk)} chars, json={jfrac:.0%}{' after retry' if retried else ''})")
                     time.sleep(3)
         finally:
@@ -347,15 +347,16 @@ if __name__ == "__main__":
 
         # 2026-09: subjective steering removed — no element-specific flagship
         # targets, no element-frequency goals. Batches exist only for VRAM chunking.
-        # The designer format block is the v2 contract generated per batch by
-        # schema_v2.cda_format_block via cda_format_block_for() (modality_focus).
-        # schema="v3" (AD100): single uniform v3 format block, no element quota.
-        is_v3 = CFG.get("schema") == "v3"
+        # The designer format block is the legacy-modality contract generated
+        # per batch by output_schema.cda_format_block via cda_format_block_for()
+        # (modality_focus). schema="current" (AD100): single uniform current
+        # format block, no element quota.
+        is_current = CFG.get("schema") == "current"
         cda_chunks = []
         designed_names = []  # cross-batch anti-duplication (see below)
         for b in batches:
             n = b["batch_id"]
-            fmt_block = schema_v2.cda_format_block_v3() if is_v3 else cda_format_block_for(b)
+            fmt_block = output_schema.cda_format_block_current() if is_current else cda_format_block_for(b)
             # With per-prompt seeds the batches are decorrelated, but the model
             # still gravitates to the same famous candidates. Give later
             # batches the names already produced and forbid repeats
@@ -398,7 +399,7 @@ if __name__ == "__main__":
             if not part:
                 continue
             part_text = "\n".join(part)
-            chunk, jfrac, retried = call_expert("manufacturing", build_expert_prompt("manufacturing", part_text, is_v3), f"task100_manufacturing_{TS}", n, CFG["manufacturing"]["max_tokens"], CFG["manufacturing"]["temperature"], part_lines=part, is_v3=is_v3)
+            chunk, jfrac, retried = call_expert("manufacturing", build_expert_prompt("manufacturing", part_text, is_current), f"task100_manufacturing_{TS}", n, CFG["manufacturing"]["max_tokens"], CFG["manufacturing"]["temperature"], part_lines=part, is_current=is_current)
             print(f"  manufacturing chunk {n} done ({len(chunk)} chars, json={jfrac:.0%}{' after retry' if retried else ''})")
             apa_chunks.append(chunk)
             time.sleep(3)
@@ -417,7 +418,7 @@ if __name__ == "__main__":
             if not part:
                 continue
             part_text = "\n".join(part)
-            chunk, jfrac, retried = call_expert("delivery", build_expert_prompt("delivery", part_text, is_v3), f"task100_delivery_{TS}", n, CFG["delivery"]["max_tokens"], CFG["delivery"]["temperature"], part_lines=part, is_v3=is_v3)
+            chunk, jfrac, retried = call_expert("delivery", build_expert_prompt("delivery", part_text, is_current), f"task100_delivery_{TS}", n, CFG["delivery"]["max_tokens"], CFG["delivery"]["temperature"], part_lines=part, is_current=is_current)
             print(f"  delivery chunk {n} done ({len(chunk)} chars, json={jfrac:.0%}{' after retry' if retried else ''})")
             epa_chunks.append(chunk)
             time.sleep(3)
@@ -436,7 +437,7 @@ if __name__ == "__main__":
             if not part:
                 continue
             part_text = "\n".join(part)
-            chunk, jfrac, retried = call_expert("safety", build_expert_prompt("safety", part_text, is_v3), f"task100_safety_{TS}", n, CFG["safety"]["max_tokens"], CFG["safety"]["temperature"], part_lines=part, is_v3=is_v3)
+            chunk, jfrac, retried = call_expert("safety", build_expert_prompt("safety", part_text, is_current), f"task100_safety_{TS}", n, CFG["safety"]["max_tokens"], CFG["safety"]["temperature"], part_lines=part, is_current=is_current)
             print(f"  safety chunk {n} done ({len(chunk)} chars, json={jfrac:.0%}{' after retry' if retried else ''})")
             bsa_chunks.append(chunk)
             time.sleep(3)
@@ -455,7 +456,7 @@ if __name__ == "__main__":
             if not part:
                 continue
             part_text = "\n".join(part)
-            chunk, jfrac, retried = call_expert("mechanism", build_expert_prompt("mechanism", part_text, is_v3), f"task100_mechanism_{TS}", n, CFG["mechanism"]["max_tokens"], CFG["mechanism"]["temperature"], part_lines=part, is_v3=is_v3)
+            chunk, jfrac, retried = call_expert("mechanism", build_expert_prompt("mechanism", part_text, is_current), f"task100_mechanism_{TS}", n, CFG["mechanism"]["max_tokens"], CFG["mechanism"]["temperature"], part_lines=part, is_current=is_current)
             print(f"  mechanism chunk {n} done ({len(chunk)} chars, json={jfrac:.0%}{' after retry' if retried else ''})")
             mma_chunks.append(chunk)
             time.sleep(3)
@@ -470,7 +471,7 @@ if __name__ == "__main__":
         print("=" * 60)
 
         trunc = CFG["ranker"]["input_truncation"]
-        ca_raw = call("ranker", build_ca_prompt(cda_raw, epa_raw, mma_raw, is_v3, trunc),
+        ca_raw = call("ranker", build_ca_prompt(cda_raw, epa_raw, mma_raw, is_current, trunc),
                       max_tokens=CFG["ranker"]["max_tokens"],
                       temp=CFG["ranker"]["temperature"])
         save(f"task100_ranker_{TS}.txt", ca_raw)

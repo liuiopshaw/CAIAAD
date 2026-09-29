@@ -13,7 +13,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import schema_v2  # noqa: E402
+import output_schema  # noqa: E402
 
 
 DEFAULT_TOA_GOAL = (
@@ -47,15 +47,15 @@ def batch_focus(batch: dict) -> str:
 
 
 def cda_format_block_for(batch: dict) -> str:
-    """v2 designer format block for a batch, driven by its optional
-    'modality_focus' ("free" | "nano_mixed" | a schema_v2.MODALITIES value;
+    """Legacy-modality designer format block for a batch, driven by its optional
+    'modality_focus' ("free" | "nano_mixed" | an output_schema.MODALITIES value;
     missing = legacy nano-only config -> "nano_mixed")."""
     mf = batch.get("modality_focus") or "nano_mixed"
     if mf == "free":
-        return schema_v2.cda_format_block(None)
+        return output_schema.cda_format_block(None)
     if mf == "nano_mixed":
-        return schema_v2.cda_format_block(None) + "\n" + NANO_ONLY_LINE
-    return schema_v2.cda_format_block(mf)
+        return output_schema.cda_format_block(None) + "\n" + NANO_ONLY_LINE
+    return output_schema.cda_format_block(mf)
 
 
 def split_chunks(lines: list, k: int) -> list:
@@ -70,7 +70,7 @@ def split_chunks(lines: list, k: int) -> list:
     return chunks
 
 
-def build_expert_prompt(agent: str, part_text: str, is_v3: bool) -> str:
+def build_expert_prompt(agent: str, part_text: str, is_current: bool) -> str:
     """Single source of the four expert prompts (manufacturing / delivery /
     safety / mechanism). Subscore JSON tails feed the deterministic ASA engine
     (scripts/asa_scoring.py + asa_rubric.json).
@@ -78,14 +78,14 @@ def build_expert_prompt(agent: str, part_text: str, is_v3: bool) -> str:
     When the records body alone would push the prompt past PROMPT_CHAR_CAP,
     the BODY is clipped and the prompt rebuilt — the mandatory format footer
     at the end is never truncated away (raw agent outputs are unaffected)."""
-    prompt = _expert_prompt(agent, part_text, is_v3)
+    prompt = _expert_prompt(agent, part_text, is_current)
     over = len(prompt) - PROMPT_CHAR_CAP
     if over <= 0:
         return prompt
-    return _expert_prompt(agent, part_text[:max(0, len(part_text) - over)], is_v3)
+    return _expert_prompt(agent, part_text[:max(0, len(part_text) - over)], is_current)
 
 
-def _expert_prompt(agent: str, part_text: str, is_v3: bool) -> str:
+def _expert_prompt(agent: str, part_text: str, is_current: bool) -> str:
     if agent == "manufacturing":
         return f"""Assess MANUFACTURABILITY & PRECISE CONTROL (manufacturability and precise-control capability) of each candidate below: is its preparation controllable, scalable, and precisely tunable in composition and dose?
 
@@ -103,7 +103,7 @@ Candidates:
 Output: ONE line per candidate with the original fields UNCHANGED, then append a semicolon and a JSON object with the manufacturability score, e.g.:
 ...original line...; {{"manufacturability": 9}}"""
     if agent == "delivery":
-        if is_v3:
+        if is_current:
             return f"""Score TARGET-TISSUE DELIVERY EFFICIENCY (target-tissue delivery efficiency, 1-10) for each candidate below: how efficiently the candidate reaches its intended target tissue — for gut-targeted candidates consider stability in GI tract, mucosal retention, size/ligand effects; for CNS candidates consider BBB penetration, bioavailability (10 = most efficient delivery).
 
 Candidates:
@@ -224,8 +224,8 @@ def designer_prompt(count: int, n: int, total_batches: int, focus: str,
 # ranker prompt
 # ---------------------------------------------------------------------------
 
-def ca_structure(is_v3: bool) -> str:
-    if is_v3:
+def ca_structure(is_current: bool) -> str:
+    if is_current:
         return """Report structure:
 1. Total count by Drug_Type (nano_formulation/biologic/small_molecule/other)
 2. Distribution of Target_Category (gut_targeted_regulation/CNS_intervention_neurorepair/signaling_pathway_modulation/peripheral_nerve_regulation/epigenetic_regulation)
@@ -245,11 +245,11 @@ def ca_structure(is_v3: bool) -> str:
 
 
 def build_ca_prompt(designer_text: str, delivery_text: str, mechanism_text: str,
-                    is_v3: bool, trunc: dict) -> str:
+                    is_current: bool, trunc: dict) -> str:
     """Ranker (comparison & summary) prompt, with the configured truncations."""
     return (
         "Generate a comprehensive summary report from the 100 candidates below.\n\n"
-        f"{ca_structure(is_v3)}\n\n"
+        f"{ca_structure(is_current)}\n\n"
         "Candidates:\n"
         f"{designer_text[:trunc['designer']]}\n\n"
         "delivery validation:\n"

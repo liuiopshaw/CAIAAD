@@ -1,5 +1,4 @@
 {
-  "version": "0.7",
   "axes": {
     "delivery_efficiency": {
       "weight": 0.3,

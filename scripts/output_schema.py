@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Schema v2 — single source of truth for the CDA output contract.
+Output schema — single source of truth for the CDA output contract.
 
-Phase 0 note: task_100_materials.py still EMITS the legacy 11-field v1 format
-(FIELDS_V1); the 13-field v2 format (FIELDS_V2) is the target contract for the
-small-molecule / biologic domain extension (Phase 4 switch). This module lets
-consumers (rank_cda_outputs.py, rank_to_excel.py) parse both transparently.
+The current pipeline emits the 13-field AD100 contract (FIELDS_CURRENT);
+the retired legacy layouts (FIELDS_LEGACY 11-field, FIELDS_LEGACY_MODALITY
+13-field) are still parsed transparently for old runs. This module lets
+consumers parse both without drift.
 
 Iron rule (project docs): agent output is never rewritten. normalize_record only
 relocates fields mechanically — legacy Material_Category moves into Modality
@@ -16,9 +16,9 @@ VERBATIM, and fields that do not exist in the old record are filled with "NA".
 # Field definitions
 # ---------------------------------------------------------------------------
 
-# v2 contract (13 columns). Material_Category is merged into Modality; fields
-# that do not apply to a record's modality are filled with NA.
-FIELDS_V2 = [
+# Retired legacy-modality contract (13 columns). Material_Category is merged
+# into Modality; fields that do not apply to a record's modality are filled with NA.
+FIELDS_LEGACY_MODALITY = [
     "Material_Name",
     "Modality",
     "Chemical_Formula",
@@ -34,8 +34,8 @@ FIELDS_V2 = [
     "Key_Features",
 ]
 
-# Legacy v1 contract (11 columns) — what task_100_materials.py emits today.
-FIELDS_V1 = [
+# Retired legacy contract (11 columns) — old task_100_materials.py output.
+FIELDS_LEGACY = [
     "Material_Name",
     "Chemical_Formula",
     "Ligand",
@@ -96,7 +96,7 @@ MODALITY_FIELD_GUIDE = {
 # ---------------------------------------------------------------------------
 
 def cda_format_block(modality_focus: "str | None" = None) -> str:
-    """Field-spec text block for CDA prompts (v2 contract).
+    """Field-spec text block for CDA prompts (legacy-modality contract).
 
     modality_focus: one of MODALITIES, or None for a mixed-modality batch.
     """
@@ -106,7 +106,7 @@ def cda_format_block(modality_focus: "str | None" = None) -> str:
     lines = [
         "For EACH candidate, output ONE line with ALL these fields, pipe-separated:",
         "",
-        " | ".join(FIELDS_V2),
+        " | ".join(FIELDS_LEGACY_MODALITY),
         "",
         f"Modality MUST be one of: {', '.join(MODALITIES)}",
         f"Disease_Intervention MUST be one of: {', '.join(DISEASE_INTERVENTIONS)}",
@@ -141,11 +141,12 @@ def cda_format_block(modality_focus: "str | None" = None) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Record normalization (v1 9/10/11-col and v2 13-col -> v2 dict)
+# Record normalization (legacy 9/10/11-col and 13-col -> legacy-modality dict)
 # ---------------------------------------------------------------------------
 
 def normalize_record(cells: "list[str]") -> "dict | None":
-    """Normalize a pipe-split record (9/10/11/13 cells) into a FIELDS_V2 dict.
+    """Normalize a pipe-split record (9/10/11/13 cells) into a
+    FIELDS_LEGACY_MODALITY dict.
 
     Returns None for unrecognized column counts. Mechanical relocation only:
     legacy Material_Category moves into Modality verbatim; SMILES/Target_UniProt
@@ -153,23 +154,24 @@ def normalize_record(cells: "list[str]") -> "dict | None":
     """
     cells = list(cells)
     n = len(cells)
-    if n == 10:  # v1 without Ligand
+    if n == 10:  # legacy without Ligand
         cells = cells[:2] + [""] + cells[2:]
-    elif n == 9:  # v1 without Chemical_Formula/Ligand
+    elif n == 9:  # legacy without Chemical_Formula/Ligand
         cells = [cells[0], "", ""] + cells[1:]
     elif n == 12 and cells[1] in MODALITIES:
-        # v2 record with Ligand dropped (observed: models fold the ligand
-        # into Material_Name, e.g. "Fe3O4@PVP", and skip the field).
-        # cells[1] is Modality in v2 but Chemical_Formula in v1, so the
-        # MODALITIES check discriminates safely. Empty Ligand, never invented.
+        # Legacy-modality record with Ligand dropped (observed: models fold the
+        # ligand into Material_Name, e.g. "Fe3O4@PVP", and skip the field).
+        # cells[1] is Modality in the legacy-modality layout but
+        # Chemical_Formula in the 11-field legacy layout, so the MODALITIES
+        # check discriminates safely. Empty Ligand, never invented.
         cells = cells[:5] + [""] + cells[5:]
 
     n = len(cells)
-    if n == len(FIELDS_V2):  # 13 — already v2
-        return dict(zip(FIELDS_V2, cells))
+    if n == len(FIELDS_LEGACY_MODALITY):  # 13 — already legacy-modality
+        return dict(zip(FIELDS_LEGACY_MODALITY, cells))
 
-    if n == len(FIELDS_V1):  # 11 — legacy v1
-        rec = dict(zip(FIELDS_V1, cells))
+    if n == len(FIELDS_LEGACY):  # 11 — legacy
+        rec = dict(zip(FIELDS_LEGACY, cells))
         return {
             "Material_Name": rec["Material_Name"],
             "Modality": rec["Material_Category"],  # verbatim relocation
@@ -190,11 +192,11 @@ def normalize_record(cells: "list[str]") -> "dict | None":
 
 
 # ---------------------------------------------------------------------------
-# Schema v3 — AD100 run contract (, user-specified 4-dimension
+# Current schema — AD100 run contract (user-specified 4-dimension
 # classification; single-choice per dimension; English enums; NO element quota)
 # ---------------------------------------------------------------------------
 
-FIELDS_V3 = [
+FIELDS_CURRENT = [
     "Material_Name",
     "Drug_Type",          # dim 1: drug type
     "Target_Category",    # dim 2: drug target category
@@ -249,12 +251,12 @@ DRUG_TYPE_FIELD_GUIDE = {
 }
 
 
-def cda_format_block_v3() -> str:
-    """Field-spec text block for CDA prompts (v3 / AD100 contract)."""
+def cda_format_block_current() -> str:
+    """Field-spec text block for CDA prompts (current / AD100 contract)."""
     lines = [
         "For EACH candidate, output ONE line with ALL these fields, pipe-separated:",
         "",
-        " | ".join(FIELDS_V3),
+        " | ".join(FIELDS_CURRENT),
         "",
         "Classification rules — EXACTLY ONE value per dimension, copied verbatim:",
         f"Drug_Type MUST be one of: {', '.join(DRUG_TYPES)}",
@@ -283,13 +285,14 @@ def cda_format_block_v3() -> str:
     return "\n".join(lines)
 
 
-def parse_record_v3(cells: "list[str]") -> "dict | None":
-    """Normalize a pipe-split v3 record into a FIELDS_V3 dict.
+def parse_record_current(cells: "list[str]") -> "dict | None":
+    """Normalize a pipe-split current-schema record into a FIELDS_CURRENT dict.
 
     Accepted shapes (discriminated from other schemas by cells[1] being a
-    DRUG_TYPES value — v2 has Modality there, a disjoint enum):
-      13 cells = current v3 (no NADH; user requirement)
-      14 cells = legacy v3 run with NADH_Activity — NADH cell dropped
+    DRUG_TYPES value — the legacy-modality layout has Modality there, a
+    disjoint enum):
+      13 cells = current (no NADH; user requirement)
+      14 cells = legacy run with NADH_Activity — NADH cell dropped
       12 cells = ligand folded into Material_Name, Ligand field dropped
     Empty fields are never invented.
     """
@@ -308,10 +311,10 @@ def parse_record_v3(cells: "list[str]") -> "dict | None":
                 and cells[2] in TARGET_CATEGORIES
                 and cells[4] in AD_MECHANISMS):
             return None
-    if n == len(FIELDS_V3) + 1:  # legacy with NADH at index 12
+    if n == len(FIELDS_CURRENT) + 1:  # legacy with NADH at index 12
         cells = cells[:12] + cells[13:]
-    elif n == len(FIELDS_V3) - 1:  # ligand dropped
+    elif n == len(FIELDS_CURRENT) - 1:  # ligand dropped
         cells = cells[:8] + [""] + cells[8:]
-    if len(cells) == len(FIELDS_V3):
-        return dict(zip(FIELDS_V3, cells))
+    if len(cells) == len(FIELDS_CURRENT):
+        return dict(zip(FIELDS_CURRENT, cells))
     return None

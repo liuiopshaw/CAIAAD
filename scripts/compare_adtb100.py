@@ -29,7 +29,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from output_utils import find_run_dir
 
 BENCHMARK = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..",
-                         "benchmark", "AD-TxBench-100_v3.0.json")
+                         "benchmark", "AD-TxBench-100.json")
 
 DIMS = ["efficacy", "mechanism", "safety", "bbb", "clinical", "overall"]
 PRESET_DIMS = {"efficacy": "Efficacy", "mechanism": "Mechanism_score", "bbb": "BBB_score",
@@ -43,12 +43,12 @@ RUBRIC_DIMS = ["ad_relevance", "delivery", "synergy", "duration", "manufacturabi
 RUBRIC_PRESET_DIMS = {"ad_relevance": "Efficacy", "delivery": "BBB_score",
                       "safety": "Safety_score", "overall": "Overall_score"}
 
-# v3 AD-TxBench-100: benchmark dims are exactly the rubric dims (hard-gated).
-V3_PRESET_RUBRIC = {"ad_relevance": "AD_relevance", "delivery": "Target_delivery",
+# Current AD-TxBench-100: benchmark dims are exactly the rubric dims (hard-gated).
+CURRENT_PRESET_RUBRIC = {"ad_relevance": "AD_relevance", "delivery": "Target_delivery",
                     "synergy": "Multi_target_synergy", "duration": "Effect_duration",
                     "manufacturability": "Manufacturing_control", "safety": "Biosafety",
                     "overall": "Final_score"}
-V3_PRESET_LEGACY = {"overall": "Final_score"}
+CURRENT_PRESET_LEGACY = {"overall": "Final_score"}
 
 
 def avg_ranks(values):
@@ -99,14 +99,14 @@ def main():
     bench = json.load(open(bench_path, encoding="utf-8"))
     truth = {r["ID"]: r for r in bench["records"]}
 
-    is_v3 = "Therapeutic" in bench["records"][0]
-    overall_key = "Final_score" if is_v3 else "Overall_score"
-    label_key = "Ground_truth" if is_v3 else "Label"
+    is_current = "Therapeutic" in bench["records"][0]
+    overall_key = "Final_score" if is_current else "Overall_score"
+    label_key = "Ground_truth" if is_current else "Label"
 
     is_rubric = bool(payload.get("rubric"))
     dims = RUBRIC_DIMS if is_rubric else DIMS
-    if is_v3:
-        preset_map = V3_PRESET_RUBRIC if is_rubric else V3_PRESET_LEGACY
+    if is_current:
+        preset_map = CURRENT_PRESET_RUBRIC if is_rubric else CURRENT_PRESET_LEGACY
     else:
         preset_map = RUBRIC_PRESET_DIMS if is_rubric else PRESET_DIMS
 
@@ -176,12 +176,12 @@ def main():
     # 2. Spearman per dimension
     A("## 2. Spearman rank correlation (agent dimension scores vs preset counterparts, tie-corrected)")
     A("")
-    if is_rubric and not is_v3:
+    if is_rubric and not is_current:
         A("> rubric dimensions do not map to benchmark dimensions; only ad_relevance↔Efficacy, delivery↔BBB_score, "
           "safety↔Safety_score, and overall↔Overall_score are comparable; other dimensions are marked NA.")
         A("")
-    if is_v3 and is_rubric:
-        A("> v3 benchmark dimensions correspond one-to-one with the rubric; overall↔Final_score (hard-gated formula).")
+    if is_current and is_rubric:
+        A("> current benchmark dimensions correspond one-to-one with the rubric; overall↔Final_score (hard-gated formula).")
         A("")
     A("| Dimension | rho |")
     A("|---|---|")

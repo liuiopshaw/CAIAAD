@@ -16,8 +16,8 @@ modify the raw agent output; only produces independent verification artifacts):
 - biologic → UniProt get_entry(Target_UniProt) → validate that the accession exists
 
 Input: task100_designer_<TS>_part*.txt in the run directory (parsed with
-schema_v2.normalize_record, compatible with legacy 9/10/11-column records
-and 13-column v2 records).
+output_schema.normalize_record, compatible with legacy 9/10/11-column records
+and 13-column legacy-modality records).
 Output (written to the same run directory):
 - compound_lookup_raw_<TS>.txt  — raw API responses written to disk
 - compound_map_<TS>.json        — {source, ts, materials: {name: {...}}}
@@ -36,9 +36,9 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from output_utils import find_run_dir, OUTPUT_ROOT
-from schema_v2 import normalize_record
+from output_schema import normalize_record
 
-# Nano modality set: the four from schema_v2 plus same-named values migrated verbatim from legacy records' Material_Category
+# Nano modality set: the four from output_schema plus same-named values migrated verbatim from legacy records' Material_Category
 NANO_MODALITIES = {"nanocluster", "nanoparticle", "single_atom", "dual_atom"}
 
 # Invalid placeholder values (what agents fill in for not-applicable fields)
@@ -55,10 +55,11 @@ def _is_filled(value) -> bool:
 # ---------------------------------------------------------------------------
 
 def load_records(input_dir: Path, ts: str):
-    """Read task100_designer_<ts>_part*.txt; v2 is parsed with normalize_record,
-    v3 (AD100) with parse_record_v3, mapping Drug_Type to the routing Modality."""
-    from schema_v2 import parse_record_v3
-    V3_TO_MODALITY = {"nano_formulation": "nanoparticle",
+    """Read task100_designer_<ts>_part*.txt; legacy-modality records are parsed
+    with normalize_record, current AD100 records with parse_record_current,
+    mapping Drug_Type to the routing Modality."""
+    from output_schema import parse_record_current
+    DRUG_TYPE_TO_MODALITY = {"nano_formulation": "nanoparticle",
                       "small_molecule": "small_molecule",
                       "biologic": "biologic",
                       "composite": "nanoparticle",  # binary composite: verify as the nano phase first (formula + coating)
@@ -73,14 +74,15 @@ def load_records(input_dir: Path, ts: str):
             if "|" not in line:
                 continue
             cells = [c.strip() for c in line.split("|")]
-            # v3 FIRST: both v2 and v3 accept 13-col records, but
-            # parse_record_v3 discriminates on DRUG_TYPES (cells[1]) while
-            # normalize_record would silently misparse v3 rows as v2.
+            # Current schema FIRST: both the legacy-modality and the current
+            # layout accept 13-col records, but parse_record_current
+            # discriminates on DRUG_TYPES (cells[1]) while normalize_record
+            # would silently misparse current rows as legacy-modality.
             rec = None
-            rec3 = parse_record_v3(cells)
-            if rec3 is not None:
-                rec3["Modality"] = V3_TO_MODALITY.get(rec3.get("Drug_Type", ""), "other")
-                rec = rec3
+            rec_current = parse_record_current(cells)
+            if rec_current is not None:
+                rec_current["Modality"] = DRUG_TYPE_TO_MODALITY.get(rec_current.get("Drug_Type", ""), "other")
+                rec = rec_current
             if rec is None:
                 rec = normalize_record(cells)
             if rec is not None:
@@ -89,18 +91,18 @@ def load_records(input_dir: Path, ts: str):
 
 
 # ---------------------------------------------------------------------------
-# Per-modality verification functions (input: v2 record dict; output: map entry + raw record list)
+# Per-modality verification functions (input: legacy-modality record dict; output: map entry + raw record list)
 # ---------------------------------------------------------------------------
 
 def lookup_nano(rec, inorg_fn, organic_fn, raw_lines, sleep_s=1.0):
     """Nano modality: reuse candidates_for + query functions from formula_lookup.py.
 
     candidates_for expects a legacy cells list ([0] name, [1] formula, [2] ligand);
-    here we mechanically rebuild that triple from the v2 record and feed it in.
+    here we mechanically rebuild that triple from the legacy-modality record and feed it in.
     """
     # candidates_for expects a legacy cells list ([0] name, [1] formula, [2] ligand, and
-    # checks field presence via len(cells)>=10/11); here we rebuild from the v2 record
-    # and pad to 11 columns before feeding it in.
+    # checks field presence via len(cells)>=10/11); here we rebuild from the
+    # legacy-modality record and pad to 11 columns before feeding it in.
     from formula_lookup import candidates_for
 
     name = rec["Material_Name"]

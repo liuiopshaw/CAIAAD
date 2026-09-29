@@ -11,9 +11,9 @@ the same formulas as compare_adtb100.py:
   parse coverage.
 
 Ground-truth keys, tier set, and tier thresholds are derived from the benchmark
-file exactly like compare_adtb100.py: v3 (AD-TxBench-100) records carry
+file exactly like compare_adtb100.py: current (AD-TxBench-100) records carry
 Final_score / Ground_truth and tiers are ordered by mean preset Final_score;
-legacy v1 files keep Overall_score / Label. Tier classification thresholds are
+legacy files keep Overall_score / Label. Tier classification thresholds are
 the midpoints of the preset tier means, and k for precision@k is the number of
 preset positives among the evaluated records.
 
@@ -30,18 +30,19 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from compare_adtb100 import spearman
 from output_utils import OUTPUT_ROOT
 
-BENCHMARK = Path(__file__).resolve().parent.parent / "benchmark" / "AD-TxBench-100_v3.0.json"
+BENCHMARK = Path(__file__).resolve().parent.parent / "benchmark" / "AD-TxBench-100.json"
 
 
 def load_truth():
-    """Benchmark records keyed by ID, plus the derived v3/v1 key names, tier
-    set (ordered best→worst by mean preset overall), and tier thresholds
-    (midpoints of preset tier means) — same derivation as compare_adtb100.py."""
+    """Benchmark records keyed by ID, plus the derived current/legacy key
+    names, tier set (ordered best→worst by mean preset overall), and tier
+    thresholds (midpoints of preset tier means) — same derivation as
+    compare_adtb100.py."""
     bench = json.loads(BENCHMARK.read_text(encoding="utf-8"))
     records = bench["records"]
-    is_v3 = "Therapeutic" in records[0]
-    overall_key = "Final_score" if is_v3 else "Overall_score"
-    label_key = "Ground_truth" if is_v3 else "Label"
+    is_current = "Therapeutic" in records[0]
+    overall_key = "Final_score" if is_current else "Overall_score"
+    label_key = "Ground_truth" if is_current else "Label"
 
     tier_vals = {}
     for r in records:

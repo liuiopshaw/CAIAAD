@@ -31,7 +31,7 @@ from rank_cda_outputs import (parse_records, _normalize, FIELDS, LEGACY_FIELDS,
                               ELEMENTS, INTERVENTION, MECHANISM, NADH,
                               load_subscores, compute_asa_map, SELF_REPORT, ASA_ADJ)
 from output_utils import find_run_dir
-import schema_v2
+import output_schema
 
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
@@ -198,7 +198,7 @@ def main():
     rows = [
         ("Run Timestamp", ts),
         ("Source Files", ", ".join(src_files)),
-        ("ASA Ranking Mode", f"ASA_Adj deterministic computation (rubric v{rubric.get('version')})" if asa_map else "designer self-reported ASA_Score (no subscores, fallback)"),
+        ("ASA Ranking Mode", "ASA_Adj deterministic computation (asa_rubric)" if asa_map else "designer self-reported ASA_Score (no subscores, fallback)"),
         ("DB_Formula Source", db_source or "not verified"),
         ("Total Materials", f"{len(valid)}" + (f" (deduplicated by Material_Name: {len(valid)+removed} original rows, {removed} duplicates removed)" if dedup else "")),
         ("NADH Activity YES", f"{nadh_yes} ({nadh_yes/len(valid)*100:.0f}%)" if valid else "0"),
@@ -210,7 +210,7 @@ def main():
         ("Element frequency Top8, full ranking (excl. O/N/C)", ", ".join(f"{e}×{n}" for e, n in all_elem.most_common(8))),
         ("Element frequency of both-qualified candidates (excl. O)", ", ".join(f"{e}×{n}" for e, n in elem_freq.most_common(6))),
         ("", ""),
-        ("Modality Distribution", ", ".join(f"{m}×{mod_freq.get(m, 0)}" for m in schema_v2.MODALITIES)),
+        ("Modality Distribution", ", ".join(f"{m}×{mod_freq.get(m, 0)}" for m in output_schema.MODALITIES)),
         ("Mechanism Distribution", ", ".join(f"{k}×{v}" for k, v in mech_freq.most_common())),
         ("SMILES non-NA", smiles_ok),
         ("Target_UniProt non-NA", uniprot_ok),
@@ -229,8 +229,8 @@ def main():
     for cell in ws3[1]:
         cell.font = Font(bold=True, color="FFFFFF")
         cell.fill = PatternFill("solid", fgColor="4472C4")
-    observed = list(schema_v2.MODALITIES) + sorted(
-        {r[MODALITY].strip() for r in valid} - set(schema_v2.MODALITIES))
+    observed = list(output_schema.MODALITIES) + sorted(
+        {r[MODALITY].strip() for r in valid} - set(output_schema.MODALITIES))
     for m in observed:
         group = [r for r in valid if r[MODALITY].strip() == m][:5]
         for j, r in enumerate(group, 1):

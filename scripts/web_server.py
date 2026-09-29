@@ -42,7 +42,7 @@ BASE_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(BASE_DIR))
 from output_utils import run_dir, OUTPUT_ROOT  # noqa: E402
 import llm_client  # noqa: E402
-import schema_v2  # noqa: E402
+import output_schema  # noqa: E402
 import pipeline_prompts  # noqa: E402
 from pipeline_prompts import (  # noqa: E402
     batch_focus, cda_format_block_for, split_chunks, build_expert_prompt,
@@ -79,7 +79,7 @@ def parse_plan(toa_raw: str) -> dict:
 # App
 # ---------------------------------------------------------------------------
 
-app = FastAPI(title="Nano-Bio Evaluator — coordinator Chat", version="0.1")
+app = FastAPI(title="Nano-Bio Evaluator — coordinator Chat")
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 orch_lock = asyncio.Lock()
@@ -171,7 +171,7 @@ async def orchestrate_stream(message: str, session_id: str):
 
     try:
         cfg = load_cfg()
-        is_v3 = cfg.get("schema") == "v3"
+        is_current = cfg.get("schema") == "current"
         async with httpx.AsyncClient() as client:
             # ---- Step 1: coordinator plan ----
             # (prompt built by pipeline_prompts.coordinator_prompt; the user
@@ -213,7 +213,7 @@ async def orchestrate_stream(message: str, session_id: str):
             designed_names = []  # cross-batch anti-duplication (matches CLI pipeline)
             for b in batches:
                 n = b["batch_id"]
-                fmt_block = schema_v2.cda_format_block_v3() if is_v3 else cda_format_block_for(b)
+                fmt_block = output_schema.cda_format_block_current() if is_current else cda_format_block_for(b)
                 exclusion = ""
                 if designed_names:
                     shown = designed_names[-60:]
@@ -249,7 +249,7 @@ async def orchestrate_stream(message: str, session_id: str):
                     yield emit({"type": "agent_start", "agent": agent, "batch": n})
                     chunk = await call_agent(
                         client, agent,
-                        build_expert_prompt(agent, "\n".join(part), is_v3),
+                        build_expert_prompt(agent, "\n".join(part), is_current),
                         cfg[agent]["max_tokens"], cfg[agent]["temperature"])
                     save_raw(out, f"task100_{agent}_{ts}_part{n}.txt", chunk)
                     chunks_out.append(chunk)
@@ -264,7 +264,7 @@ async def orchestrate_stream(message: str, session_id: str):
             ca_raw = await call_agent(
                 client, "ranker",
                 build_ca_prompt(cda_raw, raws["delivery"], raws["mechanism"],
-                                is_v3, trunc),
+                                is_current, trunc),
                 cfg["ranker"]["max_tokens"], cfg["ranker"]["temperature"])
             save_raw(out, f"task100_ranker_{ts}.txt", ca_raw)
             yield emit({"type": "summary", "content": ca_raw})

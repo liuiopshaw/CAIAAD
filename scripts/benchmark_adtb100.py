@@ -2,7 +2,7 @@
 """
 ADTB-100 blind benchmark evaluation.
 
-Feeds the 100 compounds from benchmark/AD-TxBench-100_v3.0.json
+Feeds the 100 compounds from benchmark/AD-TxBench-100.json
 to the Nano-Bio agent ensemble WITHOUT revealing Category / Label / any preset score
 (blind protocol). Each batch is scored by domain agents:
 
@@ -31,22 +31,22 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import llm_client
 from output_utils import run_dir
 BENCHMARK = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..",
-                         "benchmark", "AD-TxBench-100_v3.0.json")
+                         "benchmark", "AD-TxBench-100.json")
 
 
 def load_records(path):
     """Load a benchmark JSON and normalize records to
-    {ID, Compound, Class, Mechanism}. Supports v1 (ADTB-100) and v3
-    (AD-TxBench-100) schemas. v3 anonymized placeholders (Candidate_NN with
-    'To be curated' fields) carry zero information for blind scoring and are
-    skipped — reported in the payload."""
+    {ID, Compound, Class, Mechanism}. Supports legacy (ADTB-100) and current
+    (AD-TxBench-100) schemas. Current-schema anonymized placeholders
+    (Candidate_NN with 'To be curated' fields) carry zero information for
+    blind scoring and are skipped — reported in the payload."""
     with open(path, encoding="utf-8") as f:
         bench = json.load(f)
     recs = bench["records"]
-    is_v3 = "Therapeutic" in recs[0]
+    is_current = "Therapeutic" in recs[0]
     norm, skipped = [], 0
     for r in recs:
-        if is_v3:
+        if is_current:
             name, cls, mech = r["Therapeutic"], r["Therapeutic_class"], r["Mechanism"]
             if name.startswith("Candidate_") or cls == "To be curated" or mech == "To be curated":
                 skipped += 1
@@ -57,7 +57,7 @@ def load_records(path):
                          "Mechanism": r["Mechanism"]})
     bench["_norm_records"] = norm
     bench["_skipped"] = skipped
-    bench["_schema"] = "v3" if is_v3 else "v1"
+    bench["_schema"] = "current" if is_current else "legacy"
     return bench
 
 TS = int(time.time())
@@ -421,7 +421,7 @@ def main():
                     help="AD-relevance gate: off = additive (default), "
                          "hard = ×(ad/10), soft = ×(0.5+0.5·ad/10)")
     ap.add_argument("--benchmark", default=BENCHMARK,
-                    help="benchmark JSON path (v1 ADTB-100 or v3 AD-TxBench-100 schema)")
+                    help="benchmark JSON path (legacy ADTB-100 or current AD-TxBench-100 schema)")
     ap.add_argument("--name-only", action="store_true",
                     help="further reduce disclosure: agents see ONLY the drug name")
     ap.add_argument("--anonymize", action="store_true",
@@ -588,7 +588,6 @@ def main():
         "benchmark_file": os.path.basename(args.benchmark),
         "schema": bench["_schema"],
         "skipped_placeholders": bench["_skipped"],
-        "version": bench["version"],
         "protocol": ("blind, anonymized — agents saw Candidate_NNN codes + Class/Mechanism; "
                      "names and preset scores hidden" if args.anonymize else
                      "blind, name-only — agents saw ONLY the drug name; "

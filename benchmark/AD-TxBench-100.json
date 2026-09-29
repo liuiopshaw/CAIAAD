@@ -1,6 +1,5 @@
 {
   "dataset": "AD-TxBench-100",
-  "version": "v3.0",
   "purpose": "Publication-oriented benchmark for Alzheimer therapeutic multi-agent evaluation",
   "scoring": {
     "AD_relevance": "gate",
