@@ -17,6 +17,7 @@ logger = logging.getLogger("discover")
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import llm_client
 from output_utils import run_dir
+from pipeline_prompts import PROMPT_CHAR_CAP
 
 TIMESTAMP = int(time.time())
 OUTPUT_DIR = run_dir(TIMESTAMP)  # per-run folder: outputs/run_<TS>/
@@ -24,7 +25,8 @@ OUTPUT_DIR = run_dir(TIMESTAMP)  # per-run folder: outputs/run_<TS>/
 
 def call_agent(agent: str, prompt: str, max_tokens: int = 10240, temperature: float = 0.2, retries: int = 3) -> str:
     # Retry policy (502/503 wait, ReadTimeout retry) lives in llm_client.
-    return llm_client.chat(agent, prompt[:10000], max_tokens=max_tokens,
+    # Cap sized so the trailing format instruction of each prompt survives.
+    return llm_client.chat(agent, prompt[:PROMPT_CHAR_CAP], max_tokens=max_tokens,
                            temperature=temperature, timeout=1800, retries=retries)
 
 

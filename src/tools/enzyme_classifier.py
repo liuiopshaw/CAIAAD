@@ -25,13 +25,19 @@ class EnzymeClassifier:
 
     def __init__(self):
         self.rules = self._load_rules()
+        # Whether the rules data file was actually loaded; when False the
+        # classifier cannot make predictions and run() degrades explicitly
+        self._rules_loaded = bool(self.rules.get("rules"))
 
     def _load_rules(self) -> dict:
         try:
             with open(self.RULES_PATH, "r", encoding="utf-8") as f:
                 return json.load(f)
         except FileNotFoundError:
-            logger.warning(f"Rules file not found at {self.RULES_PATH}, using empty rules")
+            logger.warning(
+                f"EnzymeClassifier rules file not found at {self.RULES_PATH}; "
+                f"the classifier is disabled until data/enzyme_classification_rules.json is provided"
+            )
             return {"rules": [], "element_toxicity_flags": {}}
 
     def run(self, material_properties: dict) -> dict:
@@ -46,8 +52,23 @@ class EnzymeClassifier:
 
         Returns:
             dict with predicted enzyme activities, confidence levels,
-            toxicity flags, and AD therapeutic relevance.
+            toxicity flags, and AD therapeutic relevance. If the rules data
+            file is missing, returns an empty result with a clear error
+            message instead of silently producing no predictions.
         """
+        if not self._rules_loaded:
+            return {
+                "predicted_activities": [],
+                "toxicity_flags": [],
+                "primary_activity": None,
+                "source": "EnzymeClassifier (rule-based)",
+                "error": (
+                    f"Classification rules data not found at {self.RULES_PATH}; "
+                    f"rule-based enzyme-activity classification is unavailable. "
+                    f"Provide data/enzyme_classification_rules.json to enable predictions."
+                )
+            }
+
         predictions = []
         core_elements = material_properties.get("core_elements", [])
         band_gap = material_properties.get("band_gap_ev")

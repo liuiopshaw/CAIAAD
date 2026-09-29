@@ -29,18 +29,24 @@ class TaskOrganizingAgent(BaseAgent):
        It is the coordination center of the entire multi-agent system: it receives user
        requirements, analyzes intents, and assigns tasks to the correct expert agents"""
 
-    # Mapping table from task type to agent class name (class-level constant)
-    # Each key represents a task type, and the value is the corresponding agent class name
-    # This mapping defines the task types supported by the system and the handler for each type
+    # Mapping table from task type to agent class name(s) (class-level constant)
+    # Keys follow the task names produced by intent recognition (see
+    # intent_recognition_prompt.md): therapeutic_design, evaluation,
+    # final_summary, mechanism_analysis, development_method, operation_guidance.
+    # Values are the agent class names under src/agents that handle each task;
+    # every referenced class must actually exist. A list value means the task
+    # is handled by several agents in parallel (e.g. the three assessment experts).
     TASK_AGENT_MAPPING = {
-        "material_design": "CreativeDesigningAgent",           # Material design task -> creative designing agent
-        "evaluation": "AssessmentScreeningAgent",              # Evaluation task -> assessment & screening agent
-        "final_validation": "AssessmentScreeningAgentOverall", # Final validation -> overall assessment agent
-        "mechanism_analysis": "MechanismMiningAgent",          # Mechanism analysis -> mechanism mining agent
-        "synthesis_method": "SynthesisGuidingAgent",           # Synthesis method -> synthesis guiding agent
-        "operation_suggestion": "OperationSuggestingAgent",     # Operation suggestion -> operation suggesting agent
-        "literature_processing": "ExtractingAgent",            # Literature processing -> information extracting agent
-        "coordinator": "TaskOrganizingAgent"                   # Coordination task -> itself
+        "therapeutic_design": "CreativeDesigningAgent",            # Therapeutic design -> creative designing agent
+        "evaluation": ["AssessmentScreeningAgentA",                 # Evaluation -> the three assessment experts
+                        "AssessmentScreeningAgentB",                 # in parallel; evaluation_mode "with_summary"
+                        "AssessmentScreeningAgentC"],                # additionally schedules the Overall expert
+        "final_summary": "AssessmentScreeningAgentOverall",        # Final summary -> overall (final validation) agent
+        "mechanism_analysis": "MechanismMiningAgent",              # Mechanism analysis -> mechanism mining agent
+        "development_method": "SynthesisGuidingAgent",             # Development/preparation method -> synthesis guiding agent
+        "operation_guidance": "OperationSuggestingAgent",          # Operation guidance -> operation suggesting agent
+        "literature_processing": "ExtractingAgent",                # Literature processing -> information extracting agent
+        "coordinator": "TaskOrganizingAgent"                       # Coordination task -> itself
     }
 
     def __init__(self, llm):
@@ -77,7 +83,7 @@ class TaskOrganizingAgent(BaseAgent):
         return Agent(
             role="Task_Organizing_agent",
             goal="Organize and coordinate experts' work to ensure efficient task completion",
-            # Load the prompt template specified in the constructor (coordinator_prompt.md, available in both zh/en)
+            # Load the prompt template specified in the constructor (coordinator_prompt.md, under locales/en/prompts)
             backstory=load_prompt(self.prompt_file),
             verbose=False,           # Disable verbose output
             allow_delegation=True,   # Critical: the coordinator must allow delegation to dispatch subtasks to expert agents
@@ -119,41 +125,46 @@ class TaskOrganizingAgent(BaseAgent):
     def get_agent_for_task(self, task_type: str) -> Union[Agent, None]:
         """Get the agent instance corresponding to a task type
 
-        First looks up the agent class name for the task type via TASK_AGENT_MAPPING,
+        First looks up the agent class name(s) for the task type via TASK_AGENT_MAPPING,
         then retrieves the agent instance from the registry.
-        If a list is registered, returns the first agent in the list.
+        If the mapping or the registered entry is a list, returns the first agent.
 
         Args:
-            task_type: Task type string (e.g. "material_design", "evaluation", etc.)
+            task_type: Task type string (e.g. "therapeutic_design", "evaluation", etc.)
 
         Returns:
             An Agent instance (when found) or None (when not found)
         """
-        # Step 1: Look up the agent class name for the task type in the mapping table
-        agent_type = self.TASK_AGENT_MAPPING.get(task_type)
-        if not agent_type:
+        # Step 1: Look up the agent class name(s) for the task type in the mapping table
+        agent_types = self.TASK_AGENT_MAPPING.get(task_type)
+        if not agent_types:
             # If the task type is not in the mapping table, log a warning
             logger.warning(f"No agent mapping for task type: {task_type}")
             return None
+        if isinstance(agent_types, str):
+            agent_types = [agent_types]
 
-        # Step 2: Get the agent instance from the registry
-        agent = self._agent_registry.get(agent_type)
-        if agent is None:
-            # Log a warning when the agent type is not registered
-            logger.warning(f"Agent type '{agent_type}' not registered")
-            return None
+        # Step 2: Get the first available agent instance from the registry
+        for agent_type in agent_types:
+            agent = self._agent_registry.get(agent_type)
+            if agent is None:
+                # Log a warning when the agent type is not registered
+                logger.warning(f"Agent type '{agent_type}' not registered")
+                continue
 
-        # Step 3: Handle list-form agents (multiple instances of the same type)
-        # If it is a list, return the first one; otherwise return it directly
-        if isinstance(agent, list):
-            return agent[0] if agent else None
-        return agent
+            # Step 3: Handle list-form agents (multiple instances of the same type)
+            # If it is a list, return the first one; otherwise return it directly
+            if isinstance(agent, list):
+                return agent[0] if agent else None
+            return agent
+
+        return None
 
     def get_all_agents_for_task(self, task_type: str) -> List[Agent]:
         """Get all agent instances corresponding to a task type
 
         Difference from get_agent_for_task:
-        - get_agent_for_task returns a single agent (the first of a list)
+        - get_agent_for_task returns a single agent (the first available)
         - This method returns the complete agent list, for scenarios requiring all experts to evaluate simultaneously
 
         Args:
@@ -162,22 +173,28 @@ class TaskOrganizingAgent(BaseAgent):
         Returns:
             A list of Agents (when found) or an empty list (when not found)
         """
-        # Look up the agent class name in the mapping table
-        agent_type = self.TASK_AGENT_MAPPING.get(task_type)
-        if not agent_type:
+        # Look up the agent class name(s) in the mapping table
+        agent_types = self.TASK_AGENT_MAPPING.get(task_type)
+        if not agent_types:
             logger.warning(f"No agent mapping for task type: {task_type}")
             return []
+        if isinstance(agent_types, str):
+            agent_types = [agent_types]
 
-        # Get the agent from the registry
-        agent = self._agent_registry.get(agent_type)
-        if agent is None:
-            logger.warning(f"Agent type '{agent_type}' not registered")
-            return []
+        # Collect agents across all mapped agent types, preserving registration order
+        agents: List[Agent] = []
+        for agent_type in agent_types:
+            agent = self._agent_registry.get(agent_type)
+            if agent is None:
+                logger.warning(f"Agent type '{agent_type}' not registered")
+                continue
 
-        # Always return a list: wrap a single agent into a list, return a list as-is
-        if isinstance(agent, list):
-            return agent
-        return [agent]
+            # Always extend as a list: wrap a single agent, extend with a list as-is
+            if isinstance(agent, list):
+                agents.extend(agent)
+            else:
+                agents.append(agent)
+        return agents
 
     # ============================================================
     #  Intent Recognition Functions

@@ -15,10 +15,10 @@ def get_language():
     Get the current application's language setting.
 
     Reads the LANGUAGE config option from the project's Config class first; if Config is unavailable, falls back to
-    the LANGUAGE environment variable, and finally defaults to "zh" (Chinese).
+    the LANGUAGE environment variable, and finally defaults to "en" (English).
 
     Returns:
-        str: Language code, such as "zh" (Chinese) or "en" (English)
+        str: Language code, such as "en" (English) or "zh" (Chinese)
     """
     try:
         # Try to get the language setting from the project's Config class
@@ -27,8 +27,8 @@ def get_language():
         return Config.LANGUAGE
     except Exception:
         # If Config is unavailable (e.g., during early stages before configuration is initialized, or in test environments),
-        # read from the LANGUAGE environment variable of the operating system, defaulting to "zh"
-        return os.getenv("LANGUAGE", "zh")
+        # read from the LANGUAGE environment variable of the operating system, defaulting to "en"
+        return os.getenv("LANGUAGE", "en")
 
 
 def load_prompt(file_path):

@@ -26,6 +26,14 @@ DEFAULT_TOA_GOAL = (
 )
 
 
+# Hard character budget for one prompt sent to the model. Header + footer of
+# build_expert_prompt / build_ca_prompt are a few hundred chars; the records
+# body is what must fit. The old 10000-char cap truncated the FINAL string,
+# which cut the mandatory JSON-tail format instruction at the prompt tail
+# (the ranker input alone is ~17k chars from the config truncations).
+PROMPT_CHAR_CAP = 60000
+
+
 NANO_ONLY_LINE = ("This batch uses NANO modalities only: "
                   "nanocluster, nanoparticle, single_atom, dual_atom")
 
@@ -65,7 +73,19 @@ def split_chunks(lines: list, k: int) -> list:
 def build_expert_prompt(agent: str, part_text: str, is_v3: bool) -> str:
     """Single source of the four expert prompts (manufacturing / delivery /
     safety / mechanism). Subscore JSON tails feed the deterministic ASA engine
-    (scripts/asa_scoring.py + asa_rubric.json)."""
+    (scripts/asa_scoring.py + asa_rubric.json).
+
+    When the records body alone would push the prompt past PROMPT_CHAR_CAP,
+    the BODY is clipped and the prompt rebuilt — the mandatory format footer
+    at the end is never truncated away (raw agent outputs are unaffected)."""
+    prompt = _expert_prompt(agent, part_text, is_v3)
+    over = len(prompt) - PROMPT_CHAR_CAP
+    if over <= 0:
+        return prompt
+    return _expert_prompt(agent, part_text[:max(0, len(part_text) - over)], is_v3)
+
+
+def _expert_prompt(agent: str, part_text: str, is_v3: bool) -> str:
     if agent == "manufacturing":
         return f"""Assess MANUFACTURABILITY & PRECISE CONTROL (manufacturability and precise-control capability) of each candidate below: is its preparation controllable, scalable, and precisely tunable in composition and dose?
 
@@ -131,7 +151,7 @@ Output: ONE line per candidate with the original fields, then append a semicolon
 _AGENTS_ROSTER = """Available agents:
 - designer: Creative material design — generates candidates (nanomaterials, small molecules, biologics) with all required fields
 - manufacturing: Manufacturability assessment — scores production controllability, scalability, and precise dose control
-- delivery: Delivery & enzyme validation — validates NADH activity and scores target-tissue delivery efficiency
+- delivery: Target-tissue delivery scoring — scores how efficiently a candidate reaches its intended target tissue
 - safety: Biosafety assessment — scores overall biosafety
 - mechanism: Mechanism mining — explains mechanisms, scores multi-target synergy and effect durability
 - ranker: Comparison & summary — ranks candidates and produces the final report"""
@@ -174,7 +194,7 @@ def coordinator_prompt(toa_goal: str, needs_pipeline: bool = False) -> str:
 
 DIRECT_ANSWER_TEMPLATE = """You are an expert assistant of the Nano-Bio Evaluator multi-agent system (Alzheimer's gut-brain-axis intervention discovery spanning nanomaterials, small-molecule drugs, and biologics).
 
-Answer the user's request directly and concisely, in the user's language. If the question is about the system's agents or workflow, answer accurately from this roster: coordinator (task orchestration/routing), designer (candidate design), manufacturing (antibacterial scoring), delivery (enzyme activity), safety (biosafety), mechanism (mechanism mining), ranker (comparison & summary).
+Answer the user's request directly and concisely, in the user's language. If the question is about the system's agents or workflow, answer accurately from this roster: coordinator (task orchestration/routing), designer (candidate design), manufacturing (manufacturability / production-QC scoring), delivery (target-tissue delivery efficiency), safety (biosafety), mechanism (mechanism mining), ranker (comparison & summary).
 
 User request: {message}"""
 

@@ -53,8 +53,9 @@ class AssessmentScreeningAgentA(BaseAgent):
         """Create and return the configured Agent instance for Assessment Expert A
 
         This method overrides the parent class's create_agent, adding:
-        1. A creation attempt for the EAS (Elastic Algorithm Service) LLM
-        2. Attachment of the unified assessment toolset
+        1. Attachment of the unified assessment toolset
+        (the LLM passed to the constructor is used as-is; LLM selection
+        is centralized in BaseAgent._resolve_llm())
 
         Returns:
             Agent: The configured Agent instance for Assessment Expert A

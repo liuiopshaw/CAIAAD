@@ -20,9 +20,11 @@ Semantics:
 - "api_key_env" names an environment variable holding the API key, sent as
   "Authorization: Bearer <key>". null = no auth header (local server).
 - "model" sets the request model directly; "model_env" names an environment
-  variable holding the model name (takes precedence over "model") — use it to
-  keep model names out of the repo. A configured-but-missing variable returns
-  a clear ERROR string, same as a missing API key.
+  variable holding the model name (takes precedence over "model"). Likewise
+  "base_url_env" names an environment variable holding the endpoint URL
+  (takes precedence over "base_url") — use these to keep provider URLs and
+  model names out of the repo. A configured-but-missing variable returns a
+  clear ERROR string, same as a missing API key.
 - Local endpoints (localhost / 127.0.0.1) keep the extra "agent" field in the
   request body — model_server uses it to switch LoRA adapters. Non-local
   endpoints receive a standard OpenAI request body WITHOUT "agent".
@@ -97,7 +99,18 @@ def chat(agent: str, prompt: str, max_tokens: int = 6144, temperature: float = 0
     A configured-but-missing API key returns a clear ERROR string immediately.
     """
     ep = resolve_endpoint(agent, endpoints)
-    local = is_local_endpoint(ep)
+
+    # Endpoint URL: "base_url_env" (env var, keeps provider URLs out of the
+    # repo) takes precedence over the inline "base_url" field. Resolved before
+    # the local check so an env-routed localhost endpoint still counts as local.
+    base_url = ep.get("base_url")
+    base_url_env = ep.get("base_url_env")
+    if base_url_env:
+        base_url = os.getenv(base_url_env)
+        if not base_url:
+            return (f"ERROR: endpoint for agent '{agent}' requires base URL env "
+                    f"var '{base_url_env}', but it is not set")
+    local = is_local_endpoint({"base_url": base_url})
 
     headers = {}
     key_env = ep.get("api_key_env")
@@ -129,7 +142,7 @@ def chat(agent: str, prompt: str, max_tokens: int = 6144, temperature: float = 0
 
     for attempt in range(retries):
         try:
-            r = httpx.post(ep["base_url"], json=body, headers=headers or None,
+            r = httpx.post(base_url, json=body, headers=headers or None,
                            timeout=timeout)
             if r.status_code == 200:
                 return r.json()["choices"][0]["message"]["content"]

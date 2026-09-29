@@ -47,18 +47,36 @@ class AssessmentScreeningAgentOverall(BaseAgent):
         )
 
     def create_agent(self):
+        """Create and return the configured Agent instance for the final validation expert
+
+        This method overrides the parent class's create_agent, adding:
+        1. Attachment of the unified assessment toolset (same as Experts A/B/C)
+        2. An appended note clarifying its aggregation role
+
+        Returns:
+            Agent: The configured Agent instance for the final validation expert
+        """
         # LLM selection (EAS / standard LLM with temperature / default LLM) has been unified into
         # BaseAgent._resolve_llm(); it is no longer created repeatedly here
 
         # Call the base class's create_agent method to complete the basic creation and configuration of the agent instance
         agent = super().create_agent()
 
-        # Special handling for the ASA final validation expert:
-        # This agent does not need any external tools; its sole responsibility is to aggregate the output
-        # of the three ASA experts A/B/C, perform weighted calculations and consistency analysis,
-        # and generate the final report
-        # Therefore the tool list is set to empty, avoiding unnecessary tool calls interfering with the aggregation logic
-        agent.tools = []
+        # Attach the toolset: use the unified ASA assessment toolset (shared with Experts A/B/C),
+        # because the final validation prompt requires verifying claimed compound identities,
+        # structures, environmental-risk and availability data through actual tool calls
+        try:
+            from src.agents.base_agent import tools_enabled
+            if tools_enabled():
+                # When tools are enabled: create the unified assessment toolset
+                agent.tools = ToolFactory.create_unified_assessment_tools()
+            else:
+                # When tools are disabled: set to an empty list
+                # The agent will rely entirely on LLM knowledge and the evaluation criteria in the backstory
+                agent.tools = []
+        except Exception:
+            # On exception, enable tools by default (conservative strategy, prioritizing functional completeness)
+            agent.tools = ToolFactory.create_unified_assessment_tools()
 
         # Enhance the prompt to clearly state its aggregation role:
         # Append an explanation after the existing backstory so the LLM clearly knows that:

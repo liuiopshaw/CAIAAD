@@ -7,10 +7,17 @@ payloads matching the given filter (default: rubric anchored, gate off =
 additive), groups by (model_variant, mode), and computes per-run metrics with
 the same formulas as compare_adtb100.py:
 
-  rho(overall), concordance, tier accuracy, precision@70, neg mean rank,
+  rho(overall), concordance, tier accuracy, precision@k, neg mean rank,
   parse coverage.
 
-Usage: python scripts/adtb100_aggregate.py [--gate off] [--out aggregate_adtb100.md]
+Ground-truth keys, tier set, and tier thresholds are derived from the benchmark
+file exactly like compare_adtb100.py: v3 (AD-TxBench-100) records carry
+Final_score / Ground_truth and tiers are ordered by mean preset Final_score;
+legacy v1 files keep Overall_score / Label. Tier classification thresholds are
+the midpoints of the preset tier means, and k for precision@k is the number of
+preset positives among the evaluated records.
+
+Usage: python scripts/adtb100_aggregate.py [--gate off] [--since TS] [--out aggregate_adtb100.md]
 """
 
 import argparse
@@ -20,21 +27,48 @@ from pathlib import Path
 
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from compare_adtb100 import spearman, TIERS
+from compare_adtb100 import spearman
 from output_utils import OUTPUT_ROOT
 
 BENCHMARK = Path(__file__).resolve().parent.parent / "benchmark" / "AD-TxBench-100_v3.0.json"
 
-TIER_RANK = {t: i for i, t in enumerate(TIERS)}
+
+def load_truth():
+    """Benchmark records keyed by ID, plus the derived v3/v1 key names, tier
+    set (ordered best→worst by mean preset overall), and tier thresholds
+    (midpoints of preset tier means) — same derivation as compare_adtb100.py."""
+    bench = json.loads(BENCHMARK.read_text(encoding="utf-8"))
+    records = bench["records"]
+    is_v3 = "Therapeutic" in records[0]
+    overall_key = "Final_score" if is_v3 else "Overall_score"
+    label_key = "Ground_truth" if is_v3 else "Label"
+
+    tier_vals = {}
+    for r in records:
+        tier_vals.setdefault(r["Category"], []).append(r[overall_key])
+    tiers = sorted(tier_vals, key=lambda t: -sum(tier_vals[t]) / len(tier_vals[t]))
+    tier_means = {t: sum(tier_vals[t]) / len(tier_vals[t]) for t in tiers}
+    thr = [(tier_means[tiers[i]] + tier_means[tiers[i + 1]]) / 2
+           for i in range(len(tiers) - 1)]
+    truth = {r["ID"]: r for r in records}
+    return truth, label_key, overall_key, tiers, thr
 
 
-def metrics_for(payload, truth):
+def metrics_for(payload, truth, label_key, overall_key, tiers, thr):
+    tier_rank = {t: i for i, t in enumerate(tiers)}  # 0 = best
+
+    def tier_of(v):
+        for i, t in enumerate(thr):
+            if v >= t:
+                return tiers[i]
+        return tiers[-1]
+
     rows = []
     for r in payload["results"]:
         t = truth[r["ID"]]
         ov = r["agent_scores"].get("overall")
-        rows.append({"tier": t["Category"], "label": t["Label"], "preset": t["Overall_score"],
-                     "overall": ov})
+        rows.append({"tier": t["Category"], "label": t[label_key],
+                     "preset": t[overall_key], "overall": ov})
     scored = [r for r in rows if r["overall"] is not None]
     n = len(rows)
     m = {"n": n, "scored": len(scored), "coverage": len(scored) / n if n else 0}
@@ -44,17 +78,17 @@ def metrics_for(payload, truth):
     pairs = ok = 0
     for a in scored:
         for b in scored:
-            if TIER_RANK[a["tier"]] < TIER_RANK[b["tier"]]:
+            if tier_rank[a["tier"]] < tier_rank[b["tier"]]:
                 pairs += 1
                 ok += 1 if a["overall"] > b["overall"] else (0.5 if a["overall"] == b["overall"] else 0)
     m["concordance"] = ok / pairs if pairs else None
-    def tier_of(v):
-        return "High-quality" if v >= 7 else ("Intermediate" if v >= 4 else "Negative control")
     m["tier_acc"] = sum(1 for r in scored if tier_of(r["overall"]) == r["tier"]) / len(scored)
+    k_pos = sum(1 for r in rows if r["label"] == "positive")
     ranked = sorted(scored, key=lambda r: r["overall"], reverse=True)
-    top70 = ranked[:70]
-    m["p70"] = sum(1 for r in top70 if r["label"] == "positive") / len(top70)
-    neg = [i + 1 for i, r in enumerate(ranked) if r["tier"] == "Negative control"]
+    topk = ranked[:k_pos]
+    m["p70"] = sum(1 for r in topk if r["label"] == "positive") / len(topk) if topk else None
+    neg_tier = tiers[-1]
+    neg = [i + 1 for i, r in enumerate(ranked) if r["tier"] == neg_tier]
     m["neg_rank"] = sum(neg) / len(neg) if neg else None
     return m
 
@@ -66,7 +100,7 @@ def main():
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
-    truth = {r["ID"]: r for r in json.loads(BENCHMARK.read_text(encoding="utf-8"))["records"]}
+    truth, label_key, overall_key, tiers, thr = load_truth()
 
     # prefer _complete.json over the raw scores file of the same run
     seen = {}
@@ -98,12 +132,12 @@ def main():
         if (args.gate == "off") == has_gate_dim:
             continue
         key = (payload.get("model_variant", "?"), payload.get("mode", "?"))
-        m = metrics_for(payload, truth)
+        m = metrics_for(payload, truth, label_key, overall_key, tiers, thr)
         m["run"] = f.parent.name
         groups[key].append(m)
 
     KEYS = [("coverage", "parse coverage"), ("rho", "Spearman rho"), ("concordance", "cross-tier concordance"),
-            ("tier_acc", "3-tier accuracy"), ("p70", "Precision@70"), ("neg_rank", "neg-control mean rank")]
+            ("tier_acc", "3-tier accuracy"), ("p70", "Precision@k (preset positives)"), ("neg_rank", "neg-control mean rank")]
 
     L = []
     A = L.append

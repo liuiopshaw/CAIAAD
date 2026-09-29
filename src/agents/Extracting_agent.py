@@ -20,9 +20,9 @@ class ExtractingAgent(BaseAgent):
     extracting information relevant to material evaluation.
 
     In the multi-agent collaboration workflow, this agent receives the user's
-    material requirements, retrieves and analyzes relevant technical literature,
-    and provides background knowledge to support subsequent synthesis design
-    and operational recommendations.
+    therapeutic-candidate requirements, retrieves and analyzes relevant technical
+    literature, and provides literature background knowledge for therapeutic
+    evaluation.
     """
 
     def __init__(self, llm):
@@ -53,10 +53,10 @@ class ExtractingAgent(BaseAgent):
         """Create and configure the agent instance, attaching the literature extraction tools.
 
         Execution flow of this method:
-        1. First try to create an EAS (Elastic Algorithm Service) LLM instance for better performance
-        2. If EAS is unavailable, fall back to the default LLM passed in at initialization
-        3. Directly load the literature extraction toolset (no conditional check needed,
-           since literature processing tools are generally required)
+        1. Uses the LLM instance passed to the constructor as-is (LLM selection
+           is centralized in BaseAgent._resolve_llm())
+        2. Directly loads the literature extraction toolset (no conditional check
+           needed, since literature processing tools are generally required)
 
         Differences from other agents:
         - Does not check the tools_enabled switch; tools are always loaded

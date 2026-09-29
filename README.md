@@ -66,6 +66,8 @@ python scripts/compare_adtb100.py <TS>    # per-tier stats, Spearman, concordanc
 python scripts/adtb100_aggregate.py       # mean +/- std across repeated runs
 ```
 
+Note: `adtb100_scores_<TS>_complete.json` is not written by the benchmark script itself — it is produced by a manual merge step (merging retried/completed items into the per-run scores file) before compare/aggregate/export consume it; when present it automatically wins over the raw scores file.
+
 All agent outputs are saved RAW and unmodified under `outputs/run_<TS>/`; scoring and ranking are mechanical extraction only.
 
 ## Scoring rubric
@@ -107,6 +109,9 @@ All absolute paths resolve through `scripts/paths.py` and can be overridden with
 | `CU_AGENT_LORA_DIR` | LoRA adapters directory | `<root>/models/lora_enhanced` |
 | `CU_AGENT_OUTPUT_DIR` | outputs directory | `<root>/outputs` |
 | `CU_AGENT_LITERATURE_DIR` | literature PDF library | `<root>/agent_literature` |
+| `CU_AGENT_SEED` | base seed for per-prompt deterministic sampling (`""` disables seeding) | `42` |
+| `CU_AGENT_WEB_PORT` | web chat server port (`scripts/web_server.py`) | `8001` |
+| `CU_AGENT_LLM_BASE` | upstream LLM base URL for the web server's health proxy | `http://localhost:8000` |
 
 ## Configuration
 

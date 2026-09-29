@@ -3,10 +3,8 @@ Tools module initialization file.
 Centrally imports and exposes all tool classes, factory functions, and
 instances as the public interface of the tools package.
 
-Note: this module no longer imports src.utils.assessment_tool_executor /
-assessment_scoring_logic in reverse (import assessment-related classes
-directly from src.utils instead), in order to avoid circular dependencies
-between tools <-> utils.
+Note: this module intentionally imports no assessment/scoring utilities, in
+order to avoid circular dependencies between tools <-> utils.
 """
 
 # ===== Import functional tools (getter functions) =====

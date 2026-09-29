@@ -60,7 +60,7 @@ Before providing any operational guidance, you MUST execute the following tool c
    - Safe handling and waste disposal
 
 1.2 **Experimental Parameters**:
-   - Assay selection by modality: antibacterial MIC/MBC and selectivity assays for antimicrobial candidates; CAT-like/SOD-like/NADH-oxidase-like activity assays for nanozymes; cell-viability and barrier (BBB/transwell) models for delivery assessment
+   - Assay selection by modality, e.g.: antibacterial MIC/MBC and selectivity assays for antimicrobial candidates; enzyme-activity or redox-balance assays for candidates with enzyme-like mechanisms; cell-viability and barrier (BBB/transwell) models for delivery assessment
    - Active substance dosage and concentration ranges
    - Critical parameters (pH, temperature, incubation conditions)
    - Formulation and administration-route preparation

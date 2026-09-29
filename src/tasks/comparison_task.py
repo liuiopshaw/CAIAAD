@@ -10,8 +10,10 @@ class ComparisonTask:
 
     def create_task(self, agent, context_tasks=None, user_requirement=None):
         desc = (
-            "Aggregate evaluation results from APA (antibacterial), EPA (enzyme activity), "
-            "and BSA (biosafety) for all candidate materials. Apply consistency coefficient "
+            "Aggregate evaluation results from the manufacturing (manufacturing QC & "
+            "precise tunability), delivery (target-tissue delivery efficiency), and "
+            "safety (biosafety) evaluations for all candidate materials. "
+            "Apply consistency coefficient "
             "Cj fusion:\n"
             "  Cj = 1 − (1/3) × Σ(Wij − W̄j)² / W̄j\n"
             "  Sj = W̄j × Cj\n\n"

@@ -143,11 +143,11 @@ class ToolFactory:
         - Keep core data sources + independent functional tools
 
         Mapping between assessment dimensions and tools:
-        - Catalytic performance (50%)      -> materials_project (material structure, electronic structure, stability)
-        - Economic feasibility (10%)       -> molport (commercial availability)
-        - Environmental friendliness (10%) -> PNEC (environmental risk assessment)
-        - Technical feasibility (10%)      -> materials_project (material structure and synthesis feasibility)
-        - Structural rationality (20%)     -> pubchem (chemical properties, toxicity, structure validation)
+        - Target-Tissue Delivery Efficiency (30%)       -> pubchem (compound properties, BBB-relevant descriptors)
+        - Multi-Target Synergy Potential (15%)          -> pubchem / materials_project (activity and target data)
+        - Effect Duration (10%)                         -> pubchem (half-life / release-related data)
+        - Manufacturing QC & Precise Tunability (25%)   -> molport (commercial availability), materials_project (phase structure)
+        - Biosafety (20%)                               -> pubchem (toxicity data), PNEC (environmental risk assessment)
 
         Returns:
             list: list of unified assessment tool instances

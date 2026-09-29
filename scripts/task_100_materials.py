@@ -5,11 +5,12 @@ Auto-starts server, waits for ready, runs pipeline, cleans up.
 ALL agent outputs preserved RAW.
 
 Batch quotas and per-step parameters are externalized to pipeline_config.json
-(--config to override). Phase 4: the default config is the three-modality
-(nano / small_molecule / biologic) batch matrix; the pre-Phase-4 nano-only
-config is preserved as pipeline_config.nano_only.json for regression
-(batch-structure comparison only — its designer prompt format block is now the
-v2 contract from schema_v2.cda_format_block, not the legacy v1 text).
+(--config to override). The default config is schema v3 (AD100): the designer
+emits the uniform 13-field v3 contract from schema_v2.cda_format_block_v3, with
+no modality or element quotas — the v2 per-batch format block is only used when
+a config sets "schema" to something else. The pre-Phase-4 nano-only config was
+deleted (its purpose was reproducing the element-steered baseline, which no
+longer exists).
 
 Pipeline order: coordinator -> designer -> manufacturing -> delivery -> safety -> mechanism -> ranker.
 manufacturing/delivery/safety/mechanism append a JSON subscore tail per material line (raw output
@@ -31,6 +32,7 @@ import pipeline_prompts
 from pipeline_prompts import (
     batch_focus, cda_format_block_for, split_chunks, build_expert_prompt,
     coordinator_prompt, designer_prompt, build_ca_prompt, DEFAULT_TOA_GOAL,
+    PROMPT_CHAR_CAP,
 )
 
 TS = int(time.time())
@@ -116,7 +118,7 @@ def start_server():
     print("Starting server...")
     server_script = Path(__file__).parent / "model_server.py"
     proc = subprocess.Popen(
-        ["python", str(server_script)],
+        [sys.executable, str(server_script)],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
     )
     print(f"  Server PID: {proc.pid}")
@@ -182,7 +184,9 @@ def call(agent: str, prompt: str, max_tokens: int = 10240, temp: float = 0.3, ti
     # retry_on_timeout=False: on a local ReadTimeout the server is likely
     # still generating this very request, and a retry would queue a duplicate
     # long generation that cannot finish within its own timeout window.
-    return llm_client.chat(agent, prompt[:10000], max_tokens=max_tokens,
+    # The cap only guards against pathological prompt sizes; build_expert_prompt
+    # already clips the records body so the format footer always survives.
+    return llm_client.chat(agent, prompt[:PROMPT_CHAR_CAP], max_tokens=max_tokens,
                            temperature=temp, timeout=timeout, retries=3,
                            retry_on_timeout=False)
 
@@ -381,12 +385,12 @@ if __name__ == "__main__":
         mat_lines = [l for l in cda_raw.split("\n") if l.strip() and "|" in l]
 
         # ============================================================
-        # Step 3: manufacturing scores selective antibacterial subscores (chunked)
+        # Step 3: manufacturing scores manufacturability subscores (chunked)
         # Subscore JSON tail feeds the deterministic ASA engine
         # (scripts/asa_scoring.py + asa_rubric.json) — raw output unchanged.
         # ============================================================
         print("=" * 60)
-        print("STEP 3: manufacturing — Selective antibacterial subscores")
+        print("STEP 3: manufacturing — Manufacturability subscores")
         print("=" * 60)
 
         apa_chunks = []
@@ -402,10 +406,10 @@ if __name__ == "__main__":
         apa_raw = "\n".join(apa_chunks)
 
         # ============================================================
-        # Step 4: delivery validates NADH and refines predictions (chunked)
+        # Step 4: delivery scores target-tissue delivery efficiency (chunked)
         # ============================================================
         print("=" * 60)
-        print("STEP 4: delivery — Validate NADH activity and refine")
+        print("STEP 4: delivery — Target-tissue delivery subscores")
         print("=" * 60)
 
         epa_chunks = []
@@ -477,8 +481,8 @@ if __name__ == "__main__":
         print(f"All outputs in: {OUTPUT}/")
         print(f"  task100_coordinator_{TS}.txt           — coordinator task plan")
         print(f"  task100_designer_{TS}_part1-{total_batches}.txt   — {total_count} materials with all fields ({total_batches} raw chunks)")
-        print(f"  task100_manufacturing_{TS}_part1-{CFG['manufacturing']['chunks']}.txt   — manufacturing antibacterial subscores (raw chunks)")
-        print(f"  task100_delivery_{TS}_part1-{CFG['delivery']['chunks']}.txt   — delivery validation + subscores (raw chunks)")
+        print(f"  task100_manufacturing_{TS}_part1-{CFG['manufacturing']['chunks']}.txt   — manufacturing manufacturability subscores (raw chunks)")
+        print(f"  task100_delivery_{TS}_part1-{CFG['delivery']['chunks']}.txt   — delivery target-tissue delivery subscores (raw chunks)")
         print(f"  task100_safety_{TS}_part1-{CFG['safety']['chunks']}.txt   — safety biosafety subscores (raw chunks)")
         print(f"  task100_mechanism_{TS}_part1-{CFG['mechanism']['chunks']}.txt   — mechanism mechanism analysis + axis score (raw chunks)")
         print(f"  task100_ranker_{TS}.txt            — ranker final summary")

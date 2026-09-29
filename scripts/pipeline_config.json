@@ -1,7 +1,7 @@
 {
   "version": "0.3",
-  "schema": "v1",
-  "notes": ": subjective steering removed. No flagship batch, no modality quotas, no Disease_Intervention/Mechanism mandates, no element preferences. 4 batches x 25 free-composition candidates; the model distributes modalities and mechanisms at its own discretion. Verifiability requirements kept (real names, no invented SMILES/UniProt). Pre-Phase-4 steered nano-only config (pipeline_config.nano_only.json) deleted — its purpose was reproducing the element-steered baseline, which no longer exists.",
+  "schema": "v3",
+  "notes": "Subjective steering removed. No flagship batch, no modality quotas, no Disease_Intervention/Mechanism mandates, no element preferences. 4 batches x 25 free-composition candidates; the model distributes modalities and mechanisms at its own discretion. Verifiability requirements kept (real names, no invented SMILES/UniProt). Pre-Phase-4 steered nano-only config (pipeline_config.nano_only.json) deleted — its purpose was reproducing the element-steered baseline, which no longer exists.",
   "toa_goal": "Predict 100 drug candidates for Alzheimer's disease therapy, spanning nano formulations, biologics, small molecules, and other innovative approaches — freely distributed across all types with NO element or modality quotas. Classify every candidate along four dimensions: drug type, target category, action mode, and AD therapeutic mechanism. Assess delivery efficiency, multi-target synergy, effect durability, manufacturability, and biosafety; analyze mechanisms; produce a ranked summary report.",
   "coordinator": {
     "max_tokens": 2048,
@@ -14,28 +14,24 @@
         "batch_id": 1,
         "count": 25,
         "max_tokens": 3072,
-        "modality_focus": "free",
         "focus": "diverse AD drug candidates across all drug types (nano_formulation, small_molecule, biologic, other) with no modality or element quota. Each candidate must be a DISTINCT base therapeutic (no size/core/form variants of one parent). Names must be real and verifiable where applicable; SMILES/UniProt only when completely certain, else NA"
       },
       {
         "batch_id": 2,
         "count": 25,
         "max_tokens": 3072,
-        "modality_focus": "free",
         "focus": "more diverse AD drug candidates with no modality or element quota — vary compositions, targets, and mechanisms; do not duplicate batch 1"
       },
       {
         "batch_id": 3,
         "count": 25,
         "max_tokens": 3072,
-        "modality_focus": "free",
         "focus": "more diverse AD drug candidates with no modality or element quota — span target categories and action modes not yet covered; do not duplicate previous batches"
       },
       {
         "batch_id": 4,
         "count": 25,
         "max_tokens": 3072,
-        "modality_focus": "free",
         "focus": "final set of AD drug candidates with no modality or element quota — cover the remaining diversity of the AD drug space; do not duplicate previous batches"
       }
     ]

@@ -136,6 +136,8 @@ def main():
     if ts is None:
         candidates = (list(OUTPUT_ROOT.glob("run_*/task100_designer_*_part1.txt"))
                       + list(OUTPUT_ROOT.glob("task100_designer_*_part1.txt")))
+        if not candidates:
+            raise SystemExit("No task100_designer_*_part1.txt found under outputs/ — run the pipeline first")
         latest = max(candidates, key=lambda p: p.stat().st_mtime)
         ts = re.search(r"task100_designer_(\d+)_part1", latest.name).group(1)
 

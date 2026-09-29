@@ -47,9 +47,10 @@ class CreativeDesigningAgent(BaseAgent):
         """Create and return a configured creative designing Agent instance
 
         This method overrides the parent class's create_agent, adding:
-        1. An attempt to create an EAS (Elastic Algorithm Service) LLM
-        2. Attachment of tools dedicated to material design
-        3. Enhancement of the backstory (adding database query and tool usage guidance)
+        1. Attachment of tools dedicated to therapeutic design
+        2. Enhancement of the backstory (adding design output and tool usage requirements)
+        (the LLM passed to the constructor is used as-is; LLM selection
+        is centralized in BaseAgent._resolve_llm())
 
         Returns:
             Agent: The fully configured material design Agent instance
@@ -77,14 +78,14 @@ class CreativeDesigningAgent(BaseAgent):
         # Enhance the backstory: append additional design output requirements and tool usage strategy after the original prompt
         agent.backstory += (
             "\n\nWhen outputting design results, include the following detailed information whenever possible:\n"
-            "- Materials Project ID (mp-xxx) (if the material exists in the database)\n"
-            "- Chemical formula and crystal structure description\n"
-            "- Key physical properties (e.g., band gap, density)\n"
-            "- Thermodynamic stability (height above convex hull)\n"
+            "- Modality classification (small_molecule / nano_formulation / biologic / other) for every candidate\n"
+            "- Modality-specific composition and structural description\n"
+            "- SMILES (small molecules) or UniProt accession (biologics) — only when verified; otherwise NA, never invent\n"
+            "- Explicit AD mechanism hypothesis (mechanism of action, target & pathway, delivery strategy)\n"
             "\nTool Usage Strategy (Rate Limiting & Reuse):\n"
-            "- Prioritize reusing already-obtained structure validation or material identifier results; avoid duplicate database searches\n"
-            "- Only call Materials Project search when essential information is missing, using minimal field sets\n"
-            "- Limit result count for element combination queries to avoid large-scale data retrieval\n"
+            "- Prioritize reusing already-obtained compound or material query results; avoid duplicate database searches\n"
+            "- Only call Materials Project or PubChem when essential information is missing, using minimal field sets\n"
+            "- Limit result counts to avoid large-scale data retrieval\n"
         )
 
         return agent

@@ -13,7 +13,16 @@ upstream LLM server; it never starts/stops/modifies it.
 - GET  /api/sessions         -> chat session list (outputs/chat/)
 - GET  /api/sessions/<id>    -> one session's history
 
-Upstream LLM base URL: env CU_AGENT_LLM_BASE (default http://localhost:8000).
+Agent traffic routing: every model call goes through llm_client.chat()
+(same as the CLI pipeline), so the web coordinator honors
+scripts/llm_endpoints.json per-agent routing — hosted endpoints get their
+Authorization header and model name from the endpoint config, local endpoints
+keep the extra "agent" field that switches LoRA adapters. call_agent() is a
+ONE-SHOT call (no token streaming from the model server): the SSE stream toward
+the browser carries whole-step events, and the blocking llm_client.chat()
+synchronous request runs in a worker thread so the event loop stays responsive.
+LLM_BASE (env CU_AGENT_LLM_BASE, default http://localhost:8000) is kept ONLY
+for the /api/health upstream proxy.
 
 Iron rules (project docs): every agent output is saved RAW — no cleaning, no
 truncation beyond the pipeline's own prompt/input conventions, no fallback
@@ -32,12 +41,13 @@ from fastapi.staticfiles import StaticFiles
 BASE_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(BASE_DIR))
 from output_utils import run_dir, OUTPUT_ROOT  # noqa: E402
+import llm_client  # noqa: E402
 import schema_v2  # noqa: E402
 import pipeline_prompts  # noqa: E402
 from pipeline_prompts import (  # noqa: E402
     batch_focus, cda_format_block_for, split_chunks, build_expert_prompt,
     coordinator_prompt, DIRECT_ANSWER_TEMPLATE, VALID_ANSWER_AGENTS,
-    designer_prompt, build_ca_prompt, DEFAULT_TOA_GOAL,
+    designer_prompt, build_ca_prompt, DEFAULT_TOA_GOAL, PROMPT_CHAR_CAP,
 )
 
 LLM_BASE = os.environ.get("CU_AGENT_LLM_BASE", "http://localhost:8000").rstrip("/")
@@ -89,19 +99,26 @@ def save_raw(out_dir: Path, name: str, content: str) -> None:
 
 async def call_agent(client: httpx.AsyncClient, agent: str, prompt: str,
                      max_tokens: int, temp: float) -> str:
-    """Single upstream call, same request shape as task_100_materials.call()."""
-    r = await client.post(
-        f"{LLM_BASE}/v1/chat/completions",
-        json={
-            "model": "nano-bio", "agent": agent,
-            "messages": [{"role": "user", "content": prompt[:10000]}],
-            "max_tokens": max_tokens, "temperature": temp,
-        },
-        timeout=GEN_TIMEOUT,
+    """Single upstream call through llm_client.chat() so the web coordinator
+    honors llm_endpoints.json per-agent routing exactly like the CLI pipeline
+    (hosted endpoints get auth header + model name from the endpoint config;
+    local endpoints keep the "agent" field that switches LoRA adapters).
+
+    The upstream request is a ONE-SHOT call (no token streaming); the blocking
+    synchronous llm_client.chat() runs in a worker thread so the SSE event
+    loop stays responsive. llm_client's retry policy applies, with
+    retry_on_timeout=False because on a local ReadTimeout the server is likely
+    still generating this very request. The `client` argument is accepted for
+    call-site compatibility — the request itself is issued inside llm_client.
+    A non-OK upstream result raises RuntimeError (feeds the SSE error event)."""
+    text = await asyncio.to_thread(
+        llm_client.chat, agent, prompt[:PROMPT_CHAR_CAP],
+        max_tokens=max_tokens, temperature=temp, timeout=GEN_TIMEOUT,
+        retries=3, retry_on_timeout=False,
     )
-    if r.status_code != 200:
-        raise RuntimeError(f"upstream {agent} returned HTTP {r.status_code}: {r.text[:200]}")
-    return r.json()["choices"][0]["message"]["content"]
+    if text.startswith("ERROR"):
+        raise RuntimeError(f"upstream {agent}: {text}")
+    return text
 
 
 def load_cfg() -> dict:

@@ -135,6 +135,8 @@ def main():
     if ts is None:
         candidates = (list(OUTPUT.glob("task100_designer_*_part1.txt"))
                       + list(OUTPUT.glob("run_*/task100_designer_*_part1.txt")))
+        if not candidates:
+            raise SystemExit("No task100_designer_*_part1.txt found under outputs/ — run the pipeline first")
         latest = max(candidates, key=lambda p: p.stat().st_mtime)
         ts = re.search(r"task100_designer_(\d+)_part1", latest.name).group(1)
 
@@ -169,9 +171,13 @@ def main():
 
     out = []
     # Database-verified formulas (tool data, NOT agent output) — present when
-    # scripts/formula_lookup.py has been run for this timestamp.
+    # scripts/formula_lookup.py has been run for this timestamp. formula_lookup
+    # writes the map into the run directory; the flat outputs/ root is only a
+    # fallback for legacy runs saved before the run-directory convention.
     db_map, db_source = {}, None
-    map_file = OUTPUT / f"task100_formula_map_{ts}.json"
+    map_file = find_run_dir(ts) / f"task100_formula_map_{ts}.json"
+    if not map_file.exists():
+        map_file = OUTPUT / f"task100_formula_map_{ts}.json"
     if map_file.exists():
         import json as _json
         payload = _json.loads(map_file.read_text(encoding="utf-8"))

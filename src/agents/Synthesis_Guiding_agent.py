@@ -52,9 +52,11 @@ class SynthesisGuidingAgent(BaseAgent):
         """Create and configure the agent instance.
 
         The execution flow of this method:
-        1. Preferentially attempt to create an EAS (Elastic Algorithm Service) LLM instance, since EAS provides higher performance and stability
-        2. If EAS is unavailable, fall back to the default LLM passed in during initialization, ensuring the system still runs in degraded mode
-        3. Decide whether to load the chemistry database query tools based on whether the endpoint supports tool calling
+        1. Uses the LLM instance passed to the constructor as-is; LLM selection
+           (EAS / temperature-configured standard LLM / default LLM) is
+           centralized in BaseAgent._resolve_llm()
+        2. Calls the parent class to create the base agent
+        3. Attaches the material search tools when tool calling is supported
 
         Returns:
             The fully configured agent instance with the required tools attached

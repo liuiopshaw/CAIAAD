@@ -12,12 +12,12 @@ logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 # Assessment Screening Expert Agent B
-# Inherits from BaseAgent and is dedicated to comprehensively evaluating material proposals
-# from an Environmental, Health and Safety (EHS) perspective
+# Inherits from BaseAgent; one of three parallel experts comprehensively evaluating
+# AD therapeutic candidates across the five weighted rubric dimensions
 class AssessmentScreeningAgentB(BaseAgent):
     """Assessment Screening Expert Agent B
-    Responsible for comprehensively evaluating all aspects of material proposals,
-    focusing on environmental impact and human health risk assessment
+    Responsible for comprehensively evaluating AD therapeutic candidates across the
+    five weighted rubric dimensions, distinguished from Experts A and C via EXPERT_ID
     """
 
     def __init__(self, llm):

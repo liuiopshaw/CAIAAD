@@ -12,13 +12,14 @@ logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 # Assessment Screening Expert C class
-# Inherits from BaseAgent, specializing in comprehensive evaluation of material proposals from the perspective of technical feasibility and engineering implementation
+# Inherits from BaseAgent; one of three parallel experts comprehensively evaluating
+# AD therapeutic candidates across the five weighted rubric dimensions
 class AssessmentScreeningAgentC(BaseAgent):
     """Assessment Screening Expert C Agent
 
-    A specialized agent responsible for comprehensively evaluating material
-    proposals across multiple dimensions (including environmental impact,
-    safety, and feasibility).
+    A specialized agent responsible for comprehensively evaluating AD therapeutic
+    candidates across the five weighted rubric dimensions, distinguished from
+    Experts A and B via EXPERT_ID.
     """
 
     def __init__(self, llm):
@@ -50,12 +51,12 @@ class AssessmentScreeningAgentC(BaseAgent):
     def create_agent(self):
         """Create and configure the assessment screening agent.
 
-        This method first attempts to create an EAS (Expert Agent System) LLM instance,
-        and falls back to the LLM passed to the constructor if EAS creation fails.
-        It then adds chemical database query tools to the agent for comprehensive material evaluation.
+        Uses the LLM instance passed to the constructor as-is (LLM selection
+        is centralized in BaseAgent._resolve_llm()), then attaches the unified
+        assessment toolset for comprehensive AD candidate evaluation.
 
         Returns:
-            The fully configured agent instance, containing the necessary tools for material evaluation
+            The fully configured agent instance, containing the necessary tools for candidate evaluation
         """
         # LLM selection (EAS / standard LLM with temperature / default LLM) has been unified into
         # BaseAgent._resolve_llm(); it is no longer created here

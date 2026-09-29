@@ -12,8 +12,9 @@ logger = logging.getLogger(__name__)
 class ComparisonAgent(BaseAgent):
     """Cross-material comparison and ranking agent.
 
-    Aggregates APA, EPA, BSA scores, applies consistency coefficient Cj fusion,
-    and produces comparison matrix, radar chart data, rankings, and recommendations.
+    Aggregates manufacturing, delivery, and safety evaluation scores, applies
+    consistency coefficient Cj fusion, and produces comparison matrix, radar
+    chart data, rankings, and recommendations.
     """
 
     def __init__(self, llm):
@@ -35,13 +36,13 @@ class ComparisonAgent(BaseAgent):
         agent.tools = []
         return agent
 
-    def calculate_comprehensive_score(self, apa_score: float, epa_score: float,
-                                       bsa_score: float) -> float:
+    def calculate_comprehensive_score(self, manufacturing_score: float, delivery_score: float,
+                                       safety_score: float) -> float:
         """S_j = W̄_j × C_j
 
         C_j = 1 − (1/3) × Σ(W_ij − W̄_j)² / W̄_j
         """
-        scores = [apa_score, epa_score, bsa_score]
+        scores = [manufacturing_score, delivery_score, safety_score]
         avg = sum(scores) / 3
         variance = sum((s - avg) ** 2 for s in scores) / 3
         if avg > 0:

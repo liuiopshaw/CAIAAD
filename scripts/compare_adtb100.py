@@ -216,7 +216,10 @@ def main():
     A("## 3. Cross-tier pairwise concordance (overall)")
     A("")
     A(f"- Total cross-tier ordered pairs: {pairs} ({pair_str})")
-    A(f"- correctly ordered by agent: {ok:.0f} (ties count 0.5) -> **concordance = {concordance:.3f}**")
+    if concordance is not None:
+        A(f"- correctly ordered by agent: {ok:.0f} (ties count 0.5) -> **concordance = {concordance:.3f}**")
+    else:
+        A("- correctly ordered by agent: none — no cross-tier pairs to judge (fewer than two tiers scored); concordance = NA")
     A("")
 
     # 4. tier classification with thresholds = midpoints of preset tier means
@@ -233,6 +236,7 @@ def main():
     for r in scored:
         conf[(r["tier"], tier_of(r["agent"]["overall"]))] += 1
     correct = sum(conf[(t, t)] for t in tiers)
+    acc = correct / len(scored) if scored else None
     thr_str = ", ".join(f"≥{t:.2f}→{tiers[i]}" for i, t in enumerate(thr))
     A(f"## 4. 3-tier classification (thresholds = midpoints of preset tier means: {thr_str}, else -> {tiers[-1]})")
     A("")
@@ -240,7 +244,10 @@ def main():
     A("|---|---|---|---|")
     for t in tiers:
         A(f"| {t} | {' | '.join(str(conf[(t, tt)]) for tt in tiers)} |")
-    A(f"| **accuracy** | | | **{correct}/{len(scored)} = {correct/len(scored):.1%}** |")
+    if acc is not None:
+        A(f"| **accuracy** | | | **{correct}/{len(scored)} = {acc:.1%}** |")
+    else:
+        A("| **accuracy** | | | **NA — no parsed overall scores** |")
     A("")
 
     # 5. precision@k (k = number of positives among evaluated)
@@ -250,7 +257,11 @@ def main():
     pk = sum(1 for r in topk if r["label"] == "positive") / len(topk) if topk else None
     A(f"## 5. Precision@{k_pos} ({k_pos} preset positives among evaluated)")
     A("")
-    A(f"- true positives in agent top-{k_pos}: {sum(1 for r in topk if r['label']=='positive')}/{k_pos} -> **{pk:.1%}**")
+    n_tp = sum(1 for r in topk if r['label'] == 'positive')
+    if pk is not None:
+        A(f"- true positives in agent top-{k_pos}: {n_tp}/{k_pos} -> **{pk:.1%}**")
+    else:
+        A(f"- true positives in agent top-{k_pos}: 0/{k_pos} -> **NA (no scored candidates)**")
     A("")
 
     # 6. negative control mean rank (last tier)
@@ -259,8 +270,11 @@ def main():
     A("## 6. Negative-control rank positions (1 = best)")
     A("")
     n_neg = tier_counts[neg_tier]
-    A(f"- mean rank of {n_neg} negative controls: **{sum(neg_ranks)/len(neg_ranks):.1f}** / {len(ranked)}"
-      f" (ideal ~= {len(ranked) - (n_neg - 1) / 2:.1f}); median {sorted(neg_ranks)[len(neg_ranks)//2]}")
+    if neg_ranks:
+        A(f"- mean rank of {n_neg} negative controls: **{sum(neg_ranks)/len(neg_ranks):.1f}** / {len(ranked)}"
+          f" (ideal ~= {len(ranked) - (n_neg - 1) / 2:.1f}); median {sorted(neg_ranks)[len(neg_ranks)//2]}")
+    else:
+        A("- negative controls: none ranked (no scored candidates) — mean rank = NA")
     A("")
 
     if missing:

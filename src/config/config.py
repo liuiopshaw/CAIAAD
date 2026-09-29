@@ -36,10 +36,6 @@ class Config:
     # DrugBank pharmacology database API key
     DRUGBANK_API_KEY = os.getenv("DRUGBANK_API_KEY", "")
 
-    # --- LLaVA vLLM local model server endpoint ---
-    LLAVA_API_BASE = os.getenv("LLAVA_API_BASE", "http://localhost:8000/v1")
-    LLAVA_MODEL_NAME = os.getenv("LLAVA_MODEL_NAME", "")
-
     # --- Model parameter configuration ---
     # Line 32: MODEL_TEMPERATURE — default temperature parameter (0.0~1.0), controls output randomness; defaults to 0.7
     MODEL_TEMPERATURE = float(os.getenv("MODEL_TEMPERATURE", "0.7"))

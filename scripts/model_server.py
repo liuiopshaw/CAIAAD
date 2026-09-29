@@ -31,7 +31,7 @@ current_agent = None
 
 AGENTS = {
     "extractor": "Knowledge Extraction",
-    "manufacturing": "Antibacterial Prediction — production QC & manufacturability scoring",
+    "manufacturing": "Manufacturability — production QC & precise-control scoring",
     "delivery": "Target-Tissue Delivery Efficiency Scoring",
     "safety": "Biosafety Assessment",
     "mechanism": "Mechanism Mining — synergy + durability scoring",
@@ -65,9 +65,14 @@ def cast_adapter_to_bf16():
         if p.dtype == torch.float32:
             p.data = p.data.to(torch.bfloat16)
             n += 1
-    if n:
+    if n and torch.cuda.is_available():
         torch.cuda.empty_cache()
-    logger.info(f"  Cast {n} fp32 params to bf16. VRAM: {torch.cuda.memory_allocated()/1e9:.1f}GB")
+    logger.info(f"  Cast {n} fp32 params to bf16. VRAM: {_vram_gb():.1f}GB")
+
+
+def _vram_gb() -> float:
+    """Allocated VRAM in GB; 0.0 on CPU-only hosts (never touches CUDA)."""
+    return torch.cuda.memory_allocated() / 1e9 if torch.cuda.is_available() else 0.0
 
 
 def switch_adapter(agent_name: str):
@@ -114,7 +119,7 @@ def switch_adapter(agent_name: str):
         raise RuntimeError(f"switch to '{agent_name}' failed: {e}")
 
     current_agent = agent_name
-    logger.info(f"  Switched to {agent_name}. VRAM: {torch.cuda.memory_allocated()/1e9:.1f}GB")
+    logger.info(f"  Switched to {agent_name}. VRAM: {_vram_gb():.1f}GB")
 
 
 def _generate(req: ChatRequest) -> dict:
@@ -139,10 +144,16 @@ def _generate(req: ChatRequest) -> dict:
     seed_env = os.environ.get("CU_AGENT_SEED", "42")
     if seed_env:
         import zlib
-        seed = (int(seed_env) + zlib.crc32(text.encode("utf-8"))) % (2**31)
-        torch.manual_seed(seed)
-        if torch.cuda.is_available():
-            torch.cuda.manual_seed_all(seed)
+        try:
+            base_seed = int(seed_env)
+        except ValueError:
+            logger.warning(f"CU_AGENT_SEED={seed_env!r} is not an integer — treating as unset (no seeding)")
+            base_seed = None
+        if base_seed is not None:
+            seed = (base_seed + zlib.crc32(text.encode("utf-8"))) % (2**31)
+            torch.manual_seed(seed)
+            if torch.cuda.is_available():
+                torch.cuda.manual_seed_all(seed)
 
     with torch.no_grad():
         output_ids = peft_model.generate(**inputs, **gen_kwargs)
@@ -183,7 +194,10 @@ async def lifespan(app: FastAPI):
     global peft_model, processor, current_agent
     from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
 
-    logger.info(f"Loading base model... VRAM: {torch.cuda.get_device_properties(0).total_memory/1e9:.1f}GB")
+    if torch.cuda.is_available():
+        logger.info(f"Loading base model... VRAM: {torch.cuda.get_device_properties(0).total_memory/1e9:.1f}GB")
+    else:
+        logger.info("Loading base model... (CPU-only host, no CUDA device)")
 
     base = Qwen3VLForConditionalGeneration.from_pretrained(
         MODEL_PATH, device_map="auto", torch_dtype=torch.bfloat16,
@@ -199,7 +213,7 @@ async def lifespan(app: FastAPI):
     peft_model = PeftModel.from_pretrained(base, first_path, adapter_name=first_adapter)
     current_agent = first_adapter  # Track it — otherwise it stays resident forever
     cast_adapter_to_bf16()  # LoRA saved fp32; halve adapter VRAM for inference
-    logger.info(f"  Initial adapter: {first_adapter}. VRAM: {torch.cuda.memory_allocated()/1e9:.1f}GB")
+    logger.info(f"  Initial adapter: {first_adapter}. VRAM: {_vram_gb():.1f}GB")
     logger.info(f"Ready. Available adapters: {adapters}")
     yield
 
