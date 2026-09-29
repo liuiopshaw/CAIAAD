@@ -92,7 +92,7 @@ All agent outputs are saved RAW and unmodified under `outputs/run_<TS>/`; scorin
 │   ├── benchmark_adtb100.py / compare_adtb100.py / adtb100_aggregate.py
 │   ├── compound_lookup.py / formula_lookup.py   # DB verification of agent identifiers
 │   └── pipeline_config*.json / asa_rubric*.json
-├── src/                      # agent framework + domain tools (CrewAI)
+├── src/tools/                # domain tools (PubChem, ChEMBL, DrugBank, UniProt, Materials Project, NanoLit)
 ├── finetune/                 # (local only, not committed) literature index + training-data builders + trainer
 ├── benchmark/                # AD-TxBench-100
 └── .env.example
