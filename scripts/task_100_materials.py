@@ -100,7 +100,7 @@ def call_expert(agent: str, prompt: str, save_prefix: str, n: int, max_tokens: i
 
 
 def start_server():
-    """Start llava_server.py and wait until it responds.
+    """Start model_server.py and wait until it responds.
 
     If a healthy server is already running, reuse it and return None
     (stop_server(None) is a no-op, so a reused server is left alive).
@@ -114,7 +114,7 @@ def start_server():
         pass
 
     print("Starting server...")
-    server_script = Path(__file__).parent / "llava_server.py"
+    server_script = Path(__file__).parent / "model_server.py"
     proc = subprocess.Popen(
         ["python", str(server_script)],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
@@ -152,7 +152,7 @@ BASE_MODE = False  # --base: route every step to the unfine-tuned base model
 def call(agent: str, prompt: str, max_tokens: int = 10240, temp: float = 0.3, timeout: int = 2400) -> str:
     global server_proc
     if BASE_MODE:
-        agent = "base"  # llava_server disables all LoRA adapters for this channel
+        agent = "base"  # model_server disables all LoRA adapters for this channel
 
     local = llm_client.is_local_endpoint(llm_client.resolve_endpoint(agent))
 

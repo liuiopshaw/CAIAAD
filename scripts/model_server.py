@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Qwen3-VL-8B Server with LoRA multi-adapter support.
+Local VLM base-model server with LoRA multi-adapter support.
 Base model loaded ONCE. LoRA adapters swapped via PEFT add_adapter/set_adapter.
 No base model reload — switching is fast (<2s) and reliable.
 
@@ -38,7 +38,7 @@ AGENTS = {
     "coordinator": "Task Orchestration",
     "ranker": "Comparison & Ranking",
     "designer": "Creative Designing — Generates novel nanomaterial candidates from API data",
-    "base": "Raw Qwen3-VL-8B base model (NO LoRA) — control experiments",
+    "base": "Raw base model (NO LoRA) — control experiments",
 }
 
 

@@ -7,7 +7,7 @@ Phase 0 note: task_100_materials.py still EMITS the legacy 11-field v1 format
 small-molecule / biologic domain extension (Phase 4 switch). This module lets
 consumers (rank_cda_outputs.py, rank_to_excel.py) parse both transparently.
 
-Iron rule (CLAUDE.md): agent output is never rewritten. normalize_record only
+Iron rule (project docs): agent output is never rewritten. normalize_record only
 relocates fields mechanically — legacy Material_Category moves into Modality
 VERBATIM, and fields that do not exist in the old record are filled with "NA".
 """

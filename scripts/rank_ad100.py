@@ -13,7 +13,7 @@ distributions:
   4. AD_Mechanism     (gut_microbiome_axis/.../synaptic_function_modulation)
 
 Outputs ranking_ad100_<TS>.md and ranking_ad100_<TS>.xlsx in the run dir.
-Agent output is never rewritten (CLAUDE.md iron rule) — ranking is mechanical.
+Agent output is never rewritten (project iron rule) — ranking is mechanical.
 
 Usage: python scripts/rank_ad100.py [timestamp] [--rubric path]
 """

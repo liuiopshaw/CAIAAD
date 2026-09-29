@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Web chat server — coordinator orchestration entry (Kimi-style UI).
+Web chat server — coordinator orchestration entry (chat-style UI).
 
-Independent of llava_server.py (:8000). This service (:8001) only PROXIES the
+Independent of model_server.py (:8000). This service (:8001) only PROXIES the
 upstream LLM server; it never starts/stops/modifies it.
 
 - GET  /                     -> static/index.html
@@ -15,7 +15,7 @@ upstream LLM server; it never starts/stops/modifies it.
 
 Upstream LLM base URL: env CU_AGENT_LLM_BASE (default http://localhost:8000).
 
-Iron rules (CLAUDE.md): every agent output is saved RAW — no cleaning, no
+Iron rules (project docs): every agent output is saved RAW — no cleaning, no
 truncation beyond the pipeline's own prompt/input conventions, no fallback
 data. Per-request raw outputs land in outputs/run_<TS>/ (output_utils.run_dir).
 """

@@ -12,18 +12,19 @@ load_dotenv()
 class Config:
     # Line 10: define the Config class; all configuration items are class attributes read from environment variables via os.getenv with default values
 
-    # --- Qwen3 model configuration ---
-    # Line 13: QWEN_API_BASE — DashScope API endpoint address
-    # Defaults to the international endpoint dashscope-intl.aliyuncs.com to avoid domestic/international region mismatch errors
-    QWEN_API_BASE = os.getenv("QWEN_API_BASE", "https://dashscope-intl.aliyuncs.com/compatible-mode/v1")
-    # Line 15: QWEN_API_KEY — DashScope API key; no default value, must be set via an environment variable or the .env file
+    # --- Hosted LLM API configuration (OpenAI-compatible) ---
+    # QWEN_API_BASE — endpoint of a hosted OpenAI-compatible API; no default,
+    # set it via an environment variable or the .env file
+    QWEN_API_BASE = os.getenv("QWEN_API_BASE", "")
+    # QWEN_API_KEY — API key of the hosted endpoint; no default, set via env or .env
     QWEN_API_KEY = os.getenv("QWEN_API_KEY")
-    # Line 17: QWEN_MODEL_NAME — model name; defaults to qwen-plus (a stable commercial model, avoiding thinking mode / streaming compatibility errors)
-    QWEN_MODEL_NAME = os.getenv("QWEN_MODEL_NAME", "qwen-plus")
+    # QWEN_MODEL_NAME — hosted model name; no default, set via env or .env
+    # (also consumed by scripts/llm_endpoints.json via model_env routing)
+    QWEN_MODEL_NAME = os.getenv("QWEN_MODEL_NAME", "")
 
     # --- OpenAI-compatible configuration (required by the CrewAI framework) ---
-    # Line 20: OPENAI_API_BASE — OpenAI-compatible endpoint used internally by CrewAI
-    OPENAI_API_BASE = os.getenv("OPENAI_API_BASE", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+    # OPENAI_API_BASE — OpenAI-compatible endpoint used internally by CrewAI
+    OPENAI_API_BASE = os.getenv("OPENAI_API_BASE", "")
     # Line 22: OPENAI_API_KEY — API key used internally by CrewAI
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
@@ -37,7 +38,7 @@ class Config:
 
     # --- LLaVA vLLM local model server endpoint ---
     LLAVA_API_BASE = os.getenv("LLAVA_API_BASE", "http://localhost:8000/v1")
-    LLAVA_MODEL_NAME = os.getenv("LLAVA_MODEL_NAME", "llava-1.6-13b-awq")
+    LLAVA_MODEL_NAME = os.getenv("LLAVA_MODEL_NAME", "")
 
     # --- Model parameter configuration ---
     # Line 32: MODEL_TEMPERATURE — default temperature parameter (0.0~1.0), controls output randomness; defaults to 0.7

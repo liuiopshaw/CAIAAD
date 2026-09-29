@@ -68,7 +68,7 @@ class SynthesisGuidingAgent(BaseAgent):
 
         # ---- Phase 3: Attach the chemistry database query tools ----
         # The tool set provides material search capabilities (e.g., substance property queries, synthesis route retrieval)
-        # Note: DashScope-compatible endpoints may not support native tool calling (function calling)
+        # Note: some compatible-mode endpoints may not support native tool calling (function calling)
         # Therefore, the tools_enabled switch must be checked first
         try:
             from src.agents.base_agent import tools_enabled

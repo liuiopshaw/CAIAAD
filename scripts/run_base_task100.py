@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Control experiment: RAW Qwen3-VL-8B base model (NO LoRA agents), ONE single call.
+Control experiment: RAW base model (NO LoRA agents), ONE single call.
 Task = the task100 material-design task, WITHOUT the element-optimization
 clauses (no flagship quota for any element, no element preference rules,
 no element-specific example line).

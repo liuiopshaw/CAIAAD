@@ -21,7 +21,7 @@ PROJECT_ROOT = Path(
 
 MODEL_PATH = os.environ.get(
     "CU_AGENT_MODEL_PATH",
-    str(PROJECT_ROOT / "models" / "qwen" / "Qwen3-VL-8B-Instruct"),
+    str(PROJECT_ROOT / "models" / "base" / "vlm-instruct"),
 )
 
 LORA_DIR = os.environ.get(

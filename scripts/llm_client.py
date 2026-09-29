@@ -3,16 +3,15 @@
 Unified per-agent LLM routing layer.
 
 Every agent call in the scripts/ pipeline goes through chat() here. By default
-everything routes to the local llava_server.py on localhost:8000 (unchanged
-behavior). Any agent can be rerouted to a cloud OpenAI-compatible API
-(DashScope / OpenAI / DeepSeek / ...) by adding an entry to
-scripts/llm_endpoints.json:
+everything routes to the local model_server.py on localhost:8000 (unchanged
+behavior). Any agent can be rerouted to a hosted OpenAI-compatible API by
+adding an entry to scripts/llm_endpoints.json:
 
   {
     "default": {"base_url": "http://localhost:8000/v1/chat/completions",
                 "model": "nano-bio", "api_key_env": null},
-    "delivery": {"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
-            "model": "qwen-plus", "api_key_env": "QWEN_API_KEY"}
+    "coordinator": {"base_url": "https://your-endpoint/v1/chat/completions",
+            "model_env": "HOSTED_MODEL_NAME", "api_key_env": "HOSTED_API_KEY"}
   }
 
 Semantics:
@@ -20,8 +19,12 @@ Semantics:
   to "default".
 - "api_key_env" names an environment variable holding the API key, sent as
   "Authorization: Bearer <key>". null = no auth header (local server).
+- "model" sets the request model directly; "model_env" names an environment
+  variable holding the model name (takes precedence over "model") — use it to
+  keep model names out of the repo. A configured-but-missing variable returns
+  a clear ERROR string, same as a missing API key.
 - Local endpoints (localhost / 127.0.0.1) keep the extra "agent" field in the
-  request body — llava_server uses it to switch LoRA adapters. Non-local
+  request body — model_server uses it to switch LoRA adapters. Non-local
   endpoints receive a standard OpenAI request body WITHOUT "agent".
 
 Agent raw outputs are returned verbatim (project iron rule: no cleaning).
@@ -76,7 +79,7 @@ def resolve_endpoint(agent: str, endpoints: dict = None) -> dict:
 
 
 def is_local_endpoint(ep: dict) -> bool:
-    """True when the endpoint is the local llava_server (localhost/127.0.0.1)."""
+    """True when the endpoint is the local model_server (localhost/127.0.0.1)."""
     url = ep.get("base_url", "")
     return "localhost" in url or "127.0.0.1" in url
 
@@ -105,14 +108,24 @@ def chat(agent: str, prompt: str, max_tokens: int = 6144, temperature: float = 0
                     f"var '{key_env}', but it is not set")
         headers["Authorization"] = f"Bearer {key}"
 
+    # Model name: "model_env" (env var, keeps model names out of the repo)
+    # takes precedence over the inline "model" field.
+    model = ep.get("model", "nano-bio")
+    model_env = ep.get("model_env")
+    if model_env:
+        model = os.getenv(model_env)
+        if not model:
+            return (f"ERROR: endpoint for agent '{agent}' requires model env "
+                    f"var '{model_env}', but it is not set")
+
     body = {
-        "model": ep.get("model", "nano-bio"),
+        "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "max_tokens": max_tokens,
         "temperature": temperature,
     }
     if local:
-        body["agent"] = agent  # llava_server switches LoRA adapters on this
+        body["agent"] = agent  # model_server switches LoRA adapters on this
 
     for attempt in range(retries):
         try:

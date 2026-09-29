@@ -8,7 +8,7 @@ material line (see task_100_materials.py). Extraction is purely mechanical:
   - material name = first pipe-separated cell of the line (verbatim)
   - subscores      = the LAST valid JSON object on the line (json.loads)
 Extraction failures (unparsed line, missing/invalid JSON tail) are recorded
-in "missing" — nothing is invented or repaired (CLAUDE.md iron rule).
+in "missing" — nothing is invented or repaired (project iron rule).
 
 Output: subscores_<TS>.json in the run directory:
   {"ts": ..., "source_files": [...],

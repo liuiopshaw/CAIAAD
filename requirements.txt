@@ -11,7 +11,7 @@ transformers
 peft>=0.11.0
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# Web servers (llava_server.py :8000, web_server.py :8001)
+# Web servers (model_server.py :8000, web_server.py :8001)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 fastapi
 uvicorn

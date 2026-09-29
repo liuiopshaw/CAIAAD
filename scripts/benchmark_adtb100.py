@@ -15,7 +15,7 @@ Raw agent outputs are saved unmodified (project iron rule); parsed scores go to
 adtb100_scores_<TS>.json in the same run dir. Compare against ground truth with
 scripts/compare_adtb100.py.
 
-Requires llava_server.py running on localhost:8000.
+Requires model_server.py running on localhost:8000.
 
 Usage: python scripts/benchmark_adtb100.py [--batch-size 20] [--only delivery,mechanism,safety,ranker]
 """
@@ -63,7 +63,7 @@ def load_records(path):
 TS = int(time.time())
 RUN_DIR = run_dir(TS)
 
-AGENT_OVERRIDE = None  # "base" = raw Qwen3-VL-8B without any LoRA adapter
+AGENT_OVERRIDE = None  # "base" = raw base model without any LoRA adapter
 
 
 def call_agent(agent: str, prompt: str, max_tokens: int = 6144, temperature: float = 0.1,
@@ -595,7 +595,7 @@ def main():
                      "class/mechanism/preset scores all hidden" if NAME_ONLY else
                      "blind — agents saw only Compound/Class/Mechanism; preset scores hidden"),
         "deanonymize": anon_map or None,
-        "model_variant": "base (Qwen3-VL-8B, NO LoRA)" if variant == "base"
+        "model_variant": "base (NO LoRA)" if variant == "base"
                          else "lora (per-agent adapters, lora_enhanced)",
         "mode": args.mode,
         "rubric": "rubric/rubric.md (AD-relevance gate x [delivery 30% / synergy 15% / "

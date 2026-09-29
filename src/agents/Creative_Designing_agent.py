@@ -60,7 +60,7 @@ class CreativeDesigningAgent(BaseAgent):
         # Call the parent class's create_agent() method to create the base Agent instance
         agent = super().create_agent()
         # Attach tools: decide whether to enable tool calls based on the environment
-        # On DashScope-compatible endpoints, tool calls may return 500 errors, so a conditional check is needed
+        # On some compatible-mode endpoints, tool calls may return 500 errors, so a conditional check is needed
         try:
             from src.agents.base_agent import tools_enabled
             if tools_enabled():
