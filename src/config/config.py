@@ -46,22 +46,11 @@ class Config:
     # The designer agent uses a higher temperature of 0.8 to increase output diversity and encourage innovative designs
     DESIGNER_TEMPERATURE = float(os.getenv("DESIGNER_TEMPERATURE", "0.8"))
 
-    # The three assessment experts use a lower temperature of 0.3 to ensure consistency and accuracy of scoring
-    ASSESSMENT_A_TEMPERATURE = float(os.getenv("ASSESSMENT_A_TEMPERATURE", "0.3"))
-    ASSESSMENT_B_TEMPERATURE = float(os.getenv("ASSESSMENT_B_TEMPERATURE", "0.3"))
-    ASSESSMENT_C_TEMPERATURE = float(os.getenv("ASSESSMENT_C_TEMPERATURE", "0.3"))
-
-    # The overall assessment expert uses a moderate temperature of 0.5, balancing stability and flexibility of comprehensive judgment
-    ASSESSMENT_OVERALL_TEMPERATURE = float(os.getenv("ASSESSMENT_OVERALL_TEMPERATURE", "0.5"))
-
-    # The other experts (mechanism analysis, synthesis guidance, operation suggestion, literature extraction) uniformly use the evaluation-grade temperature of 0.3
+    # The mechanism and extractor agents use the evaluation-grade temperature of 0.3
     MECHANISM_TEMPERATURE = float(os.getenv("MECHANISM_TEMPERATURE", "0.3"))
-    SYNTHESIS_TEMPERATURE = float(os.getenv("SYNTHESIS_TEMPERATURE", "0.3"))
-    OPERATION_TEMPERATURE = float(os.getenv("OPERATION_TEMPERATURE", "0.3"))
     EXTRACTOR_TEMPERATURE = float(os.getenv("EXTRACTOR_TEMPERATURE", "0.3"))
 
     # ---- Temperatures for the nano-bio evaluation system scoring agents ----
-    ANTIMICROBIAL_TEMPERATURE = float(os.getenv("ANTIMICROBIAL_TEMPERATURE", "0.3"))
     DELIVERY_TEMPERATURE = float(os.getenv("DELIVERY_TEMPERATURE", "0.3"))
     SAFETY_TEMPERATURE = float(os.getenv("SAFETY_TEMPERATURE", "0.3"))
     RANKER_TEMPERATURE = float(os.getenv("RANKER_TEMPERATURE", "0.1"))

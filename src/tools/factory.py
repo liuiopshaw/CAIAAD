@@ -98,7 +98,7 @@ class ToolFactory:
     @staticmethod
     def create_material_search_tools():
         """
-        Create the material search tool set — for use by SynthesisGuidingAgent,
+        Create the material search tool set — for use by the material development/synthesis workflow,
         the synthesis guidance Agent.
 
         Strategy (Less is More):

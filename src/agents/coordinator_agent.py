@@ -38,13 +38,7 @@ class CoordinatorAgent(BaseAgent):
     # is handled by several agents in parallel (e.g. the three assessment experts).
     TASK_AGENT_MAPPING = {
         "therapeutic_design": "DesignerAgent",                  # Therapeutic design -> designer agent
-        "evaluation": ["AssessmentAgentA",                       # Evaluation -> the three assessment experts
-                        "AssessmentAgentB",                       # in parallel; evaluation_mode "with_summary"
-                        "AssessmentAgentC"],                      # additionally schedules the Overall expert
-        "final_summary": "AssessmentAgentOverall",              # Final summary -> overall (final validation) agent
         "mechanism_analysis": "MechanismAgent",                 # Mechanism analysis -> mechanism agent
-        "development_method": "SynthesisGuidingAgent",          # Development/preparation method -> synthesis guiding agent
-        "operation_guidance": "OperationSuggestingAgent",       # Operation guidance -> operation suggesting agent
         "literature_processing": "ExtractorAgent",              # Literature processing -> extractor agent
         "coordinator": "CoordinatorAgent"                       # Coordination task -> itself
     }

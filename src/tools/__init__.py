@@ -44,7 +44,6 @@ from .factory import ToolFactory
 
 # ===== Nano-Bio Evaluator: Domain Tools =====
 from .drugbank_tool import DrugBankTool
-from .enzyme_classifier import EnzymeClassifier
 from .material_compare import MaterialCompare
 
 # ===== Define the public interface of this module =====
@@ -84,6 +83,5 @@ __all__ = [
 
     # Nano-Bio Evaluator: Domain Tools
     'DrugBankTool',
-    'EnzymeClassifier',
     'MaterialCompare',
 ]
