@@ -26,9 +26,9 @@
       "Weighted_score": 8.55,
       "Final_score": 7.69,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "9443470",
+      "DOI": "10.1212/wnl.50.1.136",
+      "Expert_comment": "FDA-approved first-line AD therapy (small molecule); efficacy established in pivotal randomized trials (Neurology 1998). Key reference: PMID 9443470."
     },
     {
       "ID": "ADTX002",
@@ -46,9 +46,9 @@
       "Weighted_score": 8.55,
       "Final_score": 7.69,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "10066203",
+      "DOI": "10.1136/bmj.318.7184.633",
+      "Expert_comment": "FDA-approved first-line AD therapy (small molecule); efficacy established in pivotal randomized trials (BMJ 1999). Key reference: PMID 10066203."
     },
     {
       "ID": "ADTX003",
@@ -66,9 +66,9 @@
       "Weighted_score": 8.55,
       "Final_score": 7.69,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "10881251",
+      "DOI": "10.1212/wnl.54.12.2269",
+      "Expert_comment": "FDA-approved first-line AD therapy (small molecule); efficacy established in pivotal randomized trials (Neurology 2000). Key reference: PMID 10881251."
     },
     {
       "ID": "ADTX004",
@@ -86,9 +86,9 @@
       "Weighted_score": 8.55,
       "Final_score": 7.69,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "12672860",
+      "DOI": "10.1056/NEJMoa013128",
+      "Expert_comment": "FDA-approved first-line AD therapy (small molecule); efficacy established in pivotal randomized trials (Int J Geriatr Psychiatry 2017). Key reference: PMID 12672860."
     },
     {
       "ID": "ADTX005",
@@ -106,9 +106,9 @@
       "Weighted_score": 8.55,
       "Final_score": 7.69,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "36449413",
+      "DOI": "10.1056/NEJMoa2212948",
+      "Expert_comment": "Anti-amyloid monoclonal antibody with positive phase 3 program in early AD (Alzheimers Res Ther 2024). Key reference: PMID 36449413."
     },
     {
       "ID": "ADTX006",
@@ -126,9 +126,9 @@
       "Weighted_score": 8.55,
       "Final_score": 7.69,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "37459141",
+      "DOI": "10.1001/jama.2023.13239",
+      "Expert_comment": "Anti-amyloid monoclonal antibody with positive phase 3 program in early AD (JAMA Neurol 2025). Key reference: PMID 37459141."
     },
     {
       "ID": "ADTX007",
@@ -146,9 +146,9 @@
       "Weighted_score": 8.55,
       "Final_score": 7.69,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "35542991",
+      "DOI": "10.14283/jpad.2022.30",
+      "Expert_comment": "Evidence annotation pending. Key reference: PMID 35542991."
     },
     {
       "ID": "ADTX008",
@@ -166,9 +166,9 @@
       "Weighted_score": 6.4,
       "Final_score": 3.84,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "29365294",
+      "DOI": "10.1056/NEJMoa1705971",
+      "Expert_comment": "Investigational agent in clinical development for AD; supporting clinical data available (N Engl J Med 2018). Key reference: PMID 29365294."
     },
     {
       "ID": "ADTX009",
@@ -186,9 +186,9 @@
       "Weighted_score": 6.4,
       "Final_score": 3.84,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "30970186",
+      "DOI": "10.1056/NEJMoa1812840",
+      "Expert_comment": "Failed in phase 3 for AD (lack of efficacy and/or safety signals); development discontinued (N Engl J Med 2019). Key reference: PMID 30970186."
     },
     {
       "ID": "ADTX010",
@@ -206,9 +206,9 @@
       "Weighted_score": 6.4,
       "Final_score": 3.84,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "23883379",
+      "DOI": "10.1056/NEJMoa1210951",
+      "Expert_comment": "Failed in phase 3 for AD (lack of efficacy and/or safety signals); development discontinued (J Prev Alzheimers Dis 2026). Key reference: PMID 23883379."
     },
     {
       "ID": "ADTX011",
@@ -226,9 +226,9 @@
       "Weighted_score": 8.55,
       "Final_score": 7.69,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "30944040",
+      "DOI": "10.1186/s13063-019-3259-x",
+      "Expert_comment": "Evidence annotation pending. Key reference: PMID 30944040."
     },
     {
       "ID": "ADTX012",
@@ -246,9 +246,9 @@
       "Weighted_score": 6.4,
       "Final_score": 3.84,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "32489710",
+      "DOI": "10.14336/AD.2019.0621",
+      "Expert_comment": "Metabolic-neurodegeneration link is epidemiological/exploratory for AD (Aging Dis 2020); no approved AD indication. Key reference: PMID 32489710."
     },
     {
       "ID": "ADTX013",
@@ -266,9 +266,9 @@
       "Weighted_score": 6.4,
       "Final_score": 3.84,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "26362286",
+      "DOI": "10.1212/WNL.0000000000002035",
+      "Expert_comment": "Evidence limited to preclinical AD models (Int J Mol Sci 2025); no demonstrated clinical efficacy in AD. Key reference: PMID 26362286."
     },
     {
       "ID": "ADTX014",
@@ -286,9 +286,9 @@
       "Weighted_score": 8.55,
       "Final_score": 7.69,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "38026525",
+      "DOI": "10.2147/IJN.S434873",
+      "Expert_comment": "Nanomedicine platform demonstrated in preclinical models (Int J Nanomedicine 2023); translation and manufacturing risks remain. Key reference: PMID 38026525."
     },
     {
       "ID": "ADTX015",
@@ -306,9 +306,9 @@
       "Weighted_score": 8.55,
       "Final_score": 7.69,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "37786760",
+      "DOI": "10.1002/ibra.12126",
+      "Expert_comment": "Nanomedicine platform demonstrated in preclinical models (Ibrain 2023); translation and manufacturing risks remain. Key reference: PMID 37786760."
     },
     {
       "ID": "ADTX016",
@@ -326,9 +326,9 @@
       "Weighted_score": 8.55,
       "Final_score": 7.69,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "38830318",
+      "DOI": "10.1016/j.jcis.2024.05.193",
+      "Expert_comment": "Emerging nanomedicine approach with early-stage evidence only (J Colloid Interface Sci 2024). Key reference: PMID 38830318."
     },
     {
       "ID": "ADTX017",
@@ -346,9 +346,9 @@
       "Weighted_score": 8.55,
       "Final_score": 7.69,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "39930497",
+      "DOI": "10.1186/s12951-025-03109-3",
+      "Expert_comment": "Delivery platform rather than a therapeutic itself; AD-relevant delivery studies (J Nanobiotechnology 2025). Key reference: PMID 39930497."
     },
     {
       "ID": "ADTX018",
@@ -366,9 +366,9 @@
       "Weighted_score": 4.35,
       "Final_score": 0.87,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "31811919",
+      "DOI": "10.1016/j.cmi.2019.11.028",
+      "Expert_comment": "Not indicated for AD (antibiotic); included as a negative control. Reference PMID 31811919 documents the compound itself."
     },
     {
       "ID": "ADTX019",
@@ -386,9 +386,9 @@
       "Weighted_score": 4.35,
       "Final_score": 0.87,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "28672100",
+      "DOI": "10.1002/phar.1982",
+      "Expert_comment": "Not indicated for AD (anticoagulant); included as a negative control. Reference PMID 28672100 documents the compound itself."
     },
     {
       "ID": "ADTX020",
@@ -406,9 +406,9 @@
       "Weighted_score": 4.35,
       "Final_score": 0.87,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "Literature-based expert annotation required"
+      "PMID": "23770008",
+      "DOI": "10.1016/j.jconrel.2013.05.041",
+      "Expert_comment": "Not indicated for AD (anticancer drug); included as a negative control. Reference PMID 23770008 documents the compound itself."
     },
     {
       "ID": "ADTX021",
@@ -426,9 +426,9 @@
       "Weighted_score": 5.95,
       "Final_score": 3.57,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "2430180",
+      "DOI": "10.1056/NEJM198611133152001",
+      "Expert_comment": "Withdrawn AD therapy (hepatotoxicity limited long-term use); historical cholinesterase inhibitor (N Engl J Med 1986). Key reference: PMID 2430180."
     },
     {
       "ID": "ADTX022",
@@ -446,9 +446,9 @@
       "Weighted_score": 7.9,
       "Final_score": 6.24,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "18425924",
+      "DOI": "10.1002/14651858.CD005592.pub2",
+      "Expert_comment": "Evidence annotation pending. Key reference: PMID 18425924."
     },
     {
       "ID": "ADTX023",
@@ -466,9 +466,9 @@
       "Weighted_score": 6.4,
       "Final_score": 3.84,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "18640457",
+      "DOI": "10.1016/S0140-6736(08)61074-0",
+      "Expert_comment": "Failed in phase 3 for AD (lack of efficacy and/or safety signals); development discontinued (Lancet 2008). Key reference: PMID 18640457."
     },
     {
       "ID": "ADTX024",
@@ -486,9 +486,9 @@
       "Weighted_score": 7.75,
       "Final_score": 6.01,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "32568367",
+      "DOI": "10.1001/jamaneurol.2020.1840",
+      "Expert_comment": "Clinical AD evidence exists (JAMA Neurol 2020) but no approved AD indication; benefit-risk remains investigational. Key reference: PMID 32568367."
     },
     {
       "ID": "ADTX025",
@@ -506,9 +506,9 @@
       "Weighted_score": 8.7,
       "Final_score": 7.83,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "41865758",
+      "DOI": "10.1016/S0140-6736(26)00459-9",
+      "Expert_comment": "Evidence annotation pending. Key reference: PMID 41865758."
     },
     {
       "ID": "ADTX026",
@@ -526,9 +526,9 @@
       "Weighted_score": 6.55,
       "Final_score": 4.29,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "38395039",
+      "DOI": "10.1002/adma.202307081",
+      "Expert_comment": "Investigational agent in clinical development for AD; supporting clinical data available (Adv Mater 2024). Key reference: PMID 38395039."
     },
     {
       "ID": "ADTX027",
@@ -546,9 +546,9 @@
       "Weighted_score": 7.9,
       "Final_score": 6.24,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "26540269",
+      "DOI": "10.1371/journal.pone.0142340",
+      "Expert_comment": "Evidence limited to preclinical AD models (PLoS One 2015); no demonstrated clinical efficacy in AD. Key reference: PMID 26540269."
     },
     {
       "ID": "ADTX028",
@@ -566,9 +566,9 @@
       "Weighted_score": 6.2,
       "Final_score": 3.72,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "40678834",
+      "DOI": "10.1002/jbt.70369",
+      "Expert_comment": "Evidence limited to preclinical AD models (J Biochem Mol Toxicol 2025); no demonstrated clinical efficacy in AD. Key reference: PMID 40678834."
     },
     {
       "ID": "ADTX029",
@@ -586,9 +586,9 @@
       "Weighted_score": 6.05,
       "Final_score": 3.63,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "26302801",
+      "DOI": "10.2174/1389450116666150825113655",
+      "Expert_comment": "Evidence limited to preclinical AD models (Curr Drug Targets 2017); no demonstrated clinical efficacy in AD. Key reference: PMID 26302801."
     },
     {
       "ID": "ADTX030",
@@ -606,9 +606,9 @@
       "Weighted_score": 6.4,
       "Final_score": 3.84,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "18672400",
+      "DOI": "10.1016/S1474-4422(08)70167-4",
+      "Expert_comment": "Investigational agent in clinical development for AD; supporting clinical data available (Lancet Neurol 2008). Key reference: PMID 18672400."
     },
     {
       "ID": "ADTX031",
@@ -626,9 +626,9 @@
       "Weighted_score": 7.3,
       "Final_score": 5.33,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "34867367",
+      "DOI": "10.3389/fphar.2021.754502",
+      "Expert_comment": "Evidence annotation pending. Key reference: PMID 34867367."
     },
     {
       "ID": "ADTX032",
@@ -646,9 +646,9 @@
       "Weighted_score": 7.45,
       "Final_score": 5.55,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "28482641",
+      "DOI": "10.3233/JAD-170161",
+      "Expert_comment": "Clinical AD evidence exists (J Alzheimers Dis 2017) but no approved AD indication; benefit-risk remains investigational. Key reference: PMID 28482641."
     },
     {
       "ID": "ADTX033",
@@ -666,9 +666,9 @@
       "Weighted_score": 8.1,
       "Final_score": 6.56,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "39800452",
+      "DOI": "10.1016/j.tjpad.2024.100016",
+      "Expert_comment": "Clinical AD evidence exists (J Prev Alzheimers Dis 2025) but no approved AD indication; benefit-risk remains investigational. Key reference: PMID 39800452."
     },
     {
       "ID": "ADTX034",
@@ -686,9 +686,9 @@
       "Weighted_score": 5.85,
       "Final_score": 3.51,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "19017911",
+      "DOI": "10.1001/jama.2008.683",
+      "Expert_comment": "Clinical evidence for AD is mixed/inconclusive (JAMA 2008); not an established AD therapy. Key reference: PMID 19017911."
     },
     {
       "ID": "ADTX035",
@@ -706,9 +706,9 @@
       "Weighted_score": 6.3,
       "Final_score": 3.78,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "21917766",
+      "DOI": "10.1212/WNL.0b013e3182309fa5",
+      "Expert_comment": "Failed in phase 3 for AD (lack of efficacy and/or safety signals); development discontinued (Neurology 2011). Key reference: PMID 21917766."
     },
     {
       "ID": "ADTX036",
@@ -726,9 +726,9 @@
       "Weighted_score": 6.5,
       "Final_score": 4.2,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "28856569",
+      "DOI": "10.1007/s40261-017-0549-5",
+      "Expert_comment": "Clinical AD evidence exists (Clin Drug Investig 2017) but no approved AD indication; benefit-risk remains investigational. Key reference: PMID 28856569."
     },
     {
       "ID": "ADTX037",
@@ -746,9 +746,9 @@
       "Weighted_score": 6.7,
       "Final_score": 4.48,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "25038445",
+      "DOI": "10.1016/j.pbb.2014.07.006",
+      "Expert_comment": "Evidence annotation pending. Key reference: PMID 25038445."
     },
     {
       "ID": "ADTX038",
@@ -766,9 +766,9 @@
       "Weighted_score": 7.9,
       "Final_score": 6.24,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "37657939",
+      "DOI": "10.1212/WNL.0000000000207755",
+      "Expert_comment": "Clinical AD evidence exists (Neurology 2023) but no approved AD indication; benefit-risk remains investigational. Key reference: PMID 37657939."
     },
     {
       "ID": "ADTX039",
@@ -786,9 +786,9 @@
       "Weighted_score": 8.25,
       "Final_score": 6.81,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "23673233",
+      "DOI": "10.1186/alzrt179",
+      "Expert_comment": "Evidence limited to preclinical AD models (Alzheimers Res Ther 2013); no demonstrated clinical efficacy in AD. Key reference: PMID 23673233."
     },
     {
       "ID": "ADTX040",
@@ -806,9 +806,9 @@
       "Weighted_score": 6.8,
       "Final_score": 4.62,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "34570177",
+      "DOI": "10.1001/jamaneurol.2021.3310",
+      "Expert_comment": "Clinical AD evidence exists (JAMA Neurol 2021) but no approved AD indication; benefit-risk remains investigational. Key reference: PMID 34570177."
     },
     {
       "ID": "ADTX041",
@@ -826,9 +826,9 @@
       "Weighted_score": 5.95,
       "Final_score": 3.57,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "37495118",
+      "DOI": "10.1016/j.arr.2023.102021",
+      "Expert_comment": "Evidence annotation pending. Key reference: PMID 37495118."
     },
     {
       "ID": "ADTX042",
@@ -846,9 +846,9 @@
       "Weighted_score": 8.35,
       "Final_score": 6.97,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "38493185",
+      "DOI": "10.1186/s13024-024-00715-x",
+      "Expert_comment": "Nanomedicine platform demonstrated in preclinical models (Mol Neurodegener 2024); translation and manufacturing risks remain. Key reference: PMID 38493185."
     },
     {
       "ID": "ADTX043",
@@ -866,9 +866,9 @@
       "Weighted_score": 8.15,
       "Final_score": 6.64,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "42504877",
+      "DOI": "10.1021/acs.biomac.6c01257",
+      "Expert_comment": "Nanomedicine platform demonstrated in preclinical models (Biomacromolecules 2026); translation and manufacturing risks remain. Key reference: PMID 42504877."
     },
     {
       "ID": "ADTX044",
@@ -886,9 +886,9 @@
       "Weighted_score": 7.3,
       "Final_score": 5.33,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "38757165",
+      "DOI": "10.2174/0118722105292940240502114430",
+      "Expert_comment": "Emerging nanomedicine approach with early-stage evidence only (Recent Pat Nanotechnol 2025). Key reference: PMID 38757165."
     },
     {
       "ID": "ADTX045",
@@ -906,9 +906,9 @@
       "Weighted_score": 6.45,
       "Final_score": 4.16,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "9110909",
+      "DOI": "10.1056/NEJM199704243361704",
+      "Expert_comment": "Clinical evidence for AD is mixed/inconclusive (N Engl J Med 1997); not an established AD therapy. Key reference: PMID 9110909."
     },
     {
       "ID": "ADTX046",
@@ -926,9 +926,9 @@
       "Weighted_score": 6.35,
       "Final_score": 3.81,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "21045096",
+      "DOI": "10.1001/jama.2010.1510",
+      "Expert_comment": "Clinical evidence for AD is mixed/inconclusive (JAMA 2010); not an established AD therapy. Key reference: PMID 21045096."
     },
     {
       "ID": "ADTX047",
@@ -946,9 +946,9 @@
       "Weighted_score": 6.05,
       "Final_score": 3.63,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "38565590",
+      "DOI": "10.1038/s41598-024-57824-2",
+      "Expert_comment": "Evidence limited to preclinical AD models (Sci Rep 2024); no demonstrated clinical efficacy in AD. Key reference: PMID 38565590."
     },
     {
       "ID": "ADTX048",
@@ -966,9 +966,9 @@
       "Weighted_score": 5.85,
       "Final_score": 3.51,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "34597878",
+      "DOI": "10.1016/j.npep.2021.102200",
+      "Expert_comment": "Evidence limited to preclinical AD models (Neuropeptides 2021); no demonstrated clinical efficacy in AD. Key reference: PMID 34597878."
     },
     {
       "ID": "ADTX049",
@@ -986,9 +986,9 @@
       "Weighted_score": 6.4,
       "Final_score": 3.84,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "30224383",
+      "DOI": "10.15252/emmm.201809316",
+      "Expert_comment": "Failed in phase 3 for AD (lack of efficacy and/or safety signals); development discontinued (EMBO Mol Med 2018). Key reference: PMID 30224383."
     },
     {
       "ID": "ADTX050",
@@ -1006,9 +1006,9 @@
       "Weighted_score": 7.9,
       "Final_score": 6.24,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "33459229",
+      "DOI": "10.2174/1389450122666210114095307",
+      "Expert_comment": "Evidence limited to preclinical AD models (Curr Drug Targets 2021); no demonstrated clinical efficacy in AD. Key reference: PMID 33459229."
     },
     {
       "ID": "ADTX051",
@@ -1026,9 +1026,9 @@
       "Weighted_score": 6.55,
       "Final_score": 4.29,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "18186919",
+      "DOI": "10.1186/1742-2094-5-3",
+      "Expert_comment": "Evidence annotation pending. Key reference: PMID 18186919."
     },
     {
       "ID": "ADTX052",
@@ -1046,9 +1046,9 @@
       "Weighted_score": 6.55,
       "Final_score": 4.29,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "41845989",
+      "DOI": "10.1016/j.expneurol.2026.115729",
+      "Expert_comment": "Evidence limited to preclinical AD models (Exp Neurol 2026); no demonstrated clinical efficacy in AD. Key reference: PMID 41845989."
     },
     {
       "ID": "ADTX053",
@@ -1066,9 +1066,9 @@
       "Weighted_score": 6.1,
       "Final_score": 3.66,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "32123490",
+      "DOI": "10.2147/oajct.s221914",
+      "Expert_comment": "Evidence limited to preclinical AD models (Open Access J Clin Trials 2020); no demonstrated clinical efficacy in AD. Key reference: PMID 32123490."
     },
     {
       "ID": "ADTX054",
@@ -1086,9 +1086,9 @@
       "Weighted_score": 6.45,
       "Final_score": 4.16,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "24713151",
+      "DOI": "10.1016/j.bbr.2014.03.046",
+      "Expert_comment": "Evidence limited to preclinical AD models (Behav Brain Res 2014); no demonstrated clinical efficacy in AD. Key reference: PMID 24713151."
     },
     {
       "ID": "ADTX055",
@@ -1106,9 +1106,9 @@
       "Weighted_score": 6.65,
       "Final_score": 4.42,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "37943296",
+      "DOI": "10.1007/s00210-023-02818-6",
+      "Expert_comment": "Used symptomatically for behavioral/psychological symptoms of dementia; not disease-modifying (Naunyn Schmiedebergs Arch Pharmacol 2024). Key reference: PMID 37943296."
     },
     {
       "ID": "ADTX056",
@@ -1126,9 +1126,9 @@
       "Weighted_score": 6.65,
       "Final_score": 4.42,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "16784411",
+      "DOI": "10.1586/14737175.6.6.887",
+      "Expert_comment": "Used symptomatically for behavioral/psychological symptoms of dementia; not disease-modifying (Expert Rev Neurother 2006). Key reference: PMID 16784411."
     },
     {
       "ID": "ADTX057",
@@ -1146,9 +1146,9 @@
       "Weighted_score": 6.45,
       "Final_score": 4.16,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "10084637",
+      "DOI": "10.4088/jcp.v60n0207",
+      "Expert_comment": "Used symptomatically for behavioral/psychological symptoms of dementia; not disease-modifying (J Clin Psychiatry 1999). Key reference: PMID 10084637."
     },
     {
       "ID": "ADTX058",
@@ -1166,9 +1166,9 @@
       "Weighted_score": 6.45,
       "Final_score": 4.16,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "34918337",
+      "DOI": "10.1002/14651858.CD013304.pub2",
+      "Expert_comment": "Used symptomatically for behavioral/psychological symptoms of dementia; not disease-modifying (Cochrane Database Syst Rev 2021). Key reference: PMID 34918337."
     },
     {
       "ID": "ADTX059",
@@ -1186,9 +1186,9 @@
       "Weighted_score": 6.2,
       "Final_score": 3.72,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "22746245",
+      "DOI": "10.2174/1567205011310010014",
+      "Expert_comment": "Clinical evidence for AD is mixed/inconclusive (Curr Alzheimer Res 2013); not an established AD therapy. Key reference: PMID 22746245."
     },
     {
       "ID": "ADTX060",
@@ -1206,9 +1206,9 @@
       "Weighted_score": 6.2,
       "Final_score": 3.72,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "17148938",
+      "DOI": "10.1159/000097757",
+      "Expert_comment": "Clinical evidence for AD is mixed/inconclusive (Dement Geriatr Cogn Disord 2007); not an established AD therapy. Key reference: PMID 17148938."
     },
     {
       "ID": "ADTX061",
@@ -1226,9 +1226,9 @@
       "Weighted_score": 6.05,
       "Final_score": 3.63,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "33578876",
+      "DOI": "10.3390/nu13020586",
+      "Expert_comment": "Clinical evidence for AD is mixed/inconclusive (Nutrients 2021); not an established AD therapy. Key reference: PMID 33578876."
     },
     {
       "ID": "ADTX062",
@@ -1246,9 +1246,9 @@
       "Weighted_score": 5.85,
       "Final_score": 3.51,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "40283578",
+      "DOI": "10.3390/jcm14082748",
+      "Expert_comment": "Clinical evidence for AD is mixed/inconclusive (J Clin Med 2025); not an established AD therapy. Key reference: PMID 40283578."
     },
     {
       "ID": "ADTX063",
@@ -1266,9 +1266,9 @@
       "Weighted_score": 6.35,
       "Final_score": 3.81,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "38777413",
+      "DOI": "10.1016/bs.afnr.2023.12.003",
+      "Expert_comment": "Clinical evidence for AD is mixed/inconclusive (Adv Food Nutr Res 2024); not an established AD therapy. Key reference: PMID 38777413."
     },
     {
       "ID": "ADTX064",
@@ -1286,9 +1286,9 @@
       "Weighted_score": 6.35,
       "Final_score": 3.81,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "35053277",
+      "DOI": "10.3390/biom12010129",
+      "Expert_comment": "Clinical evidence for AD is mixed/inconclusive (Biomolecules 2022); not an established AD therapy. Key reference: PMID 35053277."
     },
     {
       "ID": "ADTX065",
@@ -1306,9 +1306,9 @@
       "Weighted_score": 6.35,
       "Final_score": 3.81,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "38700503",
+      "DOI": "10.18632/aging.205788",
+      "Expert_comment": "Clinical evidence for AD is mixed/inconclusive (Aging (Albany NY) 2024); not an established AD therapy. Key reference: PMID 38700503."
     },
     {
       "ID": "ADTX066",
@@ -1326,9 +1326,9 @@
       "Weighted_score": 7.0,
       "Final_score": 4.9,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "37786760",
+      "DOI": "10.1002/ibra.12126",
+      "Expert_comment": "Emerging nanomedicine approach with early-stage evidence only (Ibrain 2023). Key reference: PMID 37786760."
     },
     {
       "ID": "ADTX067",
@@ -1346,9 +1346,9 @@
       "Weighted_score": 7.35,
       "Final_score": 5.4,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "37086918",
+      "DOI": "10.1016/j.addr.2023.114822",
+      "Expert_comment": "Nanomedicine platform demonstrated in preclinical models (Adv Drug Deliv Rev 2023); translation and manufacturing risks remain. Key reference: PMID 37086918."
     },
     {
       "ID": "ADTX068",
@@ -1366,9 +1366,9 @@
       "Weighted_score": 8.35,
       "Final_score": 6.97,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "33096898",
+      "DOI": "10.3390/molecules25204866",
+      "Expert_comment": "Nanomedicine platform demonstrated in preclinical models (Molecules 2020); translation and manufacturing risks remain. Key reference: PMID 33096898."
     },
     {
       "ID": "ADTX069",
@@ -1386,9 +1386,9 @@
       "Weighted_score": 8.25,
       "Final_score": 6.81,
       "Ground_truth": "positive",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "21423189",
+      "DOI": "10.1038/nbt.1807",
+      "Expert_comment": "Nanomedicine platform demonstrated in preclinical models (Nat Biotechnol 2011); translation and manufacturing risks remain. Key reference: PMID 21423189."
     },
     {
       "ID": "ADTX070",
@@ -1406,9 +1406,9 @@
       "Weighted_score": 6.25,
       "Final_score": 3.75,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "40913913",
+      "DOI": "10.1016/j.biopha.2025.118527",
+      "Expert_comment": "Evidence limited to preclinical AD models (Biomed Pharmacother 2025); no demonstrated clinical efficacy in AD. Key reference: PMID 40913913."
     },
     {
       "ID": "ADTX071",
@@ -1426,9 +1426,9 @@
       "Weighted_score": 6.25,
       "Final_score": 3.75,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "11673605",
+      "DOI": "10.1212/wnl.57.8.1515",
+      "Expert_comment": "Evidence limited to preclinical AD models (Neurology 2001); no demonstrated clinical efficacy in AD. Key reference: PMID 11673605."
     },
     {
       "ID": "ADTX072",
@@ -1446,9 +1446,9 @@
       "Weighted_score": 6.55,
       "Final_score": 4.29,
       "Ground_truth": "medium",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "39128995",
+      "DOI": "10.1038/s41380-024-02691-6",
+      "Expert_comment": "Clinical evidence for AD is mixed/inconclusive (Mol Psychiatry 2025); not an established AD therapy. Key reference: PMID 39128995."
     },
     {
       "ID": "ADTX073",
@@ -1466,9 +1466,9 @@
       "Weighted_score": 4.75,
       "Final_score": 1.19,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "33388079",
+      "DOI": "10.1186/s12970-020-00383-4",
+      "Expert_comment": "Not indicated for AD (natural compound); included as a negative control. Reference PMID 33388079 documents the compound itself."
     },
     {
       "ID": "ADTX074",
@@ -1486,9 +1486,9 @@
       "Weighted_score": 4.35,
       "Final_score": 0.87,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "33762429",
+      "DOI": "10.1136/tobaccocontrol-2020-056367",
+      "Expert_comment": "Not indicated for AD (natural compound); included as a negative control. Reference PMID 33762429 documents the compound itself."
     },
     {
       "ID": "ADTX075",
@@ -1506,9 +1506,9 @@
       "Weighted_score": 4.65,
       "Final_score": 1.05,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "32580960",
+      "DOI": "10.3121/cmr.2020.1548",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 32580960 documents the compound itself."
     },
     {
       "ID": "ADTX076",
@@ -1526,9 +1526,9 @@
       "Weighted_score": 4.65,
       "Final_score": 1.05,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "36903343",
+      "DOI": "10.3390/molecules28052097",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 36903343 documents the compound itself."
     },
     {
       "ID": "ADTX077",
@@ -1546,9 +1546,9 @@
       "Weighted_score": 5.2,
       "Final_score": 1.82,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "14531725",
+      "DOI": "10.2165/00003088-200342130-00005",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 14531725 documents the compound itself."
     },
     {
       "ID": "ADTX078",
@@ -1566,9 +1566,9 @@
       "Weighted_score": 4.9,
       "Final_score": 1.33,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "16029066",
+      "DOI": "10.2165/00003088-200544080-00003",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 16029066 documents the compound itself."
     },
     {
       "ID": "ADTX079",
@@ -1586,9 +1586,9 @@
       "Weighted_score": 4.9,
       "Final_score": 1.33,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "35952066",
+      "DOI": "10.18578/bnf.437242180",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 35952066 documents the compound itself."
     },
     {
       "ID": "ADTX080",
@@ -1606,9 +1606,9 @@
       "Weighted_score": 4.9,
       "Final_score": 1.33,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "31643316",
+      "DOI": "10.31003/uspnf_m53520_05_01",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 31643316 documents the compound itself."
     },
     {
       "ID": "ADTX081",
@@ -1626,9 +1626,9 @@
       "Weighted_score": 4.65,
       "Final_score": 1.05,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "16096600",
+      "DOI": "10.1097/01.pec.0000173350.45648.9b",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 16096600 documents the compound itself."
     },
     {
       "ID": "ADTX082",
@@ -1646,9 +1646,9 @@
       "Weighted_score": 4.65,
       "Final_score": 1.05,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "31643739",
+      "DOI": "10.18578/bnfc.514775756",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 31643739 documents the compound itself."
     },
     {
       "ID": "ADTX083",
@@ -1666,9 +1666,9 @@
       "Weighted_score": 4.7,
       "Final_score": 1.1,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "35396016",
+      "DOI": "10.1016/bs.podrm.2021.10.002",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 35396016 documents the compound itself."
     },
     {
       "ID": "ADTX084",
@@ -1686,9 +1686,9 @@
       "Weighted_score": 4.35,
       "Final_score": 0.87,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "22018182",
+      "DOI": "10.1164/ajrccm-conference.2010.181.1_meetingabstracts.a5667",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 22018182 documents the compound itself."
     },
     {
       "ID": "ADTX085",
@@ -1706,9 +1706,9 @@
       "Weighted_score": 4.35,
       "Final_score": 0.87,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "29489240",
+      "DOI": "10.31003/uspnf_m23280_04_01",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 29489240 documents the compound itself."
     },
     {
       "ID": "ADTX086",
@@ -1726,9 +1726,9 @@
       "Weighted_score": 4.55,
       "Final_score": 0.95,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "7325185",
+      "DOI": "10.1515/dmdi.1984.5.1.25",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 7325185 documents the compound itself."
     },
     {
       "ID": "ADTX087",
@@ -1746,9 +1746,9 @@
       "Weighted_score": 4.55,
       "Final_score": 0.95,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "31644174",
+      "DOI": "10.18578/bnfc.726851766",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 31644174 documents the compound itself."
     },
     {
       "ID": "ADTX088",
@@ -1766,9 +1766,9 @@
       "Weighted_score": 4.5,
       "Final_score": 0.9,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "2670397",
+      "DOI": "10.18578/bnfc.253177925",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 2670397 documents the compound itself."
     },
     {
       "ID": "ADTX089",
@@ -1786,9 +1786,9 @@
       "Weighted_score": 4.7,
       "Final_score": 1.1,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "9113437",
+      "DOI": "10.2165/00003088-199732040-00002",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 9113437 documents the compound itself."
     },
     {
       "ID": "ADTX090",
@@ -1806,9 +1806,9 @@
       "Weighted_score": 4.55,
       "Final_score": 0.95,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "34067981",
+      "DOI": "10.3390/ijms22105146",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 34067981 documents the compound itself."
     },
     {
       "ID": "ADTX091",
@@ -1826,9 +1826,9 @@
       "Weighted_score": 5.2,
       "Final_score": 1.82,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "35649167",
+      "DOI": "10.4088/JCP.21m14345",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 35649167 documents the compound itself."
     },
     {
       "ID": "ADTX092",
@@ -1846,9 +1846,9 @@
       "Weighted_score": 4.55,
       "Final_score": 0.95,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "30000356",
+      "DOI": "10.31003/uspnf_m45850_02_01",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 30000356 documents the compound itself."
     },
     {
       "ID": "ADTX093",
@@ -1866,9 +1866,9 @@
       "Weighted_score": 4.35,
       "Final_score": 0.87,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "29763096",
+      "DOI": "10.18578/bnf.249857688",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 29763096 documents the compound itself."
     },
     {
       "ID": "ADTX094",
@@ -1886,9 +1886,9 @@
       "Weighted_score": 4.6,
       "Final_score": 1.0,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "31120217",
+      "DOI": "10.1007/s40278-019-57896-0",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 31120217 documents the compound itself."
     },
     {
       "ID": "ADTX095",
@@ -1906,9 +1906,9 @@
       "Weighted_score": 4.6,
       "Final_score": 1.0,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "16339094",
+      "DOI": "10.1056/NEJMoa050373",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 16339094 documents the compound itself."
     },
     {
       "ID": "ADTX096",
@@ -1926,9 +1926,9 @@
       "Weighted_score": 4.2,
       "Final_score": 0.72,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "9296249",
+      "DOI": "10.1177/106002809703100918",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 9296249 documents the compound itself."
     },
     {
       "ID": "ADTX097",
@@ -1946,9 +1946,9 @@
       "Weighted_score": 4.7,
       "Final_score": 1.1,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "36412275",
+      "DOI": "10.1210/endrev/bnac030",
+      "Expert_comment": "Not indicated for AD (peptide); included as a negative control. Reference PMID 36412275 documents the compound itself."
     },
     {
       "ID": "ADTX098",
@@ -1966,9 +1966,9 @@
       "Weighted_score": 4.55,
       "Final_score": 0.95,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "40768716",
+      "DOI": "10.1056/NEJMoa2413772",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 40768716 documents the compound itself."
     },
     {
       "ID": "ADTX099",
@@ -1986,9 +1986,9 @@
       "Weighted_score": 4.75,
       "Final_score": 1.19,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "32871342",
+      "DOI": "10.1016/j.ejmech.2020.112739",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 32871342 documents the compound itself."
     },
     {
       "ID": "ADTX100",
@@ -2006,9 +2006,9 @@
       "Weighted_score": 4.6,
       "Final_score": 1.0,
       "Ground_truth": "negative",
-      "PMID": "To be curated",
-      "DOI": "To be curated",
-      "Expert_comment": "To be curated"
+      "PMID": "33568043",
+      "DOI": "10.2174/1874467214666210210122628",
+      "Expert_comment": "Not indicated for AD (small molecule); included as a negative control. Reference PMID 33568043 documents the compound itself."
     }
   ]
 }
