@@ -10,8 +10,17 @@ upstream LLM server; it never starts/stops/modifies it.
 - GET  /api/health           -> upstream /health proxy
 - POST /api/orchestrate      -> SSE stream running the pipeline semantics
                                 coordinator -> designer(batches) -> manufacturing -> delivery -> safety -> mechanism -> ranker
+- POST /api/agent_chat       -> SSE stream for a DIRECT single-agent call
+                                (agent chosen by the frontend; no pipeline)
+- GET  /api/workspace        -> current output workspace directory
+- POST /api/workspace        -> set the output workspace directory (created if missing)
 - GET  /api/sessions         -> chat session list (outputs/chat/)
 - GET  /api/sessions/<id>    -> one session's history
+
+Workspace: raw agent outputs (and the run_<TS> folder referenced in events)
+are written under the user-selected workspace instead of the default
+outputs/ root. The selection is persisted server-side in
+outputs/workspace.json; each session also records the workspace it used.
 
 Agent traffic routing: every model call goes through llm_client.chat()
 (same as the CLI pipeline), so the web coordinator honors
@@ -26,7 +35,7 @@ for the /api/health upstream proxy.
 
 Iron rules (project docs): every agent output is saved RAW — no cleaning, no
 truncation beyond the pipeline's own prompt/input conventions, no fallback
-data. Per-request raw outputs land in outputs/run_<TS>/ (output_utils.run_dir).
+data. Per-request raw outputs land in <workspace>/run_<TS>/.
 """
 
 import os, sys, json, time, asyncio, re, uuid
@@ -55,6 +64,65 @@ CONFIG_PATH = BASE_DIR / "pipeline_config.json"
 STATIC_DIR = BASE_DIR / "static"
 CHAT_DIR = OUTPUT_ROOT / "chat"
 GEN_TIMEOUT = 2400  # long generations, same as the pipeline
+
+# ---------------------------------------------------------------------------
+# Direct single-agent consultation (no pipeline)
+# ---------------------------------------------------------------------------
+
+DIRECT_AGENTS = {
+    "designer": "Creative Designing — designs novel AD therapeutic candidates "
+                "(small molecules, nano formulations, biologics) with explicit mechanism hypotheses",
+    "extractor": "Knowledge Extraction — extracts structured material/compound knowledge from text",
+    "manufacturing": "Manufacturability — production QC & precise-control scoring",
+    "delivery": "Target-Tissue Delivery Efficiency Scoring",
+    "safety": "Biosafety Assessment",
+    "mechanism": "Mechanism Mining — molecular targets, pathways, multi-target synergy and effect duration",
+    "ranker": "Comparison & Ranking",
+}
+
+
+def direct_prompt(agent: str, message: str) -> str:
+    return (f"You are the {agent} agent of the CAIAAD multi-agent evaluation system: "
+            f"{DIRECT_AGENTS[agent]}.\n"
+            "Answer the user's request directly, in character as this specialist, "
+            "with rigorous and verifiable content. Do not defer to other agents.\n\n"
+            f"User request:\n{message}")
+
+# ---------------------------------------------------------------------------
+# Workspace (user-selected output directory)
+# ---------------------------------------------------------------------------
+
+WORKSPACE_STATE = OUTPUT_ROOT / "workspace.json"
+
+
+def get_workspace() -> str:
+    try:
+        p = WORKSPACE_STATE.read_text(encoding="utf-8").strip()
+        if p:
+            return p
+    except Exception:
+        pass
+    return str(OUTPUT_ROOT)
+
+
+def resolve_workspace(path: str) -> Path:
+    """Validate/normalize a workspace path: expand ~, make absolute, create."""
+    p = Path(path).expanduser()
+    if not p.is_absolute():
+        p = Path.cwd() / p
+    p = p.resolve()
+    if p.exists() and not p.is_dir():
+        raise ValueError(f"not a directory: {p}")
+    p.mkdir(parents=True, exist_ok=True)
+    return p
+
+
+def ws_run_dir(workspace: str, ts: int) -> Path:
+    """run_<TS> folder inside the given workspace (created)."""
+    base = Path(workspace)
+    d = base / f"run_{ts}"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
 
 # ---------------------------------------------------------------------------
 # Pipeline semantics — prompt text and helpers come from pipeline_prompts.py
@@ -144,16 +212,17 @@ def save_session(sess: dict) -> None:
         json.dump(sess, f, ensure_ascii=False, indent=2)
 
 
-async def orchestrate_stream(message: str, session_id: str):
+async def orchestrate_stream(message: str, session_id: str, workspace: str):
     """SSE generator: run the full pipeline semantics, yielding one JSON
     event per step. Raw outputs are saved per-step BEFORE the event is
     yielded, so a mid-stream failure still leaves completed raw files."""
     ts = int(time.time())
-    out = run_dir(ts)
+    out = ws_run_dir(workspace, ts)
     run_dir_str = str(out)
     sess = load_session(session_id)
     sess["messages"].append({"role": "user", "content": message, "ts": ts})
     sess["run_dir"] = run_dir_str
+    sess["workspace"] = workspace
     # Full event sequence is kept in the session so the frontend can replay
     # the whole orchestration (cards + agent contents) when reopened.
     events = sess.setdefault("events", [])
@@ -280,6 +349,47 @@ async def orchestrate_stream(message: str, session_id: str):
         yield sse({"type": "error", "message": str(e), "run_dir": run_dir_str})
 
 
+async def agent_chat_stream(message: str, agent: str, session_id: str,
+                            workspace: str):
+    """SSE generator for a DIRECT single-agent call: agent_start ->
+    direct_answer -> done. Raw output saved under the workspace."""
+    ts = int(time.time())
+    out = ws_run_dir(workspace, ts)
+    run_dir_str = str(out)
+    sess = load_session(session_id)
+    sess["messages"].append({"role": "user", "content": message, "ts": ts})
+    sess["run_dir"] = run_dir_str
+    sess["workspace"] = workspace
+    events = sess.setdefault("events", [])
+
+    def emit(ev: dict) -> str:
+        events.append(ev)
+        return sse(ev)
+
+    async def finish(status: str, content: str):
+        sess["messages"].append({
+            "role": "assistant", "content": content,
+            "run_dir": run_dir_str, "status": status, "ts": int(time.time()),
+        })
+        save_session(sess)
+
+    yield emit({"type": "agent_start", "agent": agent, "batch": 1})
+    try:
+        async with httpx.AsyncClient() as client:
+            answer = await call_agent(client, agent, direct_prompt(agent, message),
+                                      4096, 0.3)
+        save_raw(out, f"chat_{agent}_{ts}.txt", answer)
+        yield emit({"type": "direct_answer", "agent": agent, "content": answer})
+        await finish("done", answer)
+        yield emit({"type": "done", "run_dir": run_dir_str})
+    except Exception as e:
+        try:
+            await finish("error", f"ERROR: {e}")
+        except Exception:
+            pass
+        yield sse({"type": "error", "message": str(e), "run_dir": run_dir_str})
+
+
 @app.get("/")
 async def index():
     return FileResponse(str(STATIC_DIR / "index.html"))
@@ -296,6 +406,25 @@ async def api_health():
         return {"llm_base": LLM_BASE, "status": "unreachable", "error": str(e)}
 
 
+@app.get("/api/workspace")
+async def api_workspace_get():
+    return {"workspace": get_workspace()}
+
+
+@app.post("/api/workspace")
+async def api_workspace_set(payload: dict):
+    path = (payload.get("path") or "").strip()
+    if not path:
+        return JSONResponse({"error": "path is required"}, status_code=400)
+    try:
+        p = resolve_workspace(path)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+    OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
+    WORKSPACE_STATE.write_text(str(p), encoding="utf-8")
+    return {"workspace": str(p)}
+
+
 @app.post("/api/orchestrate")
 async def api_orchestrate(payload: dict):
     message = (payload.get("message") or "").strip()
@@ -304,6 +433,11 @@ async def api_orchestrate(payload: dict):
     session_id = payload.get("session_id") or uuid.uuid4().hex[:16]
     if not SESSION_ID_RE.match(session_id):
         return JSONResponse({"error": "invalid session_id"}, status_code=400)
+    workspace = payload.get("workspace") or get_workspace()
+    try:
+        workspace = str(resolve_workspace(workspace))
+    except Exception as e:
+        return JSONResponse({"error": f"invalid workspace: {e}"}, status_code=400)
 
     if orch_lock.locked():
         async def busy():
@@ -314,12 +448,37 @@ async def api_orchestrate(payload: dict):
 
     async def locked_stream():
         async with orch_lock:
-            async for chunk in orchestrate_stream(message, session_id):
+            async for chunk in orchestrate_stream(message, session_id, workspace):
                 yield chunk
 
     return StreamingResponse(locked_stream(), media_type="text/event-stream",
                              headers={"Cache-Control": "no-cache",
                                       "X-Session-Id": session_id})
+
+
+@app.post("/api/agent_chat")
+async def api_agent_chat(payload: dict):
+    message = (payload.get("message") or "").strip()
+    agent = (payload.get("agent") or "").strip()
+    if not message:
+        return JSONResponse({"error": "message is required"}, status_code=400)
+    if agent not in DIRECT_AGENTS:
+        return JSONResponse(
+            {"error": f"unknown agent '{agent}'; choose from {sorted(DIRECT_AGENTS)}"},
+            status_code=400)
+    session_id = payload.get("session_id") or uuid.uuid4().hex[:16]
+    if not SESSION_ID_RE.match(session_id):
+        return JSONResponse({"error": "invalid session_id"}, status_code=400)
+    workspace = payload.get("workspace") or get_workspace()
+    try:
+        workspace = str(resolve_workspace(workspace))
+    except Exception as e:
+        return JSONResponse({"error": f"invalid workspace: {e}"}, status_code=400)
+
+    return StreamingResponse(
+        agent_chat_stream(message, agent, session_id, workspace),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Session-Id": session_id})
 
 
 @app.get("/api/sessions")

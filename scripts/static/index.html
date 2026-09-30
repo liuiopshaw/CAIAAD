@@ -30,6 +30,22 @@
   }
   .session-item:hover { background: #ececee; }
   .session-item.active { background: #e3e7fd; color: #1f2329; }
+  /* Workspace */
+  #workspace-box { border-top: 1px solid #e5e6eb; padding: 10px 2px 4px; }
+  .ws-label { font-size: 11px; color: #8a8f99; margin-bottom: 4px; }
+  .ws-row { display: flex; gap: 6px; }
+  #ws-input {
+    flex: 1; min-width: 0; border: 1px solid #d9d9de; border-radius: 8px;
+    padding: 6px 8px; font-size: 12px; color: #1f2329; background: #fff;
+    font-family: inherit; outline: none;
+  }
+  #ws-input:focus { border-color: #4d6bfe; }
+  #ws-save {
+    border: 1px solid #d9d9de; background: #fff; border-radius: 8px;
+    width: 32px; cursor: pointer; color: #4d6bfe; font-size: 13px; flex-shrink: 0;
+  }
+  #ws-save:hover { background: #f0f0f3; }
+  .ws-hint { font-size: 11px; color: #8a8f99; margin-top: 4px; word-break: break-all; }
   #llm-status {
     padding: 10px; border-top: 1px solid #e5e6eb; font-size: 12px; color: #8a8f99;
     display: flex; align-items: center; gap: 6px;
@@ -98,6 +114,16 @@
   .run-dir-note { font-size: 12px; color: #8a8f99; margin: 4px 0 16px; word-break: break-all; }
   /* ---------- Input area ---------- */
   #input-area { border-top: 1px solid #f0f0f2; padding: 14px 0 18px; }
+  #mode-row {
+    max-width: 800px; margin: 0 auto 8px; padding: 0 24px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  #mode-row label { font-size: 12px; color: #8a8f99; }
+  #agent-mode {
+    border: 1px solid #d9d9de; border-radius: 8px; background: #fff;
+    padding: 5px 8px; font-size: 13px; color: #1f2329; font-family: inherit; outline: none;
+  }
+  #agent-mode:focus { border-color: #4d6bfe; }
   #input-box {
     max-width: 800px; margin: 0 auto; padding: 0 24px; display: flex; gap: 10px; align-items: flex-end;
   }
@@ -118,6 +144,14 @@
   <aside id="sidebar">
     <button id="new-chat"><span class="plus">＋</span> New Chat</button>
     <div id="session-list"></div>
+    <div id="workspace-box">
+      <div class="ws-label">Workspace (output directory)</div>
+      <div class="ws-row">
+        <input id="ws-input" spellcheck="false" placeholder="/absolute/path/to/workspace">
+        <button id="ws-save" title="Set workspace">✓</button>
+      </div>
+      <div class="ws-hint" id="ws-hint">Agent outputs are written here</div>
+    </div>
     <div id="llm-status"><span class="dot" id="llm-dot"></span><span id="llm-text">LLM server: detecting…</span></div>
   </aside>
   <main id="main">
@@ -125,12 +159,26 @@
       <div class="wrap">
         <div id="empty-hint">
           <h1>CAIAAD</h1>
-          <p>Coordinator orchestration entry — enter a research need; the pipeline runs task planning → creative design → antibacterial / enzyme-activity / safety evaluation → mechanism analysis → summary report</p>
+          <p>Enter a research need — the coordinator runs the full pipeline (planning → creative design → antibacterial / enzyme-activity / safety evaluation → mechanism analysis → summary report).</p>
+          <p style="margin-top:6px">Switch the <b>Agent</b> selector below to consult a single specialist directly; agent outputs are written to the workspace shown in the sidebar.</p>
         </div>
         <div id="messages"></div>
       </div>
     </div>
     <div id="input-area">
+      <div id="mode-row">
+        <label for="agent-mode">Agent</label>
+        <select id="agent-mode">
+          <option value="coordinator">Coordinator (full pipeline)</option>
+          <option value="designer">Creative Designer</option>
+          <option value="extractor">Knowledge Extraction</option>
+          <option value="manufacturing">Manufacturing Eval</option>
+          <option value="delivery">Delivery Eval</option>
+          <option value="safety">Safety Eval</option>
+          <option value="mechanism">Mechanism Analysis</option>
+          <option value="ranker">Ranker</option>
+        </select>
+      </div>
       <div id="input-box">
         <textarea id="msg-input" rows="1" placeholder="Enter a research need; press Enter to send (Shift+Enter for a newline)"></textarea>
         <button id="send-btn" title="Send">↑</button>
@@ -143,9 +191,10 @@
   "use strict";
 
   var AGENT_NAMES = {
-    designer: "Creative Designer", manufacturing: "Antibacterial Eval",
+    designer: "Creative Designer", manufacturing: "Manufacturing Eval",
     delivery: "Delivery Eval", safety: "Safety Eval",
-    mechanism: "Mechanism Analysis", ranker: "Summary Report"
+    mechanism: "Mechanism Analysis", ranker: "Summary Report",
+    extractor: "Knowledge Extraction", coordinator: "Coordinator"
   };
 
   var sessionId = null;
@@ -158,6 +207,7 @@
   var sessionListEl = document.getElementById("session-list");
   var llmDot = document.getElementById("llm-dot");
   var llmText = document.getElementById("llm-text");
+  var agentMode = document.getElementById("agent-mode");
 
   // ---------- Utils ----------
   function el(tag, cls, text) {
@@ -254,7 +304,7 @@
     };
   }
 
-  // ---------- Orchestrate one turn ----------
+  // ---------- Orchestrate one turn / direct agent call ----------
   function addUserMessage(text) {
     var row = el("div", "msg-user");
     row.appendChild(el("div", "bubble", text));
@@ -327,7 +377,9 @@
     };
   }
 
-  function runOrchestrate(text) {
+  function runRequest(text) {
+    var mode = agentMode.value;
+    var url = mode === "coordinator" ? "/api/orchestrate" : "/api/agent_chat";
     emptyHint.style.display = "none";
     addUserMessage(text);
     var area = el("div", "msg-assistant");
@@ -337,10 +389,14 @@
 
     var render = createRenderer(area);
 
-    fetch("/api/orchestrate", {
+    fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text, session_id: sessionId || undefined })
+      body: JSON.stringify({
+        message: text,
+        session_id: sessionId || undefined,
+        agent: mode === "coordinator" ? undefined : mode
+      })
     }).then(function (resp) {
       var sid = resp.headers.get("X-Session-Id");
       if (sid && !sessionId) { sessionId = sid; refreshSessions(); }
@@ -455,6 +511,34 @@
     }).catch(function () { /* ignore */ });
   }
 
+  // ---------- Workspace ----------
+  var wsInput = document.getElementById("ws-input");
+  var wsHint = document.getElementById("ws-hint");
+  function refreshWorkspace() {
+    fetch("/api/workspace").then(function (r) { return r.json(); }).then(function (d) {
+      if (d.workspace) wsInput.value = d.workspace;
+    }).catch(function () { /* ignore */ });
+  }
+  document.getElementById("ws-save").addEventListener("click", function () {
+    var p = wsInput.value.trim();
+    if (!p) return;
+    wsHint.textContent = "Saving…";
+    fetch("/api/workspace", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: p })
+    }).then(function (r) {
+      return r.json().then(function (d) { return { ok: r.ok, d: d }; });
+    }).then(function (res) {
+      if (res.ok) {
+        wsInput.value = res.d.workspace;
+        wsHint.textContent = "Agent outputs are written here";
+      } else {
+        wsHint.textContent = "Error: " + (res.d.error || "save failed");
+      }
+    }).catch(function (e) { wsHint.textContent = "Error: " + e.message; });
+  });
+
   // ---------- LLM status ----------
   function checkHealth() {
     fetch("/api/health").then(function (r) { return r.json(); }).then(function (h) {
@@ -477,7 +561,7 @@
     if (!text || generating) return;
     inputEl.value = "";
     inputEl.style.height = "auto";
-    runOrchestrate(text);
+    runRequest(text);
   }
   sendBtn.addEventListener("click", send);
   inputEl.addEventListener("keydown", function (e) {
@@ -491,6 +575,7 @@
 
   // ---------- Startup ----------
   refreshSessions();
+  refreshWorkspace();
   checkHealth();
   setInterval(checkHealth, 30000);
 })();
