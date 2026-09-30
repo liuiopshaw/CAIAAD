@@ -1,7 +1,5 @@
 ## Six-Dimension Evaluation Framework (Neutral Version)
 
-> Revised 2026-09-16: all subjective bonus content removed — no dosage form is highlighted anymore (the former "highlight nanformulation advantages" framework and the per-dimension preset-score examples have been deleted). Scoring relies only on the objective anchors of each dimension; the therapeutic type itself is not a reason for bonus or penalty.
-
 | Dimension | Weight | Core question |
 |:---|:---:|:---|
 | **0. AD relevance (gating dimension)** | Gating | Is the therapeutic genuinely relevant to AD treatment? |
