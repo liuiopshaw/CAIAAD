@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════
-# AD Multi-Agent Evaluator (Nano-Bio) — runtime & finetune deps
+# AD Multi-Agent Evaluator (CAIAAD) — runtime & finetune deps
 # Python 3.11 / 3.12
 # ═══════════════════════════════════════════════════════════════
 

@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 # ---- API constants ----
 BASE_URL = "https://rest.uniprot.org/uniprotkb"
-HEADERS = {"User-Agent": "NanoBio-UniProt-Tool/1.0"}
+HEADERS = {"User-Agent": "CAIAAD-UniProt-Tool/1.0"}
 
 # ---- Request rate limiting ----
 # Key-free public API; polite rate limiting: minimum 0.4 s between requests (>= 0.3 s required)

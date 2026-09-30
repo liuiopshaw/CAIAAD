@@ -1,5 +1,5 @@
 {
-  "default": {"base_url": "http://localhost:8000/v1/chat/completions", "model": "nano-bio", "api_key_env": null},
+  "default": {"base_url": "http://localhost:8000/v1/chat/completions", "model": "caiaad", "api_key_env": null},
   "coordinator": {"base_url_env": "QWEN_API_BASE", "model_env": "QWEN_MODEL_NAME", "api_key_env": "QWEN_API_KEY"},
   "extractor": {"base_url_env": "QWEN_API_BASE", "model_env": "QWEN_MODEL_NAME", "api_key_env": "QWEN_API_KEY"}
 }

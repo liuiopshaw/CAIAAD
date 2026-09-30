@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 # ---- API constants ----
 GRAPHQL_URL = "https://api.platform.opentargets.org/api/v4/graphql"
 HEADERS = {
-    "User-Agent": "NanoBio-OpenTargets-Tool/1.0",
+    "User-Agent": "CAIAAD-OpenTargets-Tool/1.0",
     "Content-Type": "application/json",
 }
 

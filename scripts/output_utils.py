@@ -7,7 +7,7 @@ Consumers (formula_lookup, rank, excel) call find_run_dir(ts) — which falls
 back to the flat outputs/ root for legacy runs saved before this convention.
 
 ``OUTPUT_ROOT`` resolves through scripts/paths.py (override with
-``NANO_BIO_OUTPUT_DIR``) and is re-exported here for backwards compatibility.
+``CAIAAD_OUTPUT_DIR``) and is re-exported here for backwards compatibility.
 """
 
 import os

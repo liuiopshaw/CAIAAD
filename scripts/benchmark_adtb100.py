@@ -3,7 +3,7 @@
 ADTB-100 blind benchmark evaluation.
 
 Feeds the 100 compounds from benchmark/AD-TxBench-100.json
-to the Nano-Bio agent ensemble WITHOUT revealing Category / Label / any preset score
+to the CAIAAD agent ensemble WITHOUT revealing Category / Label / any preset score
 (blind protocol). Each batch is scored by domain agents:
 
   delivery -> Efficacy (1-10)

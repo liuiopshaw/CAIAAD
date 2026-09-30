@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class DrugBankTool:
-    """Query DrugBank for pharmacological data relevant to nano-bio interactions.
+    """Query DrugBank for pharmacological data relevant to caiaad interactions.
 
     Query modes:
     - gut_metabolism: Gut microbiota metabolism pathways for a compound

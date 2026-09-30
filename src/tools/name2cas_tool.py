@@ -44,7 +44,7 @@ class NameToCASTool:
         # Set the User-Agent header so PubChem can identify and track the request source
         # A well-defined User-Agent helps the API provider with usage statistics and troubleshooting
         self.session.headers.update({
-            "User-Agent": "NanoBio-NameToCAS-Tool/1.0"
+            "User-Agent": "CAIAAD-NameToCAS-Tool/1.0"
         })
 
     def _make_request(self, endpoint: str, timeout: int = 30, max_retries: int = 3) -> Dict[str, Any]:

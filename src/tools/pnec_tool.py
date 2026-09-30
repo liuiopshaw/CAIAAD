@@ -49,7 +49,7 @@ class PNECTool:
         # Set a custom User-Agent header so the API server can identify and track
         # the request source
         self.session.headers.update({
-            "User-Agent": "NanoBio-PNEC-Tool/1.0"
+            "User-Agent": "CAIAAD-PNEC-Tool/1.0"
         })
 
         # Toxicity data for common metal elements and their corresponding valence states

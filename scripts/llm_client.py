@@ -9,7 +9,7 @@ adding an entry to scripts/llm_endpoints.json:
 
   {
     "default": {"base_url": "http://localhost:8000/v1/chat/completions",
-                "model": "nano-bio", "api_key_env": null},
+                "model": "caiaad", "api_key_env": null},
     "coordinator": {"base_url": "https://your-endpoint/v1/chat/completions",
             "model_env": "HOSTED_MODEL_NAME", "api_key_env": "HOSTED_API_KEY"}
   }
@@ -47,7 +47,7 @@ LOCAL_CHAT_URL = "http://localhost:8000/v1/chat/completions"
 
 # Built-in fallback when llm_endpoints.json is absent: everything local.
 _BUILTIN_CONFIG = {
-    "default": {"base_url": LOCAL_CHAT_URL, "model": "nano-bio", "api_key_env": None}
+    "default": {"base_url": LOCAL_CHAT_URL, "model": "caiaad", "api_key_env": None}
 }
 
 
@@ -123,7 +123,7 @@ def chat(agent: str, prompt: str, max_tokens: int = 6144, temperature: float = 0
 
     # Model name: "model_env" (env var, keeps model names out of the repo)
     # takes precedence over the inline "model" field.
-    model = ep.get("model", "nano-bio")
+    model = ep.get("model", "caiaad")
     model_env = ep.get("model_env")
     if model_env:
         model = os.getenv(model_env)

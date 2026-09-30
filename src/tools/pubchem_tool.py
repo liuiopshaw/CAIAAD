@@ -53,7 +53,7 @@ class PubChemTool:
         # ---- HTTP request headers ----
         # Set a User-Agent to identify ourselves, in compliance with PubChem usage guidelines
         self.headers = {
-            "User-Agent": "NanoBio-PubChem-Tool/1.0"
+            "User-Agent": "CAIAAD-PubChem-Tool/1.0"
         }
 
         # If an API key is available, add it to the request headers (raises the request rate limit)

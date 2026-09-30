@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import MODEL_PATH, LORA_DIR, OUTPUT_ROOT  # noqa: E402
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("nano-bio-server")
+logger = logging.getLogger("caiaad-server")
 
 peft_model = None   # Base model + PEFT wrapper, lives forever
 processor = None
@@ -48,7 +48,7 @@ class ChatMessage(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    model: str = "nano-bio"
+    model: str = "caiaad"
     messages: List[ChatMessage]
     max_tokens: int = 10240
     temperature: float = 0.3
@@ -140,14 +140,14 @@ def _generate(req: ChatRequest) -> dict:
     # sharing a long common prefix) get decorrelated sampling trajectories.
     # (First version used a single fixed seed for every request, which made
     # batches converge to near-duplicate candidate lists.) Override base with
-    # NANO_BIO_SEED; NANO_BIO_SEED="" disables seeding.
-    seed_env = os.environ.get("NANO_BIO_SEED", "42")
+    # CAIAAD_SEED; CAIAAD_SEED="" disables seeding.
+    seed_env = os.environ.get("CAIAAD_SEED", "42")
     if seed_env:
         import zlib
         try:
             base_seed = int(seed_env)
         except ValueError:
-            logger.warning(f"NANO_BIO_SEED={seed_env!r} is not an integer — treating as unset (no seeding)")
+            logger.warning(f"CAIAAD_SEED={seed_env!r} is not an integer — treating as unset (no seeding)")
             base_seed = None
         if base_seed is not None:
             seed = (base_seed + zlib.crc32(text.encode("utf-8"))) % (2**31)
@@ -173,7 +173,7 @@ def _generate(req: ChatRequest) -> dict:
 
     return {
         "id": f"chatcmpl-{int(time.time())}", "object": "chat.completion",
-        "created": int(time.time()), "model": "nano-bio",
+        "created": int(time.time()), "model": "caiaad",
         "choices": [{"index": 0, "message": {"role": "assistant", "content": response}, "finish_reason": "stop"}],
         "agent_used": req.agent
     }
@@ -218,7 +218,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="Nano-Bio Evaluator", lifespan=lifespan)
+app = FastAPI(title="CAIAAD", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 # Only one adapter can be active at a time — serialize all inference requests.
@@ -262,5 +262,5 @@ async def chat_completions(req: ChatRequest):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("NANO_BIO_PORT", 8000))
+    port = int(os.environ.get("CAIAAD_PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)

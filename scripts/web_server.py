@@ -21,7 +21,7 @@ keep the extra "agent" field that switches LoRA adapters. call_agent() is a
 ONE-SHOT call (no token streaming from the model server): the SSE stream toward
 the browser carries whole-step events, and the blocking llm_client.chat()
 synchronous request runs in a worker thread so the event loop stays responsive.
-LLM_BASE (env NANO_BIO_LLM_BASE, default http://localhost:8000) is kept ONLY
+LLM_BASE (env CAIAAD_LLM_BASE, default http://localhost:8000) is kept ONLY
 for the /api/health upstream proxy.
 
 Iron rules (project docs): every agent output is saved RAW — no cleaning, no
@@ -50,7 +50,7 @@ from pipeline_prompts import (  # noqa: E402
     designer_prompt, build_ranker_prompt, DEFAULT_COORDINATOR_GOAL, PROMPT_CHAR_CAP,
 )
 
-LLM_BASE = os.environ.get("NANO_BIO_LLM_BASE", "http://localhost:8000").rstrip("/")
+LLM_BASE = os.environ.get("CAIAAD_LLM_BASE", "http://localhost:8000").rstrip("/")
 CONFIG_PATH = BASE_DIR / "pipeline_config.json"
 STATIC_DIR = BASE_DIR / "static"
 CHAT_DIR = OUTPUT_ROOT / "chat"
@@ -79,7 +79,7 @@ def parse_plan(coordinator_raw: str) -> dict:
 # App
 # ---------------------------------------------------------------------------
 
-app = FastAPI(title="Nano-Bio Evaluator — coordinator Chat")
+app = FastAPI(title="CAIAAD — coordinator Chat")
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 orch_lock = asyncio.Lock()
@@ -358,5 +358,5 @@ async def api_session(session_id: str):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1",
-                port=int(os.environ.get("NANO_BIO_WEB_PORT", "8001")),
+                port=int(os.environ.get("CAIAAD_WEB_PORT", "8001")),
                 log_level="info")

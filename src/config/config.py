@@ -50,7 +50,7 @@ class Config:
     MECHANISM_TEMPERATURE = float(os.getenv("MECHANISM_TEMPERATURE", "0.3"))
     EXTRACTOR_TEMPERATURE = float(os.getenv("EXTRACTOR_TEMPERATURE", "0.3"))
 
-    # ---- Temperatures for the nano-bio evaluation system scoring agents ----
+    # ---- Temperatures for the caiaad evaluation system scoring agents ----
     DELIVERY_TEMPERATURE = float(os.getenv("DELIVERY_TEMPERATURE", "0.3"))
     SAFETY_TEMPERATURE = float(os.getenv("SAFETY_TEMPERATURE", "0.3"))
     RANKER_TEMPERATURE = float(os.getenv("RANKER_TEMPERATURE", "0.1"))

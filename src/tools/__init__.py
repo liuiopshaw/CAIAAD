@@ -42,7 +42,7 @@ from .crewai_molport_tool import (                                     # CrewAI 
 # ToolFactory is used to uniformly create and manage all tool instances
 from .factory import ToolFactory
 
-# ===== Nano-Bio Evaluator: Domain Tools =====
+# ===== CAIAAD: Domain Tools =====
 from .drugbank_tool import DrugBankTool
 from .material_compare import MaterialCompare
 
@@ -81,7 +81,7 @@ __all__ = [
     'CrewAIMolPortSearchTool',
     'CrewAIMolPortMoleculeInfoTool',
 
-    # Nano-Bio Evaluator: Domain Tools
+    # CAIAAD: Domain Tools
     'DrugBankTool',
     'MaterialCompare',
 ]
