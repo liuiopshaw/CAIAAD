@@ -50,7 +50,7 @@ def main():
     dedup = len(argv) > 1 and argv[1].lower() == "dedup"
 
     if file_mode:
-        # Direct raw-output file (e.g. base_task100_<TS>.txt from run_base_task100.py)
+        # Direct raw-output file (e.g. base_task100_<TS>.txt)
         src_path = Path(arg)
         if not src_path.is_absolute():
             src_path = OUTPUT / arg

@@ -34,10 +34,6 @@ DEFAULT_COORDINATOR_GOAL = (
 PROMPT_CHAR_CAP = 60000
 
 
-NANO_ONLY_LINE = ("This batch uses NANO modalities only: "
-                  "nanocluster, nanoparticle, single_atom, dual_atom")
-
-
 def batch_focus(batch: dict) -> str:
     """Prompt focus text for a designer batch: 'focus' (verbatim) wins, otherwise
     'description'."""
@@ -48,13 +44,10 @@ def batch_focus(batch: dict) -> str:
 
 def designer_format_block_for(batch: dict) -> str:
     """Legacy-modality designer format block for a batch, driven by its optional
-    'modality_focus' ("free" | "nano_mixed" | an output_schema.MODALITIES value;
-    missing = legacy nano-only config -> "nano_mixed")."""
-    mf = batch.get("modality_focus") or "nano_mixed"
+    'modality_focus' ("free" | an output_schema.MODALITIES value; missing = free)."""
+    mf = batch.get("modality_focus") or "free"
     if mf == "free":
         return output_schema.designer_format_block(None)
-    if mf == "nano_mixed":
-        return output_schema.designer_format_block(None) + "\n" + NANO_ONLY_LINE
     return output_schema.designer_format_block(mf)
 
 
