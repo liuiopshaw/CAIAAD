@@ -12,7 +12,7 @@ in .env) -> PubChem (keyless, always available). Per-query source is recorded.
 Raw API responses are saved to task100_formula_<TS>.txt and the derived mapping to
 task100_formula_map_<TS>.json — BOTH inside the run directory (outputs/run_<TS>/;
 the flat outputs/ root only serves legacy runs saved before that convention) —
-for rank_cda_outputs.py.
+for rank_designer_outputs.py.
 
 Designer records are parsed with output_schema (parse_record_current for the
 current AD100 13-field layout first, then normalize_record for legacy records),

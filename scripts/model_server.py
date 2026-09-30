@@ -57,7 +57,7 @@ class ChatRequest(BaseModel):
 
 def cast_adapter_to_bf16():
     """LoRA weights are saved in fp32 (2x VRAM). Cast to bf16 for inference —
-    halves adapter VRAM (cda 2.3GB->1.15GB) and keeps the 24GB card below the
+    halves adapter VRAM (designer 2.3GB->1.15GB) and keeps the 24GB card below the
     thrashing ceiling. Base model is already bf16, so only LoRA params change.
     """
     n = 0
@@ -136,7 +136,7 @@ def _generate(req: ChatRequest) -> dict:
 
     # Reproducibility (user requirement): deterministic seed PER
     # PROMPT — base seed + crc32(prompt). Identical prompts still reproduce
-    # byte-identical outputs, but different prompts (e.g. CDA batches 1-4
+    # byte-identical outputs, but different prompts (e.g. designer batches 1-4
     # sharing a long common prefix) get decorrelated sampling trajectories.
     # (First version used a single fixed seed for every request, which made
     # batches converge to near-duplicate candidate lists.) Override base with

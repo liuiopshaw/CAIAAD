@@ -11,7 +11,7 @@ A multi-agent system for Alzheimer's disease (AD) therapeutic candidate design a
 - 🔬 **Per-agent LoRA adapters** — one base model loaded once; adapters switched per request by `scripts/model_server.py` (FastAPI, OpenAI-compatible)
 - ☁️ **Per-agent hosted-LLM routing** — any agent can be rerouted to a hosted OpenAI-compatible API via `scripts/llm_endpoints.json`, no code changes (coordinator and extractor are routed out of the box; the model name and key live in `.env`)
 - 📊 **Blind benchmark suite** — AD-TxBench-100 (drug scoring) with harness-vs-prompt and LoRA-vs-base 2×2 protocols, rubric anchoring, AD-relevance gating, anonymization, and deterministic scoring
-- 📐 **Deterministic ASA scoring** — agent subscores are mechanically extracted and fused by `scripts/asa_scoring.py` with the weights in `scripts/asa_rubric.json`; changing the rubric re-scores historical runs without re-running any agent
+- 📐 **Deterministic scoring engine** — agent subscores are mechanically extracted and fused by `scripts/scoring_engine.py` with the weights in `scripts/scoring_rubric.json`; changing the rubric re-scores historical runs without re-running any agent
 
 ## Pipeline
 
@@ -31,7 +31,7 @@ python scripts/web_server.py            # port 8001 (NANO_BIO_WEB_PORT to overri
 
 # 3. Deterministic ranking (no agent involved; raw outputs never modified)
 python scripts/extract_subscores.py <TS>
-python scripts/rank_ad100.py <TS> --rubric scripts/asa_rubric.json
+python scripts/rank_ad100.py <TS> --rubric scripts/scoring_rubric.json
 ```
 
 ## Hosted LLM routing per agent
@@ -72,7 +72,7 @@ All agent outputs are saved RAW and unmodified under `outputs/run_<TS>/`; scorin
 
 ## Scoring rubric
 
-`rubric/rubric.md` — five weighted dimensions (target-tissue delivery 30%, multi-target synergy 15%, effect duration 10%, manufacturing control 25%, biosafety 20%) plus an optional AD-relevance gate (hard: ×ad/10; soft: ×(0.5+0.5·ad/10)). Mirrored in `scripts/asa_rubric.json` for deterministic ranking.
+`rubric/rubric.md` — five weighted dimensions (target-tissue delivery 30%, multi-target synergy 15%, effect duration 10%, manufacturing control 25%, biosafety 20%) plus an optional AD-relevance gate (hard: ×ad/10; soft: ×(0.5+0.5·ad/10)). Mirrored in `scripts/scoring_rubric.json` for deterministic ranking.
 
 ## Project Structure
 
@@ -86,12 +86,12 @@ All agent outputs are saved RAW and unmodified under `outputs/run_<TS>/`; scorin
 │   ├── task_100_materials.py # CLI candidate-design pipeline
 │   ├── web_server.py         # SSE chat orchestration (:8001) + static/index.html
 │   ├── output_schema.py      # output contract (current/legacy) single source of truth
-│   ├── asa_scoring.py        # deterministic ASA engine (rubric-driven)
+│   ├── scoring_engine.py     # deterministic scoring engine (rubric-driven)
 │   ├── extract_subscores.py  # mechanical subscore extraction
-│   ├── rank_ad100.py / rank_cda_outputs.py / rank_to_excel.py
+│   ├── rank_ad100.py / rank_designer_outputs.py / rank_to_excel.py
 │   ├── benchmark_adtb100.py / compare_adtb100.py / adtb100_aggregate.py
 │   ├── compound_lookup.py / formula_lookup.py   # DB verification of agent identifiers
-│   └── pipeline_config*.json / asa_rubric*.json
+│   └── pipeline_config*.json / scoring_rubric*.json
 ├── src/                      # agent framework + domain tools (CrewAI)
 ├── finetune/                 # (local only, not committed) literature index + training-data builders + trainer
 ├── benchmark/                # AD-TxBench-100

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Deterministic ASA scoring engine (Phase 3).
+Deterministic scoring engine (Phase 3).
 
 Pure functions — the agent subscores are inputs, the rubric is external
-configuration (scripts/asa_rubric.json). Changing the rubric re-scores
+configuration (scripts/scoring_rubric.json). Changing the rubric re-scores
 historical subscores WITHOUT re-running any agent.
 
 Axis model (rubric-driven):
@@ -27,7 +27,7 @@ Total semantics:
   mean, while applying the same consistency discount.
 
 Usage:
-  python scripts/asa_scoring.py [subscores.json] [--rubric path]
+  python scripts/scoring_engine.py [subscores.json] [--rubric path]
   (no file argument -> read JSON from stdin)
 
 Input JSON: either the full extract_subscores payload ({"materials": {...}}),
@@ -39,7 +39,7 @@ import sys
 from pathlib import Path
 
 WEIGHT_TOL = 1e-6
-DEFAULT_RUBRIC = Path(__file__).parent / "asa_rubric.json"
+DEFAULT_RUBRIC = Path(__file__).parent / "scoring_rubric.json"
 
 
 def load_rubric(path) -> dict:
@@ -110,8 +110,8 @@ def cj_consistency(scores: list, clamp: "list | None" = None) -> tuple:
     return cj, wbar * cj
 
 
-def compute_asa(axis_scores: dict, rubric: dict) -> dict:
-    """Compute the deterministic ASA for one material.
+def compute_score(axis_scores: dict, rubric: dict) -> dict:
+    """Compute the deterministic score for one material.
 
     axis_scores: {axis_name: {sub: score}} or {axis_name: direct_score}.
     Returns {total, total_raw, total_adj, axes, consistency_cj,
@@ -182,11 +182,11 @@ def main():
 
     rows = []
     for name, axes in _materials_of(payload).items():
-        r = compute_asa(axes, rubric)
+        r = compute_score(axes, rubric)
         rows.append((name, r))
     rows.sort(key=lambda kv: (-kv[1]["total_adj"], kv[0]))
 
-    print(f"asa_rubric ({rubric_path})")
+    print(f"scoring_rubric ({rubric_path})")
     for name, r in rows:
         print(f"{name}: total_adj={r['total_adj']:.3f} total_raw={r['total_raw']:.3f} "
               f"Cj={r['consistency_cj']:.3f} axes={ {k: round(v, 2) for k, v in r['axes'].items()} }"

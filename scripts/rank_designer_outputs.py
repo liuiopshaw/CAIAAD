@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Rank designer-designed materials by ASA score into a Markdown document.
+Rank designer-designed materials by self-reported score into a Markdown document.
 
 Mechanical compilation only: fields are preserved VERBATIM from the raw designer
 output files (task100_designer_<TS>_part*.txt). The only operations are:
@@ -8,18 +8,18 @@ output files (task100_designer_<TS>_part*.txt). The only operations are:
   - repairing physically fused lines (two records emitted without a newline,
     detected as 2F-1 fields; split point logged in the MD appendix)
   - normalizing legacy 9-field lines (no Chemical_Formula) to 10 fields
-  - sorting by ASA score descending
+  - sorting by self-reported score descending
 No content is rewritten, cleaned, translated, or curated.
 
-Usage: python scripts/rank_cda_outputs.py [timestamp] [--rubric path]
+Usage: python scripts/rank_designer_outputs.py [timestamp] [--rubric path]
 
 Phase 3: when the run directory contains subscores_<TS>.json (from
-extract_subscores.py), the PRIMARY sort key is ASA_Adj — the deterministic
-score from asa_scoring.py + the rubric (default scripts/asa_rubric.json,
+extract_subscores.py), the PRIMARY sort key is Score_Adj — the deterministic
+score from scoring_engine.py + the rubric (default scripts/scoring_rubric.json,
 --rubric to re-rank historical subscores with a different rubric WITHOUT
-re-running any agent). The designer self-reported ASA column is kept for display,
-renamed ASA_SelfReport. Without subscores the legacy self-report ranking is
-used unchanged.
+re-running any agent). The designer self-reported score column is kept for
+display, renamed SelfReport. Without subscores the legacy self-report ranking
+is used unchanged.
 """
 
 import argparse, json, re, sys
@@ -29,7 +29,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from output_utils import find_run_dir, OUTPUT_ROOT
 import output_schema
-import asa_scoring
+import scoring_engine
 
 OUTPUT = OUTPUT_ROOT
 
@@ -43,9 +43,9 @@ RECORD_LENGTHS = (*LEGACY_FIELDS, len(output_schema.FIELDS_LEGACY), 12, len(outp
 # Material_Name per project requirement.
 TABLE_FIELDS = ["Material_Name", "Modality", "Chemical_Formula", "SMILES", "Target_UniProt",
                 "Ligand", "Core_Elements",
-                "ASA_Score(1-10)", "Disease_Intervention", "Mechanism",
+                "Self_Score(1-10)", "Disease_Intervention", "Mechanism",
                 "NADH_Activity(YES/NO)", "Key_Features"]
-ASA = "ASA_Score(1-10)"
+SELF_SCORE = output_schema.SELF_SCORE  # canonical self-score key (legacy "ASA_Score(1-10)" accepted)
 NAME = "Material_Name"
 MODALITY = "Modality"
 SMILES = "SMILES"
@@ -57,9 +57,9 @@ NADH = "NADH_Activity(YES/NO)"
 
 NAME_RE = re.compile(r"[A-Z][A-Za-z0-9]*_[A-Za-z0-9_\-]*")
 
-# Display-only column names for the deterministic-ASA ranking mode.
-SELF_REPORT = "ASA_SelfReport"
-ASA_ADJ = "ASA_Adj"
+# Display-only column names for the deterministic-scoring ranking mode.
+SELF_REPORT = "SelfReport"
+SCORE_ADJ = "Score_Adj"
 
 
 def _normalize(cells):
@@ -76,10 +76,10 @@ def load_subscores(ts: str):
     return json.loads(f.read_text(encoding="utf-8"))
 
 
-def compute_asa_map(payload: dict, rubric_path=None):
-    """(rubric, {material_name: compute_asa result}) from a subscores payload."""
-    rubric = asa_scoring.load_rubric(rubric_path or asa_scoring.DEFAULT_RUBRIC)
-    return rubric, {name: asa_scoring.compute_asa(axes, rubric)
+def compute_score_map(payload: dict, rubric_path=None):
+    """(rubric, {material_name: compute_score result}) from a subscores payload."""
+    rubric = scoring_engine.load_rubric(rubric_path or scoring_engine.DEFAULT_RUBRIC)
+    return rubric, {name: scoring_engine.compute_score(axes, rubric)
                     for name, axes in payload.get("materials", {}).items()}
 
 
@@ -125,10 +125,10 @@ def parse_records(ts: str):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Rank designer outputs (deterministic ASA when subscores exist)")
+    parser = argparse.ArgumentParser(description="Rank designer outputs (deterministic scoring when subscores exist)")
     parser.add_argument("ts", nargs="?", help="run timestamp (default: latest)")
     parser.add_argument("--rubric", default=None,
-                        help="ASA rubric JSON (default: scripts/asa_rubric.json); "
+                        help="scoring rubric JSON (default: scripts/scoring_rubric.json); "
                              "re-ranks historical subscores without re-running agents")
     args = parser.parse_args()
     ts = args.ts
@@ -142,27 +142,27 @@ def main():
 
     src_files, records, fused, bad = parse_records(ts)
 
-    # Phase 3: deterministic ASA from extracted subscores, if present.
+    # Phase 3: deterministic score from extracted subscores, if present.
     sub_payload = load_subscores(ts)
-    rubric, asa_map = (None, {})
+    rubric, score_map = (None, {})
     if sub_payload is not None:
-        rubric, asa_map = compute_asa_map(sub_payload, args.rubric)
+        rubric, score_map = compute_score_map(sub_payload, args.rubric)
 
-    def asa(rec):
+    def score(rec):
         try:
-            return float(rec[ASA])
+            return float(rec[SELF_SCORE])
         except ValueError:
             return float("nan")
 
-    valid = [r for r in records if asa(r) == asa(r)]  # drop NaN ASA
-    nan_asa = [r for r in records if asa(r) != asa(r)]
-    if asa_map:
-        # Primary key: deterministic ASA_Adj; materials without extracted
+    valid = [r for r in records if score(r) == score(r)]  # drop NaN scores
+    nan_score = [r for r in records if score(r) != score(r)]
+    if score_map:
+        # Primary key: deterministic Score_Adj; materials without extracted
         # subscores sink to the bottom (nothing is invented for them).
-        valid.sort(key=lambda r: (-asa_map[r[NAME]]["total_adj"], r[NAME])
-                   if r[NAME] in asa_map else (float("inf"), r[NAME]))
+        valid.sort(key=lambda r: (-score_map[r[NAME]]["total_adj"], r[NAME])
+                   if r[NAME] in score_map else (float("inf"), r[NAME]))
     else:
-        valid.sort(key=lambda r: (-asa(r), r[NAME]))
+        valid.sort(key=lambda r: (-score(r), r[NAME]))
 
     nadh_yes = sum(1 for r in valid if r[NADH].strip().upper() == "YES")
 
@@ -184,13 +184,13 @@ def main():
         db_map = payload.get("materials", {})
         db_source = payload.get("source")
 
-    out.append(f"# Material ASA ranking summary (run {ts})\n")
-    out.append("> This document was mechanically generated by `scripts/rank_cda_outputs.py`.")
-    if asa_map:
-        out.append(f"> **Primary sort key: ASA_Adj (deterministically computed, asa_rubric, scripts/asa_scoring.py; `--rubric` re-computes historical subscores with a different rubric without re-running any agent).**")
-        out.append("> ASA_SelfReport is the designer self-reported ASA_Score, shown for display only and not used for sorting. Subscores come from the JSON tail of the raw manufacturing/delivery/safety/mechanism outputs (mechanically extracted by scripts/extract_subscores.py).")
+    out.append(f"# Material score ranking summary (run {ts})\n")
+    out.append("> This document was mechanically generated by `scripts/rank_designer_outputs.py`.")
+    if score_map:
+        out.append(f"> **Primary sort key: Score_Adj (deterministically computed, scoring_rubric, scripts/scoring_engine.py; `--rubric` re-computes historical subscores with a different rubric without re-running any agent).**")
+        out.append("> SelfReport is the designer self-reported score, shown for display only and not used for sorting. Subscores come from the JSON tail of the raw manufacturing/delivery/safety/mechanism outputs (mechanically extracted by scripts/extract_subscores.py).")
     else:
-        out.append("> All fields are preserved **verbatim** from the raw designer agent output, sorted only by ASA score descending, with no content rewriting, cleaning, or curation.")
+        out.append("> All fields are preserved **verbatim** from the raw designer agent output, sorted only by self-reported score descending, with no content rewriting, cleaning, or curation.")
     out.append("> Per project goals, the ranking drops only the size value (Size_nm); the material category (Modality, relocated verbatim from Material_Category for legacy records) is kept for display.")
     if db_map:
         out.append(f"> The DB_Formula column is the database-tool verification result (source: {db_source}, scripts/formula_lookup.py), not agent output; the Chemical_Formula column remains the raw agent output.")
@@ -204,10 +204,10 @@ def main():
 
     out.append(f"- Total materials: **{len(valid)}**")
     out.append(f"- NADH activity YES: **{nadh_yes}** ({nadh_yes/len(valid)*100:.0f}%)" if valid else "")
-    out.append(f"- ASA range: {asa(valid[-1])} - {asa(valid[0])}" if valid else "")
-    if asa_map:
-        adj = [asa_map[r[NAME]]["total_adj"] for r in valid if r[NAME] in asa_map]
-        out.append(f"\n- ASA_Adj range: {min(adj):.3f} - {max(adj):.3f} (asa_rubric)" if adj else "")
+    out.append(f"- Score range: {score(valid[-1])} - {score(valid[0])}" if valid else "")
+    if score_map:
+        adj = [score_map[r[NAME]]["total_adj"] for r in valid if r[NAME] in score_map]
+        out.append(f"\n- Score_Adj range: {min(adj):.3f} - {max(adj):.3f} (scoring_rubric)" if adj else "")
     out.append("")
     out.append("## Target metric (direct antibacterial x microbiome remodeling)\n")
     out.append("| Metric | Count (share) |")
@@ -251,12 +251,12 @@ def main():
 
     out.append("## Full ranking\n")
     db_pos = TABLE_FIELDS.index("Chemical_Formula") + 1  # DB_Formula after Chemical_Formula
-    # In deterministic-ASA mode the self-report column is renamed and the
-    # computed ASA_Adj column is inserted right before it.
+    # In deterministic-scoring mode the self-report column is renamed and the
+    # computed Score_Adj column is inserted right before it.
     base_cols = []
     for f in TABLE_FIELDS:
-        if asa_map and f == ASA:
-            base_cols += [ASA_ADJ, SELF_REPORT]
+        if score_map and f == SELF_SCORE:
+            base_cols += [SCORE_ADJ, SELF_REPORT]
         else:
             base_cols.append(f)
     cols = base_cols[:db_pos] + (["DB_Formula"] if db_map else []) + base_cols[db_pos:]
@@ -265,10 +265,10 @@ def main():
     for i, r in enumerate(valid, 1):
         cells = []
         for f in TABLE_FIELDS:
-            if asa_map and f == ASA:
-                res = asa_map.get(r[NAME])
+            if score_map and f == SELF_SCORE:
+                res = score_map.get(r[NAME])
                 cells.append(f"{res['total_adj']:.3f}" if res else "—")
-                cells.append(esc(r[ASA]))
+                cells.append(esc(r[SELF_SCORE]))
             else:
                 cells.append(esc(r[f]))
         if db_map:
@@ -285,24 +285,24 @@ def main():
         if not group:
             continue
         out.append(f"### {m}\n")
-        out.append("| # | Material_Name | " + (ASA_ADJ if asa_map else ASA) + " |")
+        out.append("| # | Material_Name | " + (SCORE_ADJ if score_map else SELF_SCORE) + " |")
         out.append("|---|---|---|")
         for j, r in enumerate(group, 1):
-            if asa_map:
-                res = asa_map.get(r[NAME])
+            if score_map:
+                res = score_map.get(r[NAME])
                 score = f"{res['total_adj']:.3f}" if res else "—"
             else:
-                score = esc(r[ASA])
+                score = esc(r[SELF_SCORE])
             out.append(f"| {j} | {esc(r[NAME])} | {score} |")
         out.append("")
 
-    if asa_map:
-        no_sub = [r[NAME] for r in valid if r[NAME] not in asa_map]
-        partial = [(n, asa_map[n]["missing"]) for n in dict.fromkeys(r[NAME] for r in valid)
-                   if n in asa_map and asa_map[n]["missing"]]
+    if score_map:
+        no_sub = [r[NAME] for r in valid if r[NAME] not in score_map]
+        partial = [(n, score_map[n]["missing"]) for n in dict.fromkeys(r[NAME] for r in valid)
+                   if n in score_map and score_map[n]["missing"]]
         n_extract_missing = len(sub_payload.get("missing", []))
         if no_sub or partial or n_extract_missing:
-            out.append("\n---\n\n## Appendix: missing ASA subscores (counted as 0, never fabricated)\n")
+            out.append("\n---\n\n## Appendix: missing score subscores (counted as 0, never fabricated)\n")
             if no_sub:
                 out.append(f"### Materials with no extracted subscores ({len(no_sub)}, listed at the bottom)\n")
                 for n in no_sub:
@@ -314,16 +314,16 @@ def main():
             if n_extract_missing:
                 out.append(f"\n### Extraction-failed lines ({n_extract_missing}, see the missing field in subscores_{ts}.json)")
 
-    if fused or bad or nan_asa:
+    if fused or bad or nan_score:
         out.append("\n---\n\n## Appendix: format anomalies\n")
         if fused:
             out.append(f"### Fused-line repairs ({len(fused)})\n")
             out.append("Two materials were fused onto one line in the raw output; they were mechanically split at the last material-name marker without changing content. Original fused fields:\n")
             for fname, cell in fused:
                 out.append(f"- `{fname}`: …{esc(cell)}")
-        if nan_asa:
-            out.append(f"\n### Unparseable ASA scores ({len(nan_asa)}, excluded from ranking)\n")
-            for r in nan_asa:
+        if nan_score:
+            out.append(f"\n### Unparseable scores ({len(nan_score)}, excluded from ranking)\n")
+            for r in nan_score:
                 out.append("- " + esc(" | ".join(r[f] for f in output_schema.FIELDS_LEGACY_MODALITY)))
         if bad:
             out.append(f"\n### Unparseable lines ({len(bad)}, preserved verbatim)\n")
@@ -332,7 +332,7 @@ def main():
 
     md_path = find_run_dir(ts) / f"ranking_{ts}.md"
     md_path.write_text("\n".join(out) + "\n", encoding="utf-8")
-    mode = "ASA_Adj (asa_rubric)" if asa_map else "self-report fallback (no subscores)"
+    mode = "Score_Adj (scoring_rubric)" if score_map else "self-report fallback (no subscores)"
     print(f"Wrote {md_path} ({len(valid)} ranked materials, {len(fused)} fused repairs, {len(bad)} unparsed; mode: {mode})")
 
 

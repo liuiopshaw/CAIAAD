@@ -2,7 +2,7 @@
 """
 Export a ranking run to an Excel workbook (.xlsx).
 
-Reuses rank_cda_outputs.parse_records (same parsing/sorting as the MD ranking)
+Reuses rank_designer_outputs.parse_records (same parsing/sorting as the MD ranking)
 plus the formula_lookup map, and writes:
   Sheet 1 "Ranking": the full ranked table (same columns as ranking_<TS>.md)
   Sheet 2 "Target Metrics": direct-antibacterial x microbiome-remodeling coverage
@@ -13,9 +13,9 @@ plus the formula_lookup map, and writes:
 
 Usage: python scripts/rank_to_excel.py [timestamp|rawfile.txt] [dedup] [--rubric path]
 
-Phase 3: like rank_cda_outputs.py, when the run directory contains
-subscores_<TS>.json the deterministic ASA_Adj is the primary sort key and the
-designer self-report column is shown as ASA_SelfReport; otherwise the legacy
+Phase 3: like rank_designer_outputs.py, when the run directory contains
+subscores_<TS>.json the deterministic Score_Adj is the primary sort key and the
+designer self-report column is shown as SelfReport; otherwise the legacy
 self-report ranking is used unchanged. --rubric re-scores historical
 subscores without re-running agents.
 """
@@ -25,11 +25,11 @@ from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from rank_cda_outputs import (parse_records, _normalize, FIELDS, LEGACY_FIELDS,
+from rank_designer_outputs import (parse_records, _normalize, FIELDS, LEGACY_FIELDS,
                               RECORD_LENGTHS, TABLE_FIELDS, OUTPUT,
-                              ASA, NAME, MODALITY, SMILES, UNIPROT,
+                              SELF_SCORE, NAME, MODALITY, SMILES, UNIPROT,
                               ELEMENTS, INTERVENTION, MECHANISM, NADH,
-                              load_subscores, compute_asa_map, SELF_REPORT, ASA_ADJ)
+                              load_subscores, compute_score_map, SELF_REPORT, SCORE_ADJ)
 from output_utils import find_run_dir
 import output_schema
 
@@ -81,28 +81,28 @@ def main():
             ts = re.search(r"task100_designer_(\d+)_part1", latest.name).group(1)
         src_files, records, fused, bad = parse_records(ts)
 
-    def asa(rec):
+    def score(rec):
         try:
-            return float(rec[ASA])
+            return float(rec[SELF_SCORE])
         except ValueError:
             return float("nan")
 
-    valid = [r for r in records if asa(r) == asa(r)]
+    valid = [r for r in records if score(r) == score(r)]
 
-    # Phase 3: deterministic ASA from extracted subscores (run mode only).
-    rubric, asa_map = (None, {})
+    # Phase 3: deterministic score from extracted subscores (run mode only).
+    rubric, score_map = (None, {})
     if not file_mode:
         sub_payload = load_subscores(ts)
         if sub_payload is not None:
-            rubric, asa_map = compute_asa_map(sub_payload, rubric_path)
+            rubric, score_map = compute_score_map(sub_payload, rubric_path)
 
-    if asa_map:
-        valid.sort(key=lambda r: (-asa_map[r[NAME]]["total_adj"], r[NAME])
-                   if r[NAME] in asa_map else (float("inf"), r[NAME]))
+    if score_map:
+        valid.sort(key=lambda r: (-score_map[r[NAME]]["total_adj"], r[NAME])
+                   if r[NAME] in score_map else (float("inf"), r[NAME]))
     else:
-        valid.sort(key=lambda r: (-asa(r), r[NAME]))
+        valid.sort(key=lambda r: (-score(r), r[NAME]))
 
-    # Optional: deduplicate by Material_Name (keep first = highest ASA after
+    # Optional: deduplicate by Material_Name (keep first = highest score after
     # sorting). Requested for the base-model control output, whose template
     # loop emitted many identical materials. Raw outputs are never modified.
     removed = 0
@@ -131,11 +131,11 @@ def main():
     ws = wb.active
     ws.title = "Ranking"
     db_pos = TABLE_FIELDS.index("Chemical_Formula") + 1  # DB_Formula after Chemical_Formula
-    # Deterministic-ASA mode: rename self-report column, insert ASA_Adj before it.
+    # Deterministic-scoring mode: rename self-report column, insert Score_Adj before it.
     base_cols = []
     for f in TABLE_FIELDS:
-        if asa_map and f == ASA:
-            base_cols += [ASA_ADJ, SELF_REPORT]
+        if score_map and f == SELF_SCORE:
+            base_cols += [SCORE_ADJ, SELF_REPORT]
         else:
             base_cols.append(f)
     cols = base_cols[:db_pos] + (["DB_Formula"] if db_map else []) + base_cols[db_pos:]
@@ -147,17 +147,17 @@ def main():
     for i, r in enumerate(valid, 1):
         cells = []
         for f in TABLE_FIELDS:
-            if asa_map and f == ASA:
-                res = asa_map.get(r[NAME])
+            if score_map and f == SELF_SCORE:
+                res = score_map.get(r[NAME])
                 cells.append(round(res["total_adj"], 3) if res else "—")
-                cells.append(r[ASA])
+                cells.append(r[SELF_SCORE])
             else:
                 cells.append(r[f])
         if db_map:
             dbv = (db_map.get(r[NAME]) or {}).get("combined_formula") or "—"
             cells = cells[:db_pos] + [dbv] + cells[db_pos:]
         row = [i] + cells
-        self_col = cols.index(SELF_REPORT if asa_map else ASA) + 1  # +1 for Rank
+        self_col = cols.index(SELF_REPORT if score_map else SELF_SCORE) + 1  # +1 for Rank
         try:
             row[self_col] = float(row[self_col])
         except (ValueError, TypeError):
@@ -198,11 +198,11 @@ def main():
     rows = [
         ("Run Timestamp", ts),
         ("Source Files", ", ".join(src_files)),
-        ("ASA Ranking Mode", "ASA_Adj deterministic computation (asa_rubric)" if asa_map else "designer self-reported ASA_Score (no subscores, fallback)"),
+        ("Scoring Mode", "Score_Adj deterministic computation (scoring_rubric)" if score_map else "designer self-reported score (no subscores, fallback)"),
         ("DB_Formula Source", db_source or "not verified"),
         ("Total Materials", f"{len(valid)}" + (f" (deduplicated by Material_Name: {len(valid)+removed} original rows, {removed} duplicates removed)" if dedup else "")),
         ("NADH Activity YES", f"{nadh_yes} ({nadh_yes/len(valid)*100:.0f}%)" if valid else "0"),
-        ("ASA Range", f"{asa(valid[-1])} – {asa(valid[0])}" if valid else ""),
+        ("Score Range", f"{score(valid[-1])} – {score(valid[0])}" if valid else ""),
         ("", ""),
         ("direct_antibacterial (all)", pct(da)),
         ("microbiome_remodeling (all)", pct(mr)),
@@ -225,7 +225,7 @@ def main():
 
     # ---- Sheet 3: Modality_Top5 (primary sort key — `valid` is already sorted) ----
     ws3 = wb.create_sheet("Modality_Top5")
-    ws3.append(["Modality", "#", "Material_Name", ASA_ADJ if asa_map else ASA])
+    ws3.append(["Modality", "#", "Material_Name", SCORE_ADJ if score_map else SELF_SCORE])
     for cell in ws3[1]:
         cell.font = Font(bold=True, color="FFFFFF")
         cell.fill = PatternFill("solid", fgColor="4472C4")
@@ -234,11 +234,11 @@ def main():
     for m in observed:
         group = [r for r in valid if r[MODALITY].strip() == m][:5]
         for j, r in enumerate(group, 1):
-            if asa_map:
-                res = asa_map.get(r[NAME])
+            if score_map:
+                res = score_map.get(r[NAME])
                 score = round(res["total_adj"], 3) if res else "—"
             else:
-                score = r[ASA]
+                score = r[SELF_SCORE]
                 try:
                     score = float(score)
                 except (ValueError, TypeError):

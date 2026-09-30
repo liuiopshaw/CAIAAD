@@ -46,7 +46,7 @@ simple_test.py
 quick_test.py
 full_test.py
 # Allow performance test scripts
-!test_cda_performance.py
+!test_designer_performance.py
 TEST_REPORT.md
 FIX_REPORT.md
 tests/

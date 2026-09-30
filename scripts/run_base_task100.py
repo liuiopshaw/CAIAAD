@@ -22,11 +22,11 @@ from output_utils import run_dir, OUTPUT_ROOT
 OUTPUT = OUTPUT_ROOT  # server_responses/ audit folder stays flat here
 
 # task100 design prompt WITHOUT any element-specific steering content
-PROMPT = """Design 100 nanomaterial candidates that have been REPORTED in peer-reviewed literature and achieve HIGH comprehensive ASA scores (combining antibacterial, enzyme-like activity, and biosafety), for Alzheimer's therapy research via the gut-brain axis.
+PROMPT = """Design 100 nanomaterial candidates that have been REPORTED in peer-reviewed literature and achieve HIGH comprehensive scores (combining antibacterial, enzyme-like activity, and biosafety), for Alzheimer's therapy research via the gut-brain axis.
 
 For EACH material, output ONE line with ALL these fields, pipe-separated:
 
-Material_Name | Chemical_Formula | Ligand | Size_nm | Core_Elements | Material_Category | ASA_Score(1-10) | Disease_Intervention | Mechanism | NADH_Activity(YES/NO) | Key_Features
+Material_Name | Chemical_Formula | Ligand | Size_nm | Core_Elements | Material_Category | Self_Score(1-10) | Disease_Intervention | Mechanism | NADH_Activity(YES/NO) | Key_Features
 
 Chemical_Formula: formula of the INORGANIC active phase (e.g., Fe3O4, CeO2, ZnO)
 Ligand: the stabilizing ligand/coating as reported in literature. For nanoclusters and NPs <10nm an organic capping agent is REQUIRED (e.g., cyclodextrin, glutathione, BSA, PVP, PEG, citrate, tannic acid, chitosan). For SAC/DAC write the anchoring support (e.g., N-doped carbon, CeO2, ZIF-8, g-C3N4).

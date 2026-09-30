@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Mechanically extract per-material ASA subscores from raw agent part files.
+Mechanically extract per-material subscores from raw agent part files.
 
 Reads task100_{manufacturing,delivery,safety,mechanism}_<TS>_part*.txt from the
 run directory and collects the JSON subscore tail each agent appended to every
@@ -17,7 +17,7 @@ Output: subscores_<TS>.json in the run directory:
 
 Axis mapping: manufacturing->manufacturability, delivery->delivery_efficiency,
 safety->biosafety, mechanism->multi_target_synergy+durability
-(scripts/asa_rubric.json axis names).
+(scripts/scoring_rubric.json axis names).
 
 NOTE: agent ids were renamed 2026-09 (apa->manufacturing, epa->delivery,
 bsa->safety, mma->mechanism). Output files from older runs use the legacy

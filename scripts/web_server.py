@@ -45,9 +45,9 @@ import llm_client  # noqa: E402
 import output_schema  # noqa: E402
 import pipeline_prompts  # noqa: E402
 from pipeline_prompts import (  # noqa: E402
-    batch_focus, cda_format_block_for, split_chunks, build_expert_prompt,
+    batch_focus, designer_format_block_for, split_chunks, build_expert_prompt,
     coordinator_prompt, DIRECT_ANSWER_TEMPLATE, VALID_ANSWER_AGENTS,
-    designer_prompt, build_ca_prompt, DEFAULT_TOA_GOAL, PROMPT_CHAR_CAP,
+    designer_prompt, build_ranker_prompt, DEFAULT_COORDINATOR_GOAL, PROMPT_CHAR_CAP,
 )
 
 LLM_BASE = os.environ.get("NANO_BIO_LLM_BASE", "http://localhost:8000").rstrip("/")
@@ -63,14 +63,14 @@ GEN_TIMEOUT = 2400  # long generations, same as the pipeline
 # would create a spurious empty outputs/run_<TS>/ folder on every server start.
 # ---------------------------------------------------------------------------
 
-def parse_plan(toa_raw: str) -> dict:
+def parse_plan(coordinator_raw: str) -> dict:
     """Best-effort extraction of the coordinator plan JSON; {} when unparseable
     (callers then keep the default pipeline behavior)."""
-    start, end = toa_raw.find("{"), toa_raw.rfind("}")
+    start, end = coordinator_raw.find("{"), coordinator_raw.rfind("}")
     if start < 0 or end <= start:
         return {}
     try:
-        obj = json.loads(toa_raw[start:end + 1])
+        obj = json.loads(coordinator_raw[start:end + 1])
         return obj if isinstance(obj, dict) else {}
     except Exception:
         return {}
@@ -177,16 +177,16 @@ async def orchestrate_stream(message: str, session_id: str):
             # (prompt built by pipeline_prompts.coordinator_prompt; the user
             # request is appended by concatenation — the template contains
             # literal JSON braces and must NOT go through str.format)
-            toa_raw = await call_agent(
+            coordinator_raw = await call_agent(
                 client, "coordinator",
-                coordinator_prompt(cfg.get("toa_goal", DEFAULT_TOA_GOAL),
+                coordinator_prompt(cfg.get("coordinator_goal", DEFAULT_COORDINATOR_GOAL),
                                    needs_pipeline=True) + "\n\nUser request: " + message,
                 cfg["coordinator"]["max_tokens"], cfg["coordinator"]["temperature"])
-            save_raw(out, f"task100_coordinator_{ts}.txt", toa_raw)
-            yield emit({"type": "plan", "content": toa_raw})
+            save_raw(out, f"task100_coordinator_{ts}.txt", coordinator_raw)
+            yield emit({"type": "plan", "content": coordinator_raw})
 
             # ---- Intent routing: honor coordinator's needs_pipeline decision ----
-            plan_obj = parse_plan(toa_raw)
+            plan_obj = parse_plan(coordinator_raw)
             needs_pipeline = bool(plan_obj.get("needs_pipeline", True))
 
             if not needs_pipeline:
@@ -209,11 +209,11 @@ async def orchestrate_stream(message: str, session_id: str):
             # ---- Step 2: designer batches ----
             batches = cfg["designer"]["batches"]
             total_batches = len(batches)
-            cda_chunks = []
+            designer_chunks = []
             designed_names = []  # cross-batch anti-duplication (matches CLI pipeline)
             for b in batches:
                 n = b["batch_id"]
-                fmt_block = output_schema.cda_format_block_current() if is_current else cda_format_block_for(b)
+                fmt_block = output_schema.designer_format_block_current() if is_current else designer_format_block_for(b)
                 exclusion = ""
                 if designed_names:
                     shown = designed_names[-60:]
@@ -226,17 +226,17 @@ async def orchestrate_stream(message: str, session_id: str):
                                     batch_focus(b), fmt_block, exclusion=exclusion),
                     b["max_tokens"], cfg["designer"]["temperature"])
                 save_raw(out, f"task100_designer_{ts}_part{n}.txt", chunk)
-                cda_chunks.append(chunk)
+                designer_chunks.append(chunk)
                 for line in chunk.split("\n"):
                     if "|" in line and "Material_Name" not in line:
                         designed_names.append(line.split("|")[0].strip())
                 yield emit({"type": "agent_done", "agent": "designer", "batch": n,
                             "chars": len(chunk), "content": chunk})
 
-            cda_raw = "\n".join(cda_chunks)
+            designer_raw = "\n".join(designer_chunks)
             # Same input hygiene as the CLI: designer chatter lines (no "|") are
             # kept in the raw files but never fed to the expert agents.
-            mat_lines = [l for l in cda_raw.split("\n") if l.strip() and "|" in l]
+            mat_lines = [l for l in designer_raw.split("\n") if l.strip() and "|" in l]
 
             # ---- Steps 3-6: manufacturing / delivery / safety / mechanism (chunked per config) ----
             raws = {}
@@ -261,15 +261,15 @@ async def orchestrate_stream(message: str, session_id: str):
             # ---- Step 7: ranker summary ----
             yield emit({"type": "agent_start", "agent": "ranker", "batch": 1})
             trunc = cfg["ranker"]["input_truncation"]
-            ca_raw = await call_agent(
+            ranker_raw = await call_agent(
                 client, "ranker",
-                build_ca_prompt(cda_raw, raws["delivery"], raws["mechanism"],
-                                is_current, trunc),
+                build_ranker_prompt(designer_raw, raws["delivery"], raws["mechanism"],
+                                    is_current, trunc),
                 cfg["ranker"]["max_tokens"], cfg["ranker"]["temperature"])
-            save_raw(out, f"task100_ranker_{ts}.txt", ca_raw)
-            yield emit({"type": "summary", "content": ca_raw})
+            save_raw(out, f"task100_ranker_{ts}.txt", ranker_raw)
+            yield emit({"type": "summary", "content": ranker_raw})
 
-        await finish("done", ca_raw)
+        await finish("done", ranker_raw)
         yield emit({"type": "done", "run_dir": run_dir_str})
     except Exception as e:
         # Graceful error: report and end the stream; completed raw files stay.

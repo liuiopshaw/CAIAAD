@@ -103,7 +103,7 @@ def drug_label(d):
     return f"{d['Compound']} (Class: {d['Class']}; Mechanism: {d['Mechanism']})"
 
 
-def epa_prompt(batch):
+def delivery_prompt(batch):
     return f"""Evaluate the following Alzheimer's disease (AD) therapeutic candidates for THERAPEUTIC EFFICACY.
 
 For EACH candidate, give an Efficacy score from 1 to 10 (1 = no meaningful AD efficacy, 10 = proven strong efficacy in AD patients), based on known clinical/preclinical evidence for THIS compound in AD. Give a one-line reasoning.
@@ -116,7 +116,7 @@ Output format (ONE LINE per candidate, numbered, no other text):
 2. ..."""
 
 
-def mma_prompt(batch):
+def mechanism_prompt(batch):
     return f"""Evaluate the following Alzheimer's disease (AD) therapeutic candidates for MECHANISM quality.
 
 For EACH candidate, give a Mechanism score from 1 to 10 (1 = no plausible AD-relevant mechanism, 10 = well-validated AD disease-modifying mechanism), based on whether the stated mechanism genuinely addresses AD pathology. Give a one-line reasoning.
@@ -129,7 +129,7 @@ Output format (ONE LINE per candidate, numbered, no other text):
 2. ..."""
 
 
-def bsa_prompt(batch):
+def safety_prompt(batch):
     return f"""Evaluate the following Alzheimer's disease (AD) therapeutic candidates for SAFETY and BLOOD-BRAIN-BARRIER (BBB) suitability.
 
 For EACH candidate give TWO scores from 1 to 10:
@@ -145,7 +145,7 @@ Output format (ONE LINE per candidate, numbered, no other text):
 2. ..."""
 
 
-def ca_prompt(batch, subscores):
+def ranker_prompt(batch, subscores):
     # subscores: list of dicts with parsed dimension scores (may contain None)
     lines = []
     for j, d in enumerate(batch):
@@ -223,7 +223,7 @@ def load_rubric():
         return f.read()
 
 
-def r_bsa_prompt(batch, rubric):
+def r_safety_prompt(batch, rubric):
     return f"""You are an AD therapeutic evaluation expert. Strictly follow the scoring rubric below (quoted verbatim; you must adhere to its anchors):
 
 {rubric}
@@ -240,7 +240,7 @@ Output format (ONE LINE per candidate, numbered, no other text):
 2. ..."""
 
 
-def r_mma_prompt(batch, rubric):
+def r_mechanism_prompt(batch, rubric):
     return f"""You are an AD therapeutic mechanism analysis expert. Strictly follow the scoring rubric below (quoted verbatim; you must adhere to its anchors):
 
 {rubric}
@@ -266,7 +266,7 @@ GATE_FORMULA = {
 }
 
 
-def r_epa_prompt(batch, rubric):
+def r_delivery_prompt(batch, rubric):
     if GATE == "off":
         dims_txt = ('Evaluate the following therapeutic candidates on ONE dimension (1-10):\n'
                     '- manufacturability: Dimension 4 "Manufacturing control and precise tunability"')
@@ -290,7 +290,7 @@ Output format (ONE LINE per candidate, numbered, no other text):
 2. ..."""
 
 
-def r_ca_prompt(batch, subscores, rubric):
+def r_ranker_prompt(batch, subscores, rubric):
     lines = []
     for j, d in enumerate(batch):
         s = subscores[j]
@@ -495,9 +495,9 @@ def main():
             save_raw(f"adtb100_rsolo_batch{bnum}_raw_{TS}.txt", raw)
             parsed = parse_scores(raw, n, RUBRIC_DIM_PATTERNS)
             for k in range(n):
-                ca_ov = parsed[k].pop("overall", None)  # model's own overall
+                ranker_ov = parsed[k].pop("overall", None)  # model's own overall
                 all_scores[i + k].update(parsed[k])
-                all_scores[i + k]["ca_overall"] = ca_ov
+                all_scores[i + k]["ca_overall"] = ranker_ov
                 all_scores[i + k]["overall"] = rubric_overall(parsed[k])
             missing = sum(1 for k in range(n) if all_scores[i + k]["overall"] is None)
             if missing:
@@ -522,15 +522,15 @@ def main():
         if args.rubric:
             # Rubric-anchored harness: safety(delivery+safety) / mechanism(synergy+duration)
             # / delivery(manufacturability, +ad_relevance when gate on) -> ranker(overall).
-            epa_dims = {"manufacturability": RUBRIC_DIM_PATTERNS["manufacturability"]}
+            delivery_dims = {"manufacturability": RUBRIC_DIM_PATTERNS["manufacturability"]}
             if GATE != "off":
-                epa_dims = {"ad_relevance": RUBRIC_DIM_PATTERNS["ad_relevance"], **epa_dims}
+                delivery_dims = {"ad_relevance": RUBRIC_DIM_PATTERNS["ad_relevance"], **delivery_dims}
             for agent, pfunc, dims in [
-                ("safety", r_bsa_prompt, {"delivery": RUBRIC_DIM_PATTERNS["delivery"],
+                ("safety", r_safety_prompt, {"delivery": RUBRIC_DIM_PATTERNS["delivery"],
                                        "safety": RUBRIC_DIM_PATTERNS["safety"]}),
-                ("mechanism", r_mma_prompt, {"synergy": RUBRIC_DIM_PATTERNS["synergy"],
+                ("mechanism", r_mechanism_prompt, {"synergy": RUBRIC_DIM_PATTERNS["synergy"],
                                        "duration": RUBRIC_DIM_PATTERNS["duration"]}),
-                ("delivery", r_epa_prompt, epa_dims),
+                ("delivery", r_delivery_prompt, delivery_dims),
             ]:
                 raw = call_agent(agent, pfunc(batch, rubric_text))
                 save_raw(f"adtb100_r_{agent}_batch{bnum}_raw_{TS}.txt", raw)
@@ -545,20 +545,20 @@ def main():
                     print(f"  WARNING: {agent} batch {bnum}: {missing}/{n} items unparsed")
                 time.sleep(2)
 
-            raw = call_agent("ranker", r_ca_prompt(batch, batch_sub, rubric_text))
+            raw = call_agent("ranker", r_ranker_prompt(batch, batch_sub, rubric_text))
             save_raw(f"adtb100_r_ranker_batch{bnum}_raw_{TS}.txt", raw)
-            ca_parsed = parse_scores(raw, n, {"overall": RUBRIC_DIM_PATTERNS["overall"]})
+            ranker_parsed = parse_scores(raw, n, {"overall": RUBRIC_DIM_PATTERNS["overall"]})
             for k in range(n):
                 all_scores[i + k].update(batch_sub[k])
-                all_scores[i + k]["ca_overall"] = ca_parsed[k]["overall"]
+                all_scores[i + k]["ca_overall"] = ranker_parsed[k]["overall"]
                 all_scores[i + k]["overall"] = rubric_overall(batch_sub[k])
             time.sleep(2)
             continue
 
         for agent, pfunc, dims in [
-            ("delivery", epa_prompt, {"efficacy": DIM_PATTERNS["efficacy"]}),
-            ("mechanism", mma_prompt, {"mechanism": DIM_PATTERNS["mechanism"]}),
-            ("safety", bsa_prompt, {"safety": DIM_PATTERNS["safety"], "bbb": DIM_PATTERNS["bbb"]}),
+            ("delivery", delivery_prompt, {"efficacy": DIM_PATTERNS["efficacy"]}),
+            ("mechanism", mechanism_prompt, {"mechanism": DIM_PATTERNS["mechanism"]}),
+            ("safety", safety_prompt, {"safety": DIM_PATTERNS["safety"], "bbb": DIM_PATTERNS["bbb"]}),
         ]:
             raw = call_agent(agent, pfunc(batch))
             save_raw(f"adtb100_{agent}_batch{bnum}_raw_{TS}.txt", raw)
@@ -573,13 +573,13 @@ def main():
                 print(f"  WARNING: {agent} batch {bnum}: {missing}/{n} items unparsed")
             time.sleep(2)
 
-        raw = call_agent("ranker", ca_prompt(batch, batch_sub))
+        raw = call_agent("ranker", ranker_prompt(batch, batch_sub))
         save_raw(f"adtb100_ranker_batch{bnum}_raw_{TS}.txt", raw)
-        ca_parsed = parse_scores(raw, n, {"clinical": DIM_PATTERNS["clinical"],
-                                          "overall": DIM_PATTERNS["overall"]})
+        ranker_parsed = parse_scores(raw, n, {"clinical": DIM_PATTERNS["clinical"],
+                                              "overall": DIM_PATTERNS["overall"]})
         for k in range(n):
             all_scores[i + k].update(batch_sub[k])
-            all_scores[i + k].update(ca_parsed[k])
+            all_scores[i + k].update(ranker_parsed[k])
         time.sleep(2)
 
     variant = "base" if AGENT_OVERRIDE == "base" else "lora"

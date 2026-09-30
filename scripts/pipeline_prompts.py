@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import output_schema  # noqa: E402
 
 
-DEFAULT_TOA_GOAL = (
+DEFAULT_COORDINATOR_GOAL = (
     "Design 100 candidates spanning nanomaterials, small-molecule drugs, and "
     "biologics, with AD-relevant mechanisms as the priority — selective direct "
     "antibacterial action and gut-microbiome remodeling alongside small molecules "
@@ -27,7 +27,7 @@ DEFAULT_TOA_GOAL = (
 
 
 # Hard character budget for one prompt sent to the model. Header + footer of
-# build_expert_prompt / build_ca_prompt are a few hundred chars; the records
+# build_expert_prompt / build_ranker_prompt are a few hundred chars; the records
 # body is what must fit. The old 10000-char cap truncated the FINAL string,
 # which cut the mandatory JSON-tail format instruction at the prompt tail
 # (the ranker input alone is ~17k chars from the config truncations).
@@ -46,16 +46,16 @@ def batch_focus(batch: dict) -> str:
     return batch["description"].rstrip()
 
 
-def cda_format_block_for(batch: dict) -> str:
+def designer_format_block_for(batch: dict) -> str:
     """Legacy-modality designer format block for a batch, driven by its optional
     'modality_focus' ("free" | "nano_mixed" | an output_schema.MODALITIES value;
     missing = legacy nano-only config -> "nano_mixed")."""
     mf = batch.get("modality_focus") or "nano_mixed"
     if mf == "free":
-        return output_schema.cda_format_block(None)
+        return output_schema.designer_format_block(None)
     if mf == "nano_mixed":
-        return output_schema.cda_format_block(None) + "\n" + NANO_ONLY_LINE
-    return output_schema.cda_format_block(mf)
+        return output_schema.designer_format_block(None) + "\n" + NANO_ONLY_LINE
+    return output_schema.designer_format_block(mf)
 
 
 def split_chunks(lines: list, k: int) -> list:
@@ -72,8 +72,8 @@ def split_chunks(lines: list, k: int) -> list:
 
 def build_expert_prompt(agent: str, part_text: str, is_current: bool) -> str:
     """Single source of the four expert prompts (manufacturing / delivery /
-    safety / mechanism). Subscore JSON tails feed the deterministic ASA engine
-    (scripts/asa_scoring.py + asa_rubric.json).
+    safety / mechanism). Subscore JSON tails feed the deterministic scoring
+    engine (scripts/scoring_engine.py + scoring_rubric.json).
 
     When the records body alone would push the prompt past PROMPT_CHAR_CAP,
     the BODY is clipped and the prompt rebuilt — the mandatory format footer
@@ -165,7 +165,7 @@ ROUTING_RULE = (
 )
 
 
-def coordinator_prompt(toa_goal: str, needs_pipeline: bool = False) -> str:
+def coordinator_prompt(coordinator_goal: str, needs_pipeline: bool = False) -> str:
     """Coordinator (task orchestration) prompt.
 
     ``needs_pipeline=False`` is the CLI variant (the CLI always runs the full
@@ -186,7 +186,7 @@ def coordinator_prompt(toa_goal: str, needs_pipeline: bool = False) -> str:
     return (
         "You are the Task Orchestration Agent (coordinator). Route the following "
         "workflow to the available agents.\n\n"
-        f"Workflow goal: {toa_goal}\n\n"
+        f"Workflow goal: {coordinator_goal}\n\n"
         f"{_AGENTS_ROSTER}\n\n"
         f"{plan}{routing}"
     )
@@ -213,7 +213,7 @@ def designer_prompt(count: int, n: int, total_batches: int, focus: str,
     """Designer (candidate generation) prompt for one batch."""
     return (
         f"Design {count} candidates that have been REPORTED in peer-reviewed "
-        "literature and achieve HIGH comprehensive ASA scores (combining "
+        "literature and achieve HIGH comprehensive scores (combining "
         "antibacterial, enzyme-like activity, and biosafety).\n\n"
         f"This is batch {n} of {total_batches} — {focus}{exclusion}\n\n"
         f"{format_block}"
@@ -224,14 +224,14 @@ def designer_prompt(count: int, n: int, total_batches: int, focus: str,
 # ranker prompt
 # ---------------------------------------------------------------------------
 
-def ca_structure(is_current: bool) -> str:
+def ranker_structure(is_current: bool) -> str:
     if is_current:
         return """Report structure:
 1. Total count by Drug_Type (nano_formulation/biologic/small_molecule/other)
 2. Distribution of Target_Category (gut_targeted_regulation/CNS_intervention_neurorepair/signaling_pathway_modulation/peripheral_nerve_regulation/epigenetic_regulation)
 3. Distribution of Action_Mode (microbiota_ratio_modulation/immune_inflammation_modulation/probiotic_prebiotic_supplementation/metabolite_modulation/active_substance_delivery)
 4. Distribution of AD_Mechanism (gut_microbiome_axis/amyloid_tau_targeting/neuroprotection/neuroinflammation_modulation/synaptic_function_modulation)
-5. Top 10 highest ASA score candidates with their full details
+5. Top 10 highest-scoring candidates with their full details
 6. Key patterns: which drug types tend to have which AD mechanisms?
 7. Recommendations for Alzheimer's therapy"""
     return """Report structure:
@@ -239,17 +239,17 @@ def ca_structure(is_current: bool) -> str:
 2. Distribution of disease intervention methods
 3. Distribution of mechanisms
 4. NADH activity rate (YES count / total)
-5. Top 10 highest ASA score candidates with their full details
+5. Top 10 highest-scoring candidates with their full details
 6. Key patterns: which modalities tend to have which intervention types?
 7. Recommendations for Alzheimer's therapy via gut-brain axis"""
 
 
-def build_ca_prompt(designer_text: str, delivery_text: str, mechanism_text: str,
-                    is_current: bool, trunc: dict) -> str:
+def build_ranker_prompt(designer_text: str, delivery_text: str, mechanism_text: str,
+                        is_current: bool, trunc: dict) -> str:
     """Ranker (comparison & summary) prompt, with the configured truncations."""
     return (
         "Generate a comprehensive summary report from the 100 candidates below.\n\n"
-        f"{ca_structure(is_current)}\n\n"
+        f"{ranker_structure(is_current)}\n\n"
         "Candidates:\n"
         f"{designer_text[:trunc['designer']]}\n\n"
         "delivery validation:\n"

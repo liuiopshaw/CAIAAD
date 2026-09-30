@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Task: 100 ASA-top materials, predict intervention, mechanism, category.
+Task: 100 top-scoring materials, predict intervention, mechanism, category.
 Auto-starts server, waits for ready, runs pipeline, cleans up.
 ALL agent outputs preserved RAW.
 
 Batch quotas and per-step parameters are externalized to pipeline_config.json
 (--config to override). The default config is the current schema (AD100): the
 designer emits the uniform 13-field current contract from
-output_schema.cda_format_block_current, with no modality or element quotas —
+output_schema.designer_format_block_current, with no modality or element quotas —
 the legacy-modality per-batch format block is only used when a config sets
 "schema" to something else. The pre-Phase-4 nano-only config was deleted (its
 purpose was reproducing the element-steered baseline, which no longer exists).
@@ -15,7 +15,7 @@ purpose was reproducing the element-steered baseline, which no longer exists).
 Pipeline order: coordinator -> designer -> manufacturing -> delivery -> safety -> mechanism -> ranker.
 manufacturing/delivery/safety/mechanism append a JSON subscore tail per material line (raw output
 preserved verbatim); scripts/extract_subscores.py mechanically collects them
-into subscores_<TS>.json for the deterministic ASA engine (asa_scoring.py).
+into subscores_<TS>.json for the deterministic scoring engine (scoring_engine.py).
 """
 
 import os, sys, json, time, subprocess, argparse
@@ -30,8 +30,8 @@ from output_utils import run_dir
 import output_schema
 import pipeline_prompts
 from pipeline_prompts import (
-    batch_focus, cda_format_block_for, split_chunks, build_expert_prompt,
-    coordinator_prompt, designer_prompt, build_ca_prompt, DEFAULT_TOA_GOAL,
+    batch_focus, designer_format_block_for, split_chunks, build_expert_prompt,
+    coordinator_prompt, designer_prompt, build_ranker_prompt, DEFAULT_COORDINATOR_GOAL,
     PROMPT_CHAR_CAP,
 )
 
@@ -230,7 +230,7 @@ if __name__ == "__main__":
         is_current = CFG.get("schema") == "current"
         server_proc = start_server()
         try:
-            fmt_block = output_schema.cda_format_block_current() if is_current else cda_format_block_for(batch_cfg)
+            fmt_block = output_schema.designer_format_block_current() if is_current else designer_format_block_for(batch_cfg)
             chunk = call("designer", designer_prompt(
                 batch_cfg["count"], batch_id, total_batches,
                 batch_focus(batch_cfg), fmt_block, exclusion=args.note),
@@ -271,17 +271,17 @@ if __name__ == "__main__":
         from output_utils import find_run_dir
         TS = int(args.experts_only)
         OUTPUT = find_run_dir(args.experts_only)
-        cda_files = sorted(OUTPUT.glob(f"task100_designer_{TS}_part*.txt"))
-        if not cda_files:
+        designer_files = sorted(OUTPUT.glob(f"task100_designer_{TS}_part*.txt"))
+        if not designer_files:
             raise SystemExit(f"No designer parts found for run {TS} in {OUTPUT}")
-        mat_lines = [l for f in cda_files for l in f.read_text(encoding="utf-8").split("\n") if l.strip() and "|" in l]
+        mat_lines = [l for f in designer_files for l in f.read_text(encoding="utf-8").split("\n") if l.strip() and "|" in l]
         # Redo suffix increments (redo, redo2, redo3...) so previous reruns'
         # raw files are never overwritten (iron rule).
         redo_idx = 1
         while list(OUTPUT.glob(f"task100_manufacturing_{TS}_redo{'' if redo_idx == 1 else redo_idx}_part1.txt")):
             redo_idx += 1
         redo_tag = "" if redo_idx == 1 else str(redo_idx)
-        print(f"EXPERTS-ONLY rerun for run {TS}: {len(mat_lines)} candidate lines from {len(cda_files)} designer parts (suffix redo{redo_tag})")
+        print(f"EXPERTS-ONLY rerun for run {TS}: {len(mat_lines)} candidate lines from {len(designer_files)} designer parts (suffix redo{redo_tag})")
 
         server_proc = start_server()
         try:
@@ -323,16 +323,16 @@ if __name__ == "__main__":
         print("STEP 1: coordinator — Task planning")
         print("=" * 60)
 
-        toa_goal = CFG.get("toa_goal", DEFAULT_TOA_GOAL)
-        toa_raw = call("coordinator", coordinator_prompt(toa_goal),
-                       max_tokens=CFG["coordinator"]["max_tokens"],
-                       temp=CFG["coordinator"]["temperature"])
-        save(f"task100_coordinator_{TS}.txt", toa_raw)
+        coordinator_goal = CFG.get("coordinator_goal", DEFAULT_COORDINATOR_GOAL)
+        coordinator_raw = call("coordinator", coordinator_prompt(coordinator_goal),
+                               max_tokens=CFG["coordinator"]["max_tokens"],
+                               temp=CFG["coordinator"]["temperature"])
+        save(f"task100_coordinator_{TS}.txt", coordinator_raw)
         print("  coordinator done")
         time.sleep(3)  # adapter switch is synchronous now; no unload wait needed
 
         # ============================================================
-        # Step 2: designer designs 100 ASA-top materials (batched)
+        # Step 2: designer designs 100 top-scoring materials (batched)
         # Long single-shot generations pin VRAM at the 24GB ceiling and
         # stall (allocator thrashing). Chunked calls stay in the fast
         # regime (~40 tok/s) and checkpoint one raw file per chunk.
@@ -342,21 +342,21 @@ if __name__ == "__main__":
         total_batches = len(batches)
         total_count = sum(b["count"] for b in batches)
         print("=" * 60)
-        print(f"STEP 2: designer — Design {total_count} ASA-top materials ({total_batches} batches from config)")
+        print(f"STEP 2: designer — Design {total_count} top-scoring materials ({total_batches} batches from config)")
         print("=" * 60)
 
         # 2026-09: subjective steering removed — no element-specific flagship
         # targets, no element-frequency goals. Batches exist only for VRAM chunking.
         # The designer format block is the legacy-modality contract generated
-        # per batch by output_schema.cda_format_block via cda_format_block_for()
+        # per batch by output_schema.designer_format_block via designer_format_block_for()
         # (modality_focus). schema="current" (AD100): single uniform current
         # format block, no element quota.
         is_current = CFG.get("schema") == "current"
-        cda_chunks = []
+        designer_chunks = []
         designed_names = []  # cross-batch anti-duplication (see below)
         for b in batches:
             n = b["batch_id"]
-            fmt_block = output_schema.cda_format_block_current() if is_current else cda_format_block_for(b)
+            fmt_block = output_schema.designer_format_block_current() if is_current else designer_format_block_for(b)
             # With per-prompt seeds the batches are decorrelated, but the model
             # still gravitates to the same famous candidates. Give later
             # batches the names already produced and forbid repeats
@@ -372,39 +372,39 @@ if __name__ == "__main__":
                          max_tokens=b["max_tokens"], temp=CFG["designer"]["temperature"])
             save(f"task100_designer_{TS}_part{n}.txt", chunk)
             print(f"  designer batch {n}/{total_batches} done ({len(chunk)} chars)")
-            cda_chunks.append(chunk)
+            designer_chunks.append(chunk)
             for line in chunk.split("\n"):
                 if "|" in line and "Material_Name" not in line:
                     designed_names.append(line.split("|")[0].strip())
             time.sleep(3)  # adapter switch is synchronous now; no unload wait needed
 
         # In-memory join as downstream INPUT only; raw per-chunk files are the saved outputs
-        cda_raw = "\n".join(cda_chunks)
+        designer_raw = "\n".join(designer_chunks)
 
         # Input hygiene: designer chatter lines (no "|") are kept in the raw files
         # but never fed to the expert agents (they poison chunk quality).
-        mat_lines = [l for l in cda_raw.split("\n") if l.strip() and "|" in l]
+        mat_lines = [l for l in designer_raw.split("\n") if l.strip() and "|" in l]
 
         # ============================================================
         # Step 3: manufacturing scores manufacturability subscores (chunked)
-        # Subscore JSON tail feeds the deterministic ASA engine
-        # (scripts/asa_scoring.py + asa_rubric.json) — raw output unchanged.
+        # Subscore JSON tail feeds the deterministic scoring engine
+        # (scripts/scoring_engine.py + scoring_rubric.json) — raw output unchanged.
         # ============================================================
         print("=" * 60)
         print("STEP 3: manufacturing — Manufacturability subscores")
         print("=" * 60)
 
-        apa_chunks = []
+        manufacturing_chunks = []
         for n, part in enumerate(split_chunks(mat_lines, CFG["manufacturing"]["chunks"]), start=1):
             if not part:
                 continue
             part_text = "\n".join(part)
             chunk, jfrac, retried = call_expert("manufacturing", build_expert_prompt("manufacturing", part_text, is_current), f"task100_manufacturing_{TS}", n, CFG["manufacturing"]["max_tokens"], CFG["manufacturing"]["temperature"], part_lines=part, is_current=is_current)
             print(f"  manufacturing chunk {n} done ({len(chunk)} chars, json={jfrac:.0%}{' after retry' if retried else ''})")
-            apa_chunks.append(chunk)
+            manufacturing_chunks.append(chunk)
             time.sleep(3)
 
-        apa_raw = "\n".join(apa_chunks)
+        manufacturing_raw = "\n".join(manufacturing_chunks)
 
         # ============================================================
         # Step 4: delivery scores target-tissue delivery efficiency (chunked)
@@ -413,17 +413,17 @@ if __name__ == "__main__":
         print("STEP 4: delivery — Target-tissue delivery subscores")
         print("=" * 60)
 
-        epa_chunks = []
+        delivery_chunks = []
         for n, part in enumerate(split_chunks(mat_lines, CFG["delivery"]["chunks"]), start=1):
             if not part:
                 continue
             part_text = "\n".join(part)
             chunk, jfrac, retried = call_expert("delivery", build_expert_prompt("delivery", part_text, is_current), f"task100_delivery_{TS}", n, CFG["delivery"]["max_tokens"], CFG["delivery"]["temperature"], part_lines=part, is_current=is_current)
             print(f"  delivery chunk {n} done ({len(chunk)} chars, json={jfrac:.0%}{' after retry' if retried else ''})")
-            epa_chunks.append(chunk)
+            delivery_chunks.append(chunk)
             time.sleep(3)
 
-        epa_raw = "\n".join(epa_chunks)
+        delivery_raw = "\n".join(delivery_chunks)
 
         # ============================================================
         # Step 5: safety scores biosafety subscores (chunked)
@@ -432,17 +432,17 @@ if __name__ == "__main__":
         print("STEP 5: safety — Biosafety subscores")
         print("=" * 60)
 
-        bsa_chunks = []
+        safety_chunks = []
         for n, part in enumerate(split_chunks(mat_lines, CFG["safety"]["chunks"]), start=1):
             if not part:
                 continue
             part_text = "\n".join(part)
             chunk, jfrac, retried = call_expert("safety", build_expert_prompt("safety", part_text, is_current), f"task100_safety_{TS}", n, CFG["safety"]["max_tokens"], CFG["safety"]["temperature"], part_lines=part, is_current=is_current)
             print(f"  safety chunk {n} done ({len(chunk)} chars, json={jfrac:.0%}{' after retry' if retried else ''})")
-            bsa_chunks.append(chunk)
+            safety_chunks.append(chunk)
             time.sleep(3)
 
-        bsa_raw = "\n".join(bsa_chunks)
+        safety_raw = "\n".join(safety_chunks)
 
         # ============================================================
         # Step 6: mechanism explains mechanisms (chunked)
@@ -451,17 +451,17 @@ if __name__ == "__main__":
         print("STEP 6: mechanism — Mechanism and intervention analysis")
         print("=" * 60)
 
-        mma_chunks = []
+        mechanism_chunks = []
         for n, part in enumerate(split_chunks(mat_lines, CFG["mechanism"]["chunks"]), start=1):
             if not part:
                 continue
             part_text = "\n".join(part)
             chunk, jfrac, retried = call_expert("mechanism", build_expert_prompt("mechanism", part_text, is_current), f"task100_mechanism_{TS}", n, CFG["mechanism"]["max_tokens"], CFG["mechanism"]["temperature"], part_lines=part, is_current=is_current)
             print(f"  mechanism chunk {n} done ({len(chunk)} chars, json={jfrac:.0%}{' after retry' if retried else ''})")
-            mma_chunks.append(chunk)
+            mechanism_chunks.append(chunk)
             time.sleep(3)
 
-        mma_raw = "\n".join(mma_chunks)
+        mechanism_raw = "\n".join(mechanism_chunks)
 
         # ============================================================
         # Step 7: ranker produces final ranked summary
@@ -471,10 +471,10 @@ if __name__ == "__main__":
         print("=" * 60)
 
         trunc = CFG["ranker"]["input_truncation"]
-        ca_raw = call("ranker", build_ca_prompt(cda_raw, epa_raw, mma_raw, is_current, trunc),
-                      max_tokens=CFG["ranker"]["max_tokens"],
-                      temp=CFG["ranker"]["temperature"])
-        save(f"task100_ranker_{TS}.txt", ca_raw)
+        ranker_raw = call("ranker", build_ranker_prompt(designer_raw, delivery_raw, mechanism_raw, is_current, trunc),
+                          max_tokens=CFG["ranker"]["max_tokens"],
+                          temp=CFG["ranker"]["temperature"])
+        save(f"task100_ranker_{TS}.txt", ranker_raw)
 
         print(f"\n{'='*60}")
         print("PIPELINE COMPLETE")

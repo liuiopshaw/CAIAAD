@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Output schema — single source of truth for the CDA output contract.
+Output schema — single source of truth for the designer output contract.
 
 The current pipeline emits the 13-field AD100 contract (FIELDS_CURRENT);
 the retired legacy layouts (FIELDS_LEGACY 11-field, FIELDS_LEGACY_MODALITY
@@ -16,6 +16,13 @@ VERBATIM, and fields that do not exist in the old record are filled with "NA".
 # Field definitions
 # ---------------------------------------------------------------------------
 
+# Self-score column header. Current runs emit SELF_SCORE; historical run files
+# carry the literal LEGACY_SELF_SCORE header (see the legacy layouts below) —
+# normalize_record maps the legacy header to SELF_SCORE so downstream
+# consumers have a single canonical key for both eras.
+SELF_SCORE = "Self_Score(1-10)"
+LEGACY_SELF_SCORE = "ASA_Score(1-10)"
+
 # Retired legacy-modality contract (13 columns). Material_Category is merged
 # into Modality; fields that do not apply to a record's modality are filled with NA.
 FIELDS_LEGACY_MODALITY = [
@@ -27,7 +34,7 @@ FIELDS_LEGACY_MODALITY = [
     "Ligand",
     "Size_nm",
     "Core_Elements",
-    "ASA_Score(1-10)",
+    LEGACY_SELF_SCORE,
     "Disease_Intervention",
     "Mechanism",
     "NADH_Activity(YES/NO)",
@@ -42,7 +49,7 @@ FIELDS_LEGACY = [
     "Size_nm",
     "Core_Elements",
     "Material_Category",
-    "ASA_Score(1-10)",
+    LEGACY_SELF_SCORE,
     "Disease_Intervention",
     "Mechanism",
     "NADH_Activity(YES/NO)",
@@ -95,8 +102,8 @@ MODALITY_FIELD_GUIDE = {
 # Prompt generation
 # ---------------------------------------------------------------------------
 
-def cda_format_block(modality_focus: "str | None" = None) -> str:
-    """Field-spec text block for CDA prompts (legacy-modality contract).
+def designer_format_block(modality_focus: "str | None" = None) -> str:
+    """Field-spec text block for designer prompts (legacy-modality contract).
 
     modality_focus: one of MODALITIES, or None for a mixed-modality batch.
     """
@@ -150,7 +157,12 @@ def normalize_record(cells: "list[str]") -> "dict | None":
 
     Returns None for unrecognized column counts. Mechanical relocation only:
     legacy Material_Category moves into Modality verbatim; SMILES/Target_UniProt
-    are filled with "NA" for legacy records.
+    are filled with "NA" for legacy records. The self-score field is keyed
+    canonically as SELF_SCORE ("Self_Score(1-10)") in the returned dict —
+    historical files carry the LEGACY_SELF_SCORE header ("ASA_Score(1-10)")
+    at the same position, and that legacy header is accepted as an alias and
+    mapped to the canonical key here (parsing is positional, so both eras
+    parse transparently).
     """
     cells = list(cells)
     n = len(cells)
@@ -168,7 +180,9 @@ def normalize_record(cells: "list[str]") -> "dict | None":
 
     n = len(cells)
     if n == len(FIELDS_LEGACY_MODALITY):  # 13 — already legacy-modality
-        return dict(zip(FIELDS_LEGACY_MODALITY, cells))
+        rec = dict(zip(FIELDS_LEGACY_MODALITY, cells))
+        rec[SELF_SCORE] = rec.pop(LEGACY_SELF_SCORE)  # legacy header -> canonical key
+        return rec
 
     if n == len(FIELDS_LEGACY):  # 11 — legacy
         rec = dict(zip(FIELDS_LEGACY, cells))
@@ -181,7 +195,8 @@ def normalize_record(cells: "list[str]") -> "dict | None":
             "Ligand": rec["Ligand"],
             "Size_nm": rec["Size_nm"],
             "Core_Elements": rec["Core_Elements"],
-            "ASA_Score(1-10)": rec["ASA_Score(1-10)"],
+            # legacy header "ASA_Score(1-10)" mapped to the canonical key
+            SELF_SCORE: rec[LEGACY_SELF_SCORE],
             "Disease_Intervention": rec["Disease_Intervention"],
             "Mechanism": rec["Mechanism"],
             "NADH_Activity(YES/NO)": rec["NADH_Activity(YES/NO)"],
@@ -208,7 +223,7 @@ FIELDS_CURRENT = [
     "Ligand",
     "Size_nm",
     "Core_Elements",
-    "ASA_Score(1-10)",
+    SELF_SCORE,
     "Key_Features",
 ]
 
@@ -251,8 +266,8 @@ DRUG_TYPE_FIELD_GUIDE = {
 }
 
 
-def cda_format_block_current() -> str:
-    """Field-spec text block for CDA prompts (current / AD100 contract)."""
+def designer_format_block_current() -> str:
+    """Field-spec text block for designer prompts (current / AD100 contract)."""
     lines = [
         "For EACH candidate, output ONE line with ALL these fields, pipe-separated:",
         "",
@@ -294,6 +309,10 @@ def parse_record_current(cells: "list[str]") -> "dict | None":
       13 cells = current (no NADH; user requirement)
       14 cells = legacy run with NADH_Activity — NADH cell dropped
       12 cells = ligand folded into Material_Name, Ligand field dropped
+    The self-score cell is positional: current runs emit the SELF_SCORE header
+    ("Self_Score(1-10)") while historical run files carry the legacy
+    LEGACY_SELF_SCORE header ("ASA_Score(1-10)") — both are accepted and the
+    returned dict is always keyed canonically as SELF_SCORE.
     Empty fields are never invented.
     """
     cells = list(cells)
