@@ -42,6 +42,5 @@
     "manufacturability": "Manufacturing QC & precise tunability (25%)",
     "biosafety": "Biosafety (20%)"
   },
-  "standard_source": "rubric/rubric.md (neutral six-dimension framework, no subjective bonuses)",
-  "notes": "Subjective bonuses removed (mechanism_bonus/pattern_bonus deleted): ranking is pure deterministic weighted subscores + Cj consistency. No mechanism- or name-pattern-based additions."
+  "standard_source": "rubric/rubric.md (neutral six-dimension framework)"
 }

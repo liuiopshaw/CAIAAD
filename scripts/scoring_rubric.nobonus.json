@@ -42,5 +42,5 @@
     "manufacturability": "Manufacturing QC & precise tunability (25%)",
     "biosafety": "Biosafety (20%)"
   },
-  "standard_source": "rubric/rubric.md (neutral six-dimension framework, no subjective bonuses)"
+  "standard_source": "rubric/rubric.md (neutral six-dimension framework)"
 }

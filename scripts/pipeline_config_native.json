@@ -1,6 +1,5 @@
 {
   "schema": "current",
-  "notes": "NATIVE base-model run : NO steering of any kind — no flagship batch, no gut-microbiome emphasis, no element/direction-specific steering, no mechanism/pattern bonus at ranking. Batches exist only for VRAM chunking; focuses are neutral. Keeps only the current output contract (4-dim classification) and anti-hallucination hygiene rules. | Pure base-model run, zero steering, zero quota; ranking uses scoring_rubric.nobonus.json (axes without bonuses).",
   "coordinator_goal": "Predict 100 drug candidates for Alzheimer's disease therapy. Classify every candidate along four dimensions: drug type, target category, action mode, and AD therapeutic mechanism. Assess delivery efficiency, accessibility, biosafety, multi-target synergy and effect durability, analyze mechanisms, and produce a ranked summary report.",
   "coordinator": {
     "max_tokens": 2048,

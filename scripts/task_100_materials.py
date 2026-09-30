@@ -345,8 +345,6 @@ if __name__ == "__main__":
         print(f"STEP 2: designer — Design {total_count} top-scoring materials ({total_batches} batches from config)")
         print("=" * 60)
 
-        # 2026-09: subjective steering removed — no element-specific flagship
-        # targets, no element-frequency goals. Batches exist only for VRAM chunking.
         # The designer format block is the legacy-modality contract generated
         # per batch by output_schema.designer_format_block via designer_format_block_for()
         # (modality_focus). schema="current" (AD100): single uniform current

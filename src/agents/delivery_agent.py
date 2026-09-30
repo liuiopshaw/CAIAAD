@@ -10,8 +10,7 @@ class DeliveryAgent(BaseAgent):
 
     Assesses whether an AD therapeutic effectively reaches its site of action
     (barrier penetration & bioavailability, targeting & designability, exposure
-    durability). Scoring follows the shared rubric anchors; no subjective bonus
-    points.
+    durability). Scoring follows the shared rubric anchors.
     """
 
     def __init__(self, llm):

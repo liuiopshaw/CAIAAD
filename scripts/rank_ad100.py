@@ -149,9 +149,8 @@ def main():
         rubric, score_map = compute_score_map(payload, args.rubric)
 
     def sort_key(rec):
-        # No subjective bonuses: ranking is pure Score_Adj (deterministic
-        # weighted subscores + Cj consistency), or designer self-report when a run
-        # has no subscores.
+        # Ranking is pure Score_Adj (deterministic weighted subscores +
+        # Cj consistency), or designer self-report when a run has no subscores.
         if score_map is not None:
             res = score_map.get(rec[NAME])
             if res is not None:
