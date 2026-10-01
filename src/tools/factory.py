@@ -15,8 +15,6 @@ literature extraction, material design, material assessment, etc.).
 from src.tools.crewai_materials_project_tool import materials_project_tool
 # CrewAI wrapper tool for the PubChem database
 from src.tools.crewai_pubchem_tool import pubchem_tool
-# CrewAI tool for PNEC (Predicted No-Effect Concentration) environmental risk assessment
-from src.tools.crewai_pnec_tool import CrewAIPNECTool
 # CrewAI tool for data format validation (purely local validation, no external API calls)
 from src.tools.crewai_data_validator_tool import CrewAIDataValidatorTool
 # Three CrewAI tools for the MolPort chemical supplier database
@@ -39,12 +37,11 @@ class ToolFactory:
     @staticmethod
     def create_operation_guidance_tools():
         """
-        Create the operation guidance tool set — for use by operation_suggesting_agent.
+        Create the operation guidance tool set.
 
         Matched to task requirements:
         - pubchem: chemical safety data
         - materials_project: material cost data
-        - PNEC: environmental impact data
 
         Returns:
             list: list of operation guidance tool instances
@@ -52,7 +49,6 @@ class ToolFactory:
         tools = [
             pubchem_tool,                  # chemical safety data (meets task requirements)
             materials_project_tool,        # material cost data (meets task requirements)
-            CrewAIPNECTool(),              # environmental impact assessment (meets task requirements)
         ]
         return tools
 
@@ -135,8 +131,8 @@ class ToolFactory:
     @staticmethod
     def create_unified_assessment_tools():
         """
-        Create the unified assessment tool set — shared by the three
-        expert Agents Expert A/B/C.
+        Create the unified assessment tool set — shared by the expert scoring
+        agents (manufacturing, delivery, safety).
 
         Strategy (Less is More):
         - Remove MaterialIdentifier/StructureValidator (call MP+PubChem, highly redundant)
@@ -147,15 +143,14 @@ class ToolFactory:
         - Multi-Target Synergy Potential (15%)          -> pubchem / materials_project (activity and target data)
         - Effect Duration (10%)                         -> pubchem (half-life / release-related data)
         - Manufacturing QC & Precise Tunability (25%)   -> molport (commercial availability), materials_project (phase structure)
-        - Biosafety (20%)                               -> pubchem (toxicity data), PNEC (environmental risk assessment)
+        - Biosafety (20%)                               -> pubchem (toxicity data)
 
         Returns:
             list: list of unified assessment tool instances
         """
         tools = [
-            materials_project_tool,          # material structure, electronic structure, stability (catalytic performance + technical feasibility)
+            materials_project_tool,          # material structure, electronic structure, stability (technical feasibility)
             pubchem_tool,                    # chemical properties, toxicity, structure validation (structural rationality)
-            CrewAIPNECTool(),                # environmental risk assessment (independent API, environmental friendliness)
             molport_availability_tool,       # commercial availability (independent API, economic feasibility)
         ]
         return tools

@@ -262,8 +262,7 @@ async def orchestrate_stream(message: str, session_id: str, workspace: str):
                 wanted = plan_obj.get("agents_needed") or []
                 answer_agent = next(
                     (a for a in wanted if a in VALID_ANSWER_AGENTS), "ranker")
-                yield emit({"type": "agent_start", "agent": answer_agent,
-                            "batch": 1})
+                yield emit({"type": "agent_start", "agent": answer_agent})
                 answer = await call_agent(
                     client, answer_agent,
                     DIRECT_ANSWER_TEMPLATE.format(message=message),
@@ -373,7 +372,7 @@ async def agent_chat_stream(message: str, agent: str, session_id: str,
         })
         save_session(sess)
 
-    yield emit({"type": "agent_start", "agent": agent, "batch": 1})
+    yield emit({"type": "agent_start", "agent": agent})
     try:
         async with httpx.AsyncClient() as client:
             answer = await call_agent(client, agent, direct_prompt(agent, message),

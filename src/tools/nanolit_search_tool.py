@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-NanoLitSearchTool — PubMed literature search for nanomaterial/nanozyme topics.
+NanoLitSearchTool — PubMed literature search for nanomaterial / AD-therapy topics.
 
 Uses NCBI E-utilities (esearch + esummary). No API key required, but
 NCBI_API_KEY (env) raises the rate limit from 3 to 10 requests/sec.
 
 Public interface:
     tool = NanoLitSearchTool()
-    result = tool.run(query="nanozyme NADH oxidase", query_type="comprehensive")
+    result = tool.run(query="nanoparticle Alzheimer's therapy", query_type="comprehensive")
 
 Returns a JSON-serializable dict; failures are reported as
 {"success": False, "error": ...} rather than raising.
@@ -27,10 +27,10 @@ EUTILS_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 
 
 class NanoLitSearchTool:
-    """Search PubMed for nanomaterial / nanozyme literature."""
+    """Search PubMed for nanomaterial / AD-therapy literature."""
 
     name = "nanolit_search"
-    description = "Search PubMed for nanomaterial and nanozyme literature"
+    description = "Search PubMed for nanomaterial and AD-therapy literature"
 
     def __init__(self, max_results: int = 10, timeout: int = 30):
         self.max_results = max_results
@@ -140,7 +140,7 @@ class NanoLitSearchTool:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     tool = NanoLitSearchTool(max_results=3)
-    result = tool.run(query="nanozyme NADH oxidase")
+    result = tool.run(query="nanoparticle Alzheimer's therapy")
     print(f"success={result['success']} count={result.get('count')}")
     for art in result.get("results", []):
         print(f"  [{art['pmid']}] {art['title'][:80]}")

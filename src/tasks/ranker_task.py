@@ -19,8 +19,8 @@ class RankerTask:
             "  Sj = W̄j × Cj\n\n"
             "Rank materials by comprehensive score Sj. Produce comparison matrix, "
             "radar chart data, rankings, and top recommendation with:\n"
-            "- Selective antibacterial mechanism explanation\n"
-            "- Gut-brain axis pathway for Alzheimer's therapy potential\n"
+            "- Multi-target mechanism explanation\n"
+            "- AD therapeutic pathway rationale\n"
             "- Organ-specific safety profile\n\n"
             "Sj ≥ 7.0 passes the threshold for strong recommendation."
         )

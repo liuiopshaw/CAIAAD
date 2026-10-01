@@ -53,6 +53,7 @@ class Config:
     # ---- Temperatures for the caiaad evaluation system scoring agents ----
     DELIVERY_TEMPERATURE = float(os.getenv("DELIVERY_TEMPERATURE", "0.3"))
     SAFETY_TEMPERATURE = float(os.getenv("SAFETY_TEMPERATURE", "0.3"))
+    MANUFACTURING_TEMPERATURE = float(os.getenv("MANUFACTURING_TEMPERATURE", "0.3"))
     RANKER_TEMPERATURE = float(os.getenv("RANKER_TEMPERATURE", "0.1"))
 
     # --- Language configuration ---

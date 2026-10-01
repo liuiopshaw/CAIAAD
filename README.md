@@ -7,9 +7,10 @@ A multi-agent system for Alzheimer's disease (AD) therapeutic candidate design a
 
 ## Features
 
-- 🤖 **Specialized agents** — task orchestration (coordinator), creative design (designer), manufacturability scoring (manufacturing), delivery-efficiency scoring (delivery), biosafety (safety), mechanism mining (mechanism), comparison/ranking (ranker)
+- 🤖 **Specialized agents** — task orchestration (coordinator), creative design (designer), knowledge extraction from text/literature (extractor), manufacturability scoring (manufacturing), delivery-efficiency scoring (delivery), biosafety (safety), mechanism mining (mechanism), comparison/ranking (ranker)
 - 🔬 **Per-agent LoRA adapters** — one base model loaded once; adapters switched per request by `scripts/model_server.py` (FastAPI, OpenAI-compatible)
 - ☁️ **Per-agent hosted-LLM routing** — any agent can be rerouted to a hosted OpenAI-compatible API via `scripts/llm_endpoints.json`, no code changes (coordinator and extractor are routed out of the box; the model name and key live in `.env`)
+- 🖥️ **Web chat UI** — SSE orchestration with per-step agent cards, session history, a workspace picker (raw outputs are written there), and a direct-consultation mode that calls any single agent without the full pipeline (`scripts/web_server.py` + `scripts/static/index.html`)
 - 📊 **Blind benchmark suite** — AD-TxBench-100 (drug scoring) with harness-vs-prompt and LoRA-vs-base 2×2 protocols, rubric anchoring, AD-relevance gating, anonymization, and deterministic scoring
 - 📐 **Deterministic scoring engine** — agent subscores are mechanically extracted and fused by `scripts/scoring_engine.py` with the weights in `scripts/scoring_rubric.json`; changing the rubric re-scores historical runs without re-running any agent
 
@@ -28,10 +29,14 @@ python scripts/task_100_materials.py --config scripts/pipeline_config.json
 
 # 2b. Web chat entry (SSE orchestration, chat-style UI)
 python scripts/web_server.py            # port 8001 (CAIAAD_WEB_PORT to override)
+#    coordinator mode runs the full pipeline as agent cards;
+#    the Agent selector switches to direct single-agent consultation;
+#    the sidebar workspace picker chooses where raw outputs are written
 
 # 3. Deterministic ranking (no agent involved; raw outputs never modified)
 python scripts/extract_subscores.py <TS>
 python scripts/rank_ad100.py <TS> --rubric scripts/scoring_rubric.json
+python scripts/rank_to_excel.py <TS>   # Excel export (Ranking / Run Metrics / Type_Top5)
 ```
 
 ## Hosted LLM routing per agent

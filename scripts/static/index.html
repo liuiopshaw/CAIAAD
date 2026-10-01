@@ -159,7 +159,7 @@
       <div class="wrap">
         <div id="empty-hint">
           <h1>CAIAAD</h1>
-          <p>Enter a research need — the coordinator runs the full pipeline (planning → creative design → antibacterial / enzyme-activity / safety evaluation → mechanism analysis → summary report).</p>
+          <p>Enter a research need — the coordinator runs the full pipeline (planning → creative design → delivery / manufacturing / safety evaluation → mechanism analysis → summary report).</p>
           <p style="margin-top:6px">Switch the <b>Agent</b> selector below to consult a single specialist directly; agent outputs are written to the workspace shown in the sidebar.</p>
         </div>
         <div id="messages"></div>
@@ -317,12 +317,15 @@
     var agentCards = {};   // key: agent or agent#batch -> card
     function agentKey(agent, batch) {
       // batched agent (designer) gets one card per batch; chunked agents
-      // (manufacturing/delivery/safety/mechanism) merge into one card
+      // (manufacturing/delivery/safety/mechanism) merge into one card;
+      // direct single-agent answers carry no batch
+      if (batch === undefined || batch === null) return agent;
       return agent === "designer" ? agent + "#" + batch : agent;
     }
     function agentTitle(agent, batch) {
       var name = AGENT_NAMES[agent] || agent;
-      return agent === "designer" ? name + " · batch " + batch : name;
+      return agent === "designer" && batch !== undefined && batch !== null
+        ? name + " · batch " + batch : name;
     }
     function getAgentCard(agent, batch) {
       var key = agentKey(agent, batch);
@@ -358,7 +361,7 @@
         summaryCard.body.appendChild(md);
         area.appendChild(summaryCard.root);
       } else if (ev.type === "direct_answer") {
-        var acard = getAgentCard(ev.agent, 1);
+        var acard = getAgentCard(ev.agent, undefined);
         acard.setStatus("done", "Direct answer");
         var amd = el("div", "md");
         amd.innerHTML = renderMarkdown(ev.content || "");
@@ -412,7 +415,20 @@
 
       function pump() {
         return reader.read().then(function (r) {
-          if (r.done) { setGenerating(false); return; }
+          if (r.done) {
+            // flush any trailing block that was not terminated by a blank line
+            buf += decoder.decode();
+            var tail = buf.trim();
+            if (tail) {
+              tail.split("\n").forEach(function (line) {
+                if (line.indexOf("data: ") === 0) {
+                  try { handleEvent(JSON.parse(line.slice(6))); } catch (e) { /* ignore malformed lines */ }
+                }
+              });
+            }
+            setGenerating(false);
+            return;
+          }
           buf += decoder.decode(r.value, { stream: true });
           var idx;
           while ((idx = buf.indexOf("\n\n")) >= 0) {

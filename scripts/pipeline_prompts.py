@@ -18,11 +18,10 @@ import output_schema  # noqa: E402
 
 DEFAULT_COORDINATOR_GOAL = (
     "Design 100 candidates spanning nanomaterials, small-molecule drugs, and "
-    "biologics, with AD-relevant mechanisms as the priority — selective direct "
-    "antibacterial action and gut-microbiome remodeling alongside small molecules "
-    "and biologics targeting amyloid/tau/neuroinflammation pathways. Validate "
-    "NADH oxidase-like activity, assess antibacterial performance and biosafety, "
-    "analyze mechanisms, and produce a ranked summary report."
+    "biologics for Alzheimer's disease therapy, freely distributed across all "
+    "modalities and mechanisms. Assess delivery efficiency, multi-target "
+    "synergy, effect durability, manufacturability, and biosafety; analyze "
+    "mechanisms, and produce a ranked summary report."
 )
 
 
@@ -106,8 +105,7 @@ Output in the same pipe-separated format: append a semicolon and a JSON object w
 ...original line...; {{"delivery_efficiency": 8}}
 The JSON object is MANDATORY — every line MUST contain exactly one JSON object."""
         return f"""Review and validate the following candidate list. For each candidate:
-1. Verify the NADH activity prediction (YES/NO) with reasoning
-2. Score TARGET-TISSUE DELIVERY EFFICIENCY (target-tissue delivery efficiency, 1-10): how efficiently the candidate reaches its intended target tissue — for gut-targeted candidates consider stability in GI tract, mucosal retention, size/ligand effects; for CNS candidates consider BBB penetration, bioavailability (10 = most efficient delivery).
+1. Score TARGET-TISSUE DELIVERY EFFICIENCY (target-tissue delivery efficiency, 1-10): how efficiently the candidate reaches its intended target tissue — for gut-targeted candidates consider stability in GI tract, mucosal retention, size/ligand effects; for CNS candidates consider BBB penetration, bioavailability (10 = most efficient delivery).
 
 Candidates:
 {part_text}
@@ -185,7 +183,7 @@ def coordinator_prompt(coordinator_goal: str, needs_pipeline: bool = False) -> s
     )
 
 
-DIRECT_ANSWER_TEMPLATE = """You are an expert assistant of the CAIAAD multi-agent system (Alzheimer's gut-brain-axis intervention discovery spanning nanomaterials, small-molecule drugs, and biologics).
+DIRECT_ANSWER_TEMPLATE = """You are an expert assistant of the CAIAAD multi-agent system (Alzheimer's disease therapeutic evaluation spanning nanomaterials, small-molecule drugs, and biologics).
 
 Answer the user's request directly and concisely, in the user's language. If the question is about the system's agents or workflow, answer accurately from this roster: coordinator (task orchestration/routing), designer (candidate design), manufacturing (manufacturability / production-QC scoring), delivery (target-tissue delivery efficiency), safety (biosafety), mechanism (mechanism mining), ranker (comparison & summary).
 
@@ -206,8 +204,9 @@ def designer_prompt(count: int, n: int, total_batches: int, focus: str,
     """Designer (candidate generation) prompt for one batch."""
     return (
         f"Design {count} candidates that have been REPORTED in peer-reviewed "
-        "literature and achieve HIGH comprehensive scores (combining "
-        "antibacterial, enzyme-like activity, and biosafety).\n\n"
+        "literature and achieve HIGH comprehensive scores (combining delivery "
+        "efficiency, multi-target synergy, effect durability, manufacturability, "
+        "and biosafety).\n\n"
         f"This is batch {n} of {total_batches} — {focus}{exclusion}\n\n"
         f"{format_block}"
     )
@@ -231,10 +230,10 @@ def ranker_structure(is_current: bool) -> str:
 1. Total count by Modality (nanocluster/nanoparticle/single_atom/dual_atom/small_molecule/biologic)
 2. Distribution of disease intervention methods
 3. Distribution of mechanisms
-4. NADH activity rate (YES count / total)
+4. Self-score distribution (average Self_Score and range)
 5. Top 10 highest-scoring candidates with their full details
 6. Key patterns: which modalities tend to have which intervention types?
-7. Recommendations for Alzheimer's therapy via gut-brain axis"""
+7. Recommendations for Alzheimer's therapy"""
 
 
 def build_ranker_prompt(designer_text: str, delivery_text: str, mechanism_text: str,

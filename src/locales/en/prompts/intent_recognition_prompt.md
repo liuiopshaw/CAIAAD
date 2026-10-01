@@ -79,7 +79,7 @@ Analyze the user's requirement and determine:
 ## Examples
 
 ### Example 1
-**User**: "Please design a novel nanozyme therapeutic for Alzheimer's disease"
+**User**: "Please design a novel nanomaterial therapeutic for Alzheimer's disease"
 
 **Output**:
 ```json

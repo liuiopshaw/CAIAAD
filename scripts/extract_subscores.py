@@ -19,11 +19,6 @@ Axis mapping: manufacturing->manufacturability, delivery->delivery_efficiency,
 safety->biosafety, mechanism->multi_target_synergy+durability
 (scripts/scoring_rubric.json axis names).
 
-NOTE: agent ids were renamed 2026-09 (apa->manufacturing, epa->delivery,
-bsa->safety, mma->mechanism). Output files from older runs use the legacy
-task100_{apa,epa,bsa,mma}_ prefixes and are NOT picked up by the globs below;
-re-extracting subscores from a legacy run requires renaming those files first.
-
 Usage: python scripts/extract_subscores.py [timestamp]
 """
 

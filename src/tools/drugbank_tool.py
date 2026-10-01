@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-DrugBank API wrapper for pharmacology, gut metabolism, enzyme benchmarking,
+DrugBank API wrapper for pharmacology, gut metabolism,
 and drug-microbiome interaction data.
 """
 
@@ -17,8 +17,6 @@ class DrugBankTool:
 
     Query modes:
     - gut_metabolism: Gut microbiota metabolism pathways for a compound
-    - enzyme_benchmark: Kinetic parameters of natural enzymes (CAT, SOD, NADH oxidase)
-      Used by the delivery agent to compare against nanozyme activity
     - drug_microbiome: Known drug-microbiome interaction records
       Used by the mechanism agent for mechanism analogy
     """
@@ -30,8 +28,6 @@ class DrugBankTool:
     def run(self, query: str, query_type: str = "gut_metabolism") -> dict:
         if query_type == "gut_metabolism":
             return self.query_gut_metabolism(query)
-        elif query_type == "enzyme_benchmark":
-            return self.query_enzyme_benchmark(query)
         elif query_type == "drug_microbiome":
             return self.query_drug_microbiome(query)
         else:
@@ -93,45 +89,6 @@ class DrugBankTool:
                         "reaction": enzyme.get("reaction", "unknown"),
                         "metabolite": enzyme.get("product", "unknown")
                     })
-        return result
-
-    def query_enzyme_benchmark(self, enzyme_name: str) -> dict:
-        """Retrieve natural enzyme kinetic parameters.
-        Target enzymes: Catalase, Superoxide Dismutase, NADH Oxidase.
-        """
-        result = {
-            "enzyme": enzyme_name,
-            "km_value": None,
-            "kcat_value": None,
-            "kcat_km_ratio": None,
-            "optimal_pH": None,
-            "optimal_temperature_C": None,
-            "cofactor": None,
-            "active_site_residues": [],
-            "source": "DrugBank"
-        }
-        if not Config.DRUGBANK_API_KEY:
-            return result
-        search_result = self._make_request(f"search?q={enzyme_name}&type=enzyme")
-        if not search_result:
-            return result
-        hits = search_result.get("hits", [])
-        if not hits:
-            return result
-        enzyme_id = hits[0].get("drugbank_id", "")
-        detail = self._make_request(f"enzymes/{enzyme_id}")
-        if not detail:
-            return result
-        kinetics = detail.get("kinetic_parameters", {})
-        result["km_value"] = kinetics.get("km")
-        result["kcat_value"] = kinetics.get("kcat")
-        if result.get("km_value") and result.get("kcat_value"):
-            result["kcat_km_ratio"] = result["kcat_value"] / result["km_value"]
-        result["optimal_pH"] = detail.get("optimal_ph")
-        result["optimal_temperature_C"] = detail.get("optimal_temperature")
-        result["cofactor"] = detail.get("cofactor")
-        active_site = detail.get("active_site", {})
-        result["active_site_residues"] = active_site.get("residues", [])
         return result
 
     def query_drug_microbiome(self, compound_name: str) -> dict:

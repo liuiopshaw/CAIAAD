@@ -17,7 +17,7 @@ class DeliveryTask(BaseTask):
         "barrier penetration & bioavailability (50%), targeting & designability "
         "(30%), and exposure durability & dosing convenience (20%) — on a 1-10 "
         "scale, relative to its site of action (CNS targets via blood-brain "
-        "barrier penetration, or gut-brain-axis peripheral targets). Base all "
+        "barrier penetration, or peripheral targets). Base all "
         "scores on actual data and state explicitly when evidence is insufficient."
     )
     DEFAULT_EXPECTED_OUTPUT = (
