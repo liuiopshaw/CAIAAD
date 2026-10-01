@@ -80,11 +80,10 @@ def load_records(ts: str):
             cells = [c.strip() for c in line.split("|")]
             if not cells[0] or cells[0] == "Material_Name":
                 continue  # header / nameless line — never a record
-            # Current schema FIRST (same discrimination as compound_lookup.py):
-            # both the legacy-modality and the current layout accept 13-cell
-            # rows, but parse_record_current gates on the Drug_Type enum at
-            # cells[1] while normalize_record would silently misparse a
-            # current row as legacy-modality.
+            # Current schema FIRST: both the legacy-modality and the current
+            # layout accept 13-cell rows, but parse_record_current gates on
+            # the Drug_Type enum at cells[1] while normalize_record would
+            # silently misparse a current row as legacy-modality.
             rec = parse_record_current(cells) or normalize_record(cells)
             if rec is None:
                 continue

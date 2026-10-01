@@ -90,8 +90,8 @@ All agent outputs are saved RAW and unmodified under `outputs/run_<TS>/`; scorin
 │   ├── extract_subscores.py  # mechanical subscore extraction
 │   ├── rank_ad100.py / rank_designer_outputs.py / rank_to_excel.py
 │   ├── benchmark_adtb100.py / compare_adtb100.py / adtb100_aggregate.py
-│   ├── compound_lookup.py / formula_lookup.py   # DB verification of agent identifiers
-│   └── pipeline_config*.json / scoring_rubric*.json
+│   ├── formula_lookup.py     # DB verification of agent identifiers
+│   └── pipeline_config.json / scoring_rubric.json
 ├── src/                      # agent framework + domain tools (CrewAI)
 ├── finetune/                 # (local only, not committed) literature index + training-data builders + trainer
 ├── benchmark/                # AD-TxBench-100
